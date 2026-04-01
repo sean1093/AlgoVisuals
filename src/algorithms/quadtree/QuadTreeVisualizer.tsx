@@ -4,7 +4,6 @@ import { RotateCcw } from 'lucide-react';
 import { QuadTree, Point, Rectangle } from './logic';
 import Button from '../../components/shared/Button';
 import Slider from '../../components/shared/Slider';
-import ControlPanel from '../../components/shared/ControlPanel';
 
 const CANVAS_SIZE = 600;
 
@@ -92,48 +91,77 @@ function QuadTreeVisualizer() {
   const allPoints = quadTree.getAllPoints();
 
   return (
-    <div className="flex flex-col lg:flex-row gap-6">
-      {/* Control Panel */}
-      <div className="lg:w-64 flex-shrink-0">
-        <ControlPanel title="Control Panel">
-          <Slider
-            label="Capacity"
-            value={capacity}
-            min={1}
-            max={10}
-            onChange={handleCapacityChange}
-          />
-          <Button
-            variant="secondary"
-            onClick={handleReset}
-            className="w-full flex items-center justify-center gap-2"
-          >
-            <RotateCcw size={16} />
-            Reset
-          </Button>
-          <div className="text-sm text-gray-600 mt-4 p-3 bg-pastelBlue bg-opacity-20 rounded-lg border border-borderBlue">
-            <p className="font-semibold mb-2">Instructions:</p>
-            <ul className="space-y-1 text-xs">
-              <li>• Click canvas to add points</li>
-              <li>• Hover to view regions</li>
-              <li>• Adjust capacity to change subdivision threshold</li>
+    <div className="flex flex-col lg:flex-row gap-8">
+      {/* Control Panel - Apple Style */}
+      <div className="lg:w-80 flex-shrink-0">
+        <div className="space-y-6">
+          <div className="bg-gray-50 rounded-2xl p-6 space-y-6">
+            <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wider">
+              Controls
+            </h3>
+
+            <Slider
+              label="Capacity"
+              value={capacity}
+              min={1}
+              max={10}
+              onChange={handleCapacityChange}
+            />
+
+            <Button
+              variant="secondary"
+              onClick={handleReset}
+              className="w-full flex items-center justify-center gap-2"
+            >
+              <RotateCcw size={16} />
+              Reset Canvas
+            </Button>
+          </div>
+
+          <div className="bg-gray-50 rounded-2xl p-6 space-y-4">
+            <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wider">
+              Statistics
+            </h3>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <p className="text-xs text-gray-500 font-medium mb-1">Points</p>
+                <p className="text-3xl font-semibold text-gray-900">{allPoints.length}</p>
+              </div>
+              <div>
+                <p className="text-xs text-gray-500 font-medium mb-1">Nodes</p>
+                <p className="text-3xl font-semibold text-gray-900">{allNodes.length}</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-blue-50 rounded-2xl p-6">
+            <h3 className="text-sm font-semibold text-blue-900 mb-3">How to use</h3>
+            <ul className="space-y-2 text-sm text-blue-800">
+              <li className="flex items-start gap-2">
+                <span className="text-blue-500 mt-0.5">•</span>
+                <span>Click canvas to add points</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-blue-500 mt-0.5">•</span>
+                <span>Hover to highlight regions</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-blue-500 mt-0.5">•</span>
+                <span>Adjust capacity to change subdivision threshold</span>
+              </li>
             </ul>
           </div>
-          <div className="text-sm text-gray-600 mt-2 p-2 bg-gray-50 rounded-lg">
-            <p className="text-xs">Points: <span className="font-bold text-borderBlue">{allPoints.length}</span></p>
-            <p className="text-xs">Nodes: <span className="font-bold text-borderBlue">{allNodes.length}</span></p>
-          </div>
-        </ControlPanel>
+        </div>
       </div>
 
-      {/* Canvas */}
+      {/* Canvas - Apple Style */}
       <div className="flex-1 flex items-center justify-center">
         <div className="relative">
           <svg
             ref={svgRef}
             width={CANVAS_SIZE}
             height={CANVAS_SIZE}
-            className="border-2 border-borderGray rounded-xl bg-white cursor-crosshair shadow-soft-md"
+            className="border border-gray-200 rounded-3xl bg-white cursor-crosshair shadow-xl shadow-gray-200/50"
             onClick={handleCanvasClick}
             onMouseMove={handleMouseMove}
             onMouseLeave={handleMouseLeave}
@@ -153,10 +181,10 @@ function QuadTreeVisualizer() {
                   y={node.y}
                   width={node.width}
                   height={node.height}
-                  fill={isHovered ? 'rgba(168, 216, 234, 0.2)' : 'transparent'}
-                  stroke={isHovered ? '#2C5F7C' : '#4A5568'}
-                  strokeWidth={isHovered ? 3 : 1}
-                  className="transition-all duration-150"
+                  fill={isHovered ? 'rgba(59, 130, 246, 0.08)' : 'transparent'}
+                  stroke={isHovered ? '#3B82F6' : '#E5E7EB'}
+                  strokeWidth={isHovered ? 2 : 1}
+                  className="transition-all duration-200"
                 />
               );
             })}
@@ -167,13 +195,14 @@ function QuadTreeVisualizer() {
                 key={i}
                 cx={point.x}
                 cy={point.y}
-                r={5}
-                fill="#A8D8EA"
-                stroke="#2C5F7C"
+                r={6}
+                fill="#3B82F6"
+                stroke="white"
                 strokeWidth={2}
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
                 transition={{ type: "spring", stiffness: 500, damping: 20 }}
+                className="drop-shadow-md"
               />
             ))}
           </svg>
