@@ -1,147 +1,132 @@
-import { motion, useScroll, useTransform } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { getAllAlgorithms } from '../registry';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, BarChart3, GitBranch, Layers } from 'lucide-react';
 
 function LandingPage() {
   const navigate = useNavigate();
   const algorithms = getAllAlgorithms();
-  const { scrollY } = useScroll();
-  const opacity = useTransform(scrollY, [0, 200], [1, 0]);
-  const scale = useTransform(scrollY, [0, 200], [1, 0.95]);
 
   return (
-    <div className="min-h-screen bg-white">
-      {/* Hero Section - Apple Style */}
-      <motion.section
-        style={{ opacity, scale }}
-        className="relative min-h-screen flex items-center justify-center px-6 overflow-hidden"
-      >
-        <div className="max-w-5xl mx-auto text-center space-y-8">
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-            className="text-7xl md:text-8xl lg:text-9xl font-semibold tracking-tight text-gray-900 leading-none"
-          >
-            Algorithm
-            <br />
-            <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              Canvas
-            </span>
-          </motion.h1>
+    <div className="min-h-screen bg-gray-50">
+      {/* Professional Header */}
+      <header className="bg-white border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 bg-blue-600 rounded flex items-center justify-center">
+              <Layers size={20} className="text-white" />
+            </div>
+            <h1 className="text-xl font-semibold text-gray-900">Algorithm Canvas</h1>
+          </div>
+          <nav className="hidden md:flex items-center gap-8">
+            <a href="#algorithms" className="text-sm font-medium text-gray-600 hover:text-gray-900">
+              Algorithms
+            </a>
+            <a href="#features" className="text-sm font-medium text-gray-600 hover:text-gray-900">
+              Features
+            </a>
+          </nav>
+        </div>
+      </header>
 
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
-            className="text-2xl md:text-3xl text-gray-600 font-light max-w-3xl mx-auto leading-relaxed"
-          >
-            Experience data structures and algorithms
-            <br />
-            like never before
-          </motion.p>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
-            className="pt-8"
-          >
+      {/* Hero Section - B2B Professional */}
+      <section className="bg-white border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-6 py-20">
+          <div className="max-w-3xl">
+            <div className="inline-flex items-center gap-2 px-3 py-1 bg-blue-50 text-blue-700 text-sm font-medium rounded-full mb-6">
+              <BarChart3 size={16} />
+              Interactive Visualization Platform
+            </div>
+            <h1 className="text-5xl font-bold text-gray-900 mb-6 leading-tight">
+              Professional algorithm visualization and analysis tools
+            </h1>
+            <p className="text-xl text-gray-600 mb-8 leading-relaxed">
+              Understand complex data structures and algorithms through interactive dashboards.
+              Built for engineers, researchers, and technical teams.
+            </p>
             <button
               onClick={() => {
                 const element = document.getElementById('algorithms');
                 element?.scrollIntoView({ behavior: 'smooth' });
               }}
-              className="group inline-flex items-center gap-2 text-blue-600 text-lg font-medium hover:gap-4 transition-all duration-300"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors"
             >
-              Explore
-              <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
+              View Algorithms
+              <ArrowRight size={18} />
             </button>
-          </motion.div>
+          </div>
         </div>
+      </section>
 
-        {/* Scroll Indicator */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1, duration: 1 }}
-          className="absolute bottom-12 left-1/2 -translate-x-1/2"
-        >
-          <motion.div
-            animate={{ y: [0, 8, 0] }}
-            transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
-            className="w-6 h-10 border-2 border-gray-300 rounded-full flex items-start justify-center p-2"
-          >
-            <motion.div className="w-1 h-2 bg-gray-400 rounded-full" />
-          </motion.div>
-        </motion.div>
-      </motion.section>
+      {/* Features Section */}
+      <section id="features" className="py-16 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="bg-white p-6 rounded-lg border border-gray-200">
+              <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
+                <GitBranch size={20} className="text-blue-600" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">Real-time Visualization</h3>
+              <p className="text-sm text-gray-600">
+                Interactive canvas with real-time updates and visual feedback for algorithm operations
+              </p>
+            </div>
+            <div className="bg-white p-6 rounded-lg border border-gray-200">
+              <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
+                <BarChart3 size={20} className="text-blue-600" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">Performance Metrics</h3>
+              <p className="text-sm text-gray-600">
+                Track algorithm performance with detailed statistics and performance indicators
+              </p>
+            </div>
+            <div className="bg-white p-6 rounded-lg border border-gray-200">
+              <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
+                <Layers size={20} className="text-blue-600" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">Configurable Parameters</h3>
+              <p className="text-sm text-gray-600">
+                Adjust algorithm parameters and see immediate visual feedback on behavior changes
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
 
-      {/* Algorithms Section */}
-      <section id="algorithms" className="py-32 px-6 bg-gray-50">
-        <div className="max-w-7xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-            className="text-center mb-20"
-          >
-            <h2 className="text-5xl md:text-6xl font-semibold text-gray-900 mb-6">
-              Interactive visualizations
-            </h2>
-            <p className="text-xl text-gray-600 font-light max-w-2xl mx-auto">
-              Click, explore, and understand complex algorithms through beautiful animations
-            </p>
-          </motion.div>
+      {/* Algorithms Section - B2B Card Grid */}
+      <section id="algorithms" className="py-16 bg-white border-t border-gray-200">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="mb-8">
+            <h2 className="text-3xl font-bold text-gray-900 mb-2">Available Algorithms</h2>
+            <p className="text-gray-600">Select an algorithm to access the interactive dashboard</p>
+          </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 max-w-6xl mx-auto">
-            {algorithms.map((algo, index) => {
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {algorithms.map((algo) => {
               const Icon = algo.icon;
               return (
-                <motion.div
+                <div
                   key={algo.id}
-                  initial={{ opacity: 0, y: 40 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: "-100px" }}
-                  transition={{
-                    duration: 0.8,
-                    delay: index * 0.2,
-                    ease: [0.16, 1, 0.3, 1]
-                  }}
                   onClick={() => navigate(`/demo/${algo.id}`)}
-                  className="group relative bg-white rounded-3xl overflow-hidden cursor-pointer transition-all duration-500 hover:shadow-2xl hover:shadow-gray-200/50"
+                  className="group bg-white border border-gray-200 rounded-lg p-6 hover:border-blue-500 hover:shadow-md transition-all cursor-pointer"
                 >
-                  {/* Card Content */}
-                  <div className="relative p-12 h-full flex flex-col justify-between min-h-[400px]">
-                    {/* Icon */}
-                    <div className="mb-8">
-                      <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow-lg shadow-blue-500/20">
-                        <Icon size={32} className="text-white" />
-                      </div>
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:bg-blue-100 transition-colors">
+                      <Icon size={24} className="text-blue-600" />
                     </div>
-
-                    {/* Text Content */}
-                    <div className="space-y-4">
-                      <h3 className="text-4xl font-semibold text-gray-900">
-                        {algo.name}
-                      </h3>
-                      <p className="text-lg text-gray-600 leading-relaxed font-light">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between mb-2">
+                        <h3 className="text-lg font-semibold text-gray-900">{algo.name}</h3>
+                        <ArrowRight size={18} className="text-gray-400 group-hover:text-blue-600 group-hover:translate-x-1 transition-all flex-shrink-0" />
+                      </div>
+                      <p className="text-sm text-gray-600 leading-relaxed">
                         {algo.description}
                       </p>
-                    </div>
-
-                    {/* Hover Arrow */}
-                    <div className="mt-8 flex items-center gap-2 text-blue-600 font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                      <span>Explore</span>
-                      <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
+                      <div className="mt-3 inline-flex items-center gap-1 text-sm font-medium text-blue-600">
+                        <span>Open Dashboard</span>
+                      </div>
                     </div>
                   </div>
-
-                  {/* Gradient Overlay on Hover */}
-                  <div className="absolute inset-0 bg-gradient-to-br from-blue-500/0 to-purple-600/0 group-hover:from-blue-500/5 group-hover:to-purple-600/5 transition-all duration-500 pointer-events-none" />
-                </motion.div>
+                </div>
               );
             })}
           </div>
@@ -149,11 +134,17 @@ function LandingPage() {
       </section>
 
       {/* Footer */}
-      <footer className="py-16 px-6 bg-white border-t border-gray-100">
-        <div className="max-w-7xl mx-auto text-center">
-          <p className="text-sm text-gray-500 font-light">
-            Crafted with React, TypeScript, and Framer Motion
-          </p>
+      <footer className="bg-white border-t border-gray-200 py-8">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+            <div className="flex items-center gap-2 text-sm text-gray-600">
+              <span>Built with React, TypeScript, and Framer Motion</span>
+            </div>
+            <div className="flex items-center gap-6 text-sm text-gray-600">
+              <a href="#algorithms" className="hover:text-gray-900">Algorithms</a>
+              <a href="#features" className="hover:text-gray-900">Features</a>
+            </div>
+          </div>
         </div>
       </footer>
     </div>

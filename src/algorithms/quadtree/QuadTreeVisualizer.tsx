@@ -91,121 +91,153 @@ function QuadTreeVisualizer() {
   const allPoints = quadTree.getAllPoints();
 
   return (
-    <div className="flex flex-col lg:flex-row gap-8">
-      {/* Control Panel - Apple Style */}
-      <div className="lg:w-80 flex-shrink-0">
-        <div className="space-y-6">
-          <div className="bg-gray-50 rounded-2xl p-6 space-y-6">
-            <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wider">
-              Controls
-            </h3>
-
-            <Slider
-              label="Capacity"
-              value={capacity}
-              min={1}
-              max={10}
-              onChange={handleCapacityChange}
-            />
-
-            <Button
-              variant="secondary"
-              onClick={handleReset}
-              className="w-full flex items-center justify-center gap-2"
-            >
-              <RotateCcw size={16} />
-              Reset Canvas
-            </Button>
+    <div className="space-y-6">
+      {/* Statistics Cards Row - B2B Dashboard Style */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="bg-white border border-gray-200 rounded-lg p-4">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-sm font-medium text-gray-600">Total Points</span>
+            <div className="w-8 h-8 bg-blue-50 rounded flex items-center justify-center">
+              <span className="text-blue-600 text-xs font-bold">{allPoints.length}</span>
+            </div>
           </div>
+          <div className="text-2xl font-bold text-gray-900">{allPoints.length}</div>
+          <div className="text-xs text-gray-500 mt-1">Active data points</div>
+        </div>
 
-          <div className="bg-gray-50 rounded-2xl p-6 space-y-4">
-            <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wider">
-              Statistics
+        <div className="bg-white border border-gray-200 rounded-lg p-4">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-sm font-medium text-gray-600">Tree Nodes</span>
+            <div className="w-8 h-8 bg-green-50 rounded flex items-center justify-center">
+              <span className="text-green-600 text-xs font-bold">{allNodes.length}</span>
+            </div>
+          </div>
+          <div className="text-2xl font-bold text-gray-900">{allNodes.length}</div>
+          <div className="text-xs text-gray-500 mt-1">Subdivided regions</div>
+        </div>
+
+        <div className="bg-white border border-gray-200 rounded-lg p-4">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-sm font-medium text-gray-600">Capacity</span>
+            <div className="w-8 h-8 bg-purple-50 rounded flex items-center justify-center">
+              <span className="text-purple-600 text-xs font-bold">{capacity}</span>
+            </div>
+          </div>
+          <div className="text-2xl font-bold text-gray-900">{capacity}</div>
+          <div className="text-xs text-gray-500 mt-1">Points per node</div>
+        </div>
+      </div>
+
+      {/* Main Dashboard Layout */}
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        {/* Left Sidebar - Controls */}
+        <div className="lg:col-span-1 space-y-4">
+          <div className="bg-white border border-gray-200 rounded-lg p-5">
+            <h3 className="text-sm font-semibold text-gray-900 mb-4 pb-3 border-b border-gray-200">
+              Configuration
             </h3>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <p className="text-xs text-gray-500 font-medium mb-1">Points</p>
-                <p className="text-3xl font-semibold text-gray-900">{allPoints.length}</p>
-              </div>
-              <div>
-                <p className="text-xs text-gray-500 font-medium mb-1">Nodes</p>
-                <p className="text-3xl font-semibold text-gray-900">{allNodes.length}</p>
-              </div>
+
+            <div className="space-y-5">
+              <Slider
+                label="Node Capacity"
+                value={capacity}
+                min={1}
+                max={10}
+                onChange={handleCapacityChange}
+              />
+
+              <Button
+                variant="secondary"
+                onClick={handleReset}
+                className="w-full flex items-center justify-center gap-2"
+              >
+                <RotateCcw size={16} />
+                Reset
+              </Button>
             </div>
           </div>
 
-          <div className="bg-blue-50 rounded-2xl p-6">
-            <h3 className="text-sm font-semibold text-blue-900 mb-3">How to use</h3>
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-5">
+            <h3 className="text-sm font-semibold text-blue-900 mb-3">Usage Guide</h3>
             <ul className="space-y-2 text-sm text-blue-800">
               <li className="flex items-start gap-2">
-                <span className="text-blue-500 mt-0.5">•</span>
+                <span className="text-blue-600 font-bold">•</span>
                 <span>Click canvas to add points</span>
               </li>
               <li className="flex items-start gap-2">
-                <span className="text-blue-500 mt-0.5">•</span>
-                <span>Hover to highlight regions</span>
+                <span className="text-blue-600 font-bold">•</span>
+                <span>Hover regions to highlight</span>
               </li>
               <li className="flex items-start gap-2">
-                <span className="text-blue-500 mt-0.5">•</span>
-                <span>Adjust capacity to change subdivision threshold</span>
+                <span className="text-blue-600 font-bold">•</span>
+                <span>Adjust capacity threshold</span>
               </li>
             </ul>
           </div>
         </div>
-      </div>
 
-      {/* Canvas - Apple Style */}
-      <div className="flex-1 flex items-center justify-center">
-        <div className="relative">
-          <svg
-            ref={svgRef}
-            width={CANVAS_SIZE}
-            height={CANVAS_SIZE}
-            className="border border-gray-200 rounded-3xl bg-white cursor-crosshair shadow-xl shadow-gray-200/50"
-            onClick={handleCanvasClick}
-            onMouseMove={handleMouseMove}
-            onMouseLeave={handleMouseLeave}
-          >
-            {/* Render all nodes */}
-            {allNodes.map((node, i) => {
-              const isHovered = hoveredNode &&
-                node.x === hoveredNode.x &&
-                node.y === hoveredNode.y &&
-                node.width === hoveredNode.width &&
-                node.height === hoveredNode.height;
+        {/* Main Canvas Area */}
+        <div className="lg:col-span-3">
+          <div className="bg-white border border-gray-200 rounded-lg p-6">
+            <div className="flex items-center justify-between mb-4 pb-4 border-b border-gray-200">
+              <h3 className="text-lg font-semibold text-gray-900">Visualization Canvas</h3>
+              <div className="flex items-center gap-2 text-sm text-gray-600">
+                <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+                <span>Interactive Mode</span>
+              </div>
+            </div>
 
-              return (
-                <rect
-                  key={i}
-                  x={node.x}
-                  y={node.y}
-                  width={node.width}
-                  height={node.height}
-                  fill={isHovered ? 'rgba(59, 130, 246, 0.08)' : 'transparent'}
-                  stroke={isHovered ? '#3B82F6' : '#E5E7EB'}
-                  strokeWidth={isHovered ? 2 : 1}
-                  className="transition-all duration-200"
-                />
-              );
-            })}
+            <div className="flex items-center justify-center">
+              <svg
+                ref={svgRef}
+                width={CANVAS_SIZE}
+                height={CANVAS_SIZE}
+                className="border border-gray-300 rounded-lg bg-gray-50 cursor-crosshair"
+                onClick={handleCanvasClick}
+                onMouseMove={handleMouseMove}
+                onMouseLeave={handleMouseLeave}
+              >
+                {/* Render all nodes */}
+                {allNodes.map((node, i) => {
+                  const isHovered = hoveredNode &&
+                    node.x === hoveredNode.x &&
+                    node.y === hoveredNode.y &&
+                    node.width === hoveredNode.width &&
+                    node.height === hoveredNode.height;
 
-            {/* Render all points */}
-            {allPoints.map((point, i) => (
-              <motion.circle
-                key={i}
-                cx={point.x}
-                cy={point.y}
-                r={6}
-                fill="#3B82F6"
-                stroke="white"
-                strokeWidth={2}
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ type: "spring", stiffness: 500, damping: 20 }}
-                className="drop-shadow-md"
-              />
-            ))}
-          </svg>
+                  return (
+                    <rect
+                      key={i}
+                      x={node.x}
+                      y={node.y}
+                      width={node.width}
+                      height={node.height}
+                      fill={isHovered ? 'rgba(59, 130, 246, 0.1)' : 'transparent'}
+                      stroke={isHovered ? '#3B82F6' : '#D1D5DB'}
+                      strokeWidth={isHovered ? 2 : 1}
+                      className="transition-all duration-150"
+                    />
+                  );
+                })}
+
+                {/* Render all points */}
+                {allPoints.map((point, i) => (
+                  <motion.circle
+                    key={i}
+                    cx={point.x}
+                    cy={point.y}
+                    r={5}
+                    fill="#3B82F6"
+                    stroke="white"
+                    strokeWidth={2}
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ type: "spring", stiffness: 500, damping: 20 }}
+                  />
+                ))}
+              </svg>
+            </div>
+          </div>
         </div>
       </div>
     </div>

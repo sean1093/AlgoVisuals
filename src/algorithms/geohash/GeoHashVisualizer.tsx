@@ -67,193 +67,206 @@ function GeoHashVisualizer() {
   const currentPos = latLngToXY(lat, lng);
 
   return (
-    <div className="flex flex-col lg:flex-row gap-8">
-      {/* Control Panel - Apple Style */}
-      <div className="lg:w-80 flex-shrink-0">
-        <div className="space-y-6">
-          <div className="bg-gray-50 rounded-2xl p-6 space-y-5">
-            <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wider">
-              Location
+    <div className="space-y-6">
+      {/* Statistics Cards Row - B2B Dashboard Style */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="bg-white border border-gray-200 rounded-lg p-4">
+          <div className="text-sm font-medium text-gray-600 mb-2">GeoHash Code</div>
+          <div className="text-xl font-bold text-gray-900 font-mono break-all">{geohash}</div>
+          <div className="text-xs text-gray-500 mt-1">{precision} character precision</div>
+        </div>
+
+        <div className="bg-white border border-gray-200 rounded-lg p-4">
+          <div className="text-sm font-medium text-gray-600 mb-2">Latitude</div>
+          <div className="text-xl font-bold text-gray-900">{lat.toFixed(3)}°</div>
+          <div className="text-xs text-gray-500 mt-1 font-mono">
+            {bounds.minLat.toFixed(4)} ~ {bounds.maxLat.toFixed(4)}
+          </div>
+        </div>
+
+        <div className="bg-white border border-gray-200 rounded-lg p-4">
+          <div className="text-sm font-medium text-gray-600 mb-2">Longitude</div>
+          <div className="text-xl font-bold text-gray-900">{lng.toFixed(3)}°</div>
+          <div className="text-xs text-gray-500 mt-1 font-mono">
+            {bounds.minLng.toFixed(4)} ~ {bounds.maxLng.toFixed(4)}
+          </div>
+        </div>
+
+        <div className="bg-white border border-gray-200 rounded-lg p-4">
+          <div className="text-sm font-medium text-gray-600 mb-2">Precision Level</div>
+          <div className="text-xl font-bold text-gray-900">{precision}/8</div>
+          <div className="text-xs text-gray-500 mt-1">Character length</div>
+        </div>
+      </div>
+
+      {/* Main Dashboard Layout */}
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        {/* Left Sidebar - Controls */}
+        <div className="lg:col-span-1 space-y-4">
+          <div className="bg-white border border-gray-200 rounded-lg p-5">
+            <h3 className="text-sm font-semibold text-gray-900 mb-4 pb-3 border-b border-gray-200">
+              Location Input
             </h3>
 
-            {/* Lat/Lng Input */}
-            <div className="space-y-2">
-              <label className="text-xs font-medium text-gray-600 uppercase tracking-wider">Latitude</label>
-              <input
-                type="number"
-                value={lat}
-                onChange={(e) => setLat(Number(e.target.value))}
-                step="0.001"
-                min="-90"
-                max="90"
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-100 transition-all"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-xs font-medium text-gray-600 uppercase tracking-wider">Longitude</label>
-              <input
-                type="number"
-                value={lng}
-                onChange={(e) => setLng(Number(e.target.value))}
-                step="0.001"
-                min="-180"
-                max="180"
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-100 transition-all"
-              />
-            </div>
-
-            {/* Precision */}
-            <Slider
-              label="Precision"
-              value={precision}
-              min={1}
-              max={8}
-              onChange={setPrecision}
-            />
-
-            {/* Show Neighbors */}
-            <label className="flex items-center gap-3 cursor-pointer group">
-              <input
-                type="checkbox"
-                checked={showNeighbors}
-                onChange={(e) => setShowNeighbors(e.target.checked)}
-                className="w-5 h-5 accent-blue-600 cursor-pointer rounded"
-              />
-              <span className="text-sm font-medium text-gray-700 group-hover:text-gray-900 transition-colors">Show neighbor regions</span>
-            </label>
-          </div>
-
-          {/* GeoHash Result - Apple Style */}
-          <div className="bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl p-6 text-white shadow-lg shadow-blue-500/20">
-            <p className="text-xs font-semibold uppercase tracking-wider opacity-80 mb-3">GeoHash</p>
-            <p className="text-3xl font-bold font-mono break-all leading-tight">
-              {geohash}
-            </p>
-          </div>
-
-          {/* Bounds Info */}
-          <div className="bg-gray-50 rounded-2xl p-6 space-y-3">
-            <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wider">
-              Bounds
-            </h3>
-            <div className="text-sm text-gray-600 space-y-2">
+            <div className="space-y-4">
               <div>
-                <p className="text-xs text-gray-500 font-medium mb-1">Latitude range</p>
-                <p className="font-mono">{bounds.minLat.toFixed(4)} ~ {bounds.maxLat.toFixed(4)}</p>
+                <label className="text-xs font-medium text-gray-600 uppercase tracking-wider mb-2 block">
+                  Latitude
+                </label>
+                <input
+                  type="number"
+                  value={lat}
+                  onChange={(e) => setLat(Number(e.target.value))}
+                  step="0.001"
+                  min="-90"
+                  max="90"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                />
               </div>
+
               <div>
-                <p className="text-xs text-gray-500 font-medium mb-1">Longitude range</p>
-                <p className="font-mono">{bounds.minLng.toFixed(4)} ~ {bounds.maxLng.toFixed(4)}</p>
+                <label className="text-xs font-medium text-gray-600 uppercase tracking-wider mb-2 block">
+                  Longitude
+                </label>
+                <input
+                  type="number"
+                  value={lng}
+                  onChange={(e) => setLng(Number(e.target.value))}
+                  step="0.001"
+                  min="-180"
+                  max="180"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                />
               </div>
+
+              <Slider
+                label="Precision"
+                value={precision}
+                min={1}
+                max={8}
+                onChange={setPrecision}
+              />
+
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={showNeighbors}
+                  onChange={(e) => setShowNeighbors(e.target.checked)}
+                  className="w-4 h-4 accent-blue-600 cursor-pointer rounded"
+                />
+                <span className="text-sm font-medium text-gray-700">Show neighbors</span>
+              </label>
             </div>
           </div>
 
-          <div className="bg-blue-50 rounded-2xl p-6">
-            <h3 className="text-sm font-semibold text-blue-900 mb-3">How to use</h3>
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-5">
+            <h3 className="text-sm font-semibold text-blue-900 mb-3">Usage Guide</h3>
             <ul className="space-y-2 text-sm text-blue-800">
               <li className="flex items-start gap-2">
-                <span className="text-blue-500 mt-0.5">•</span>
+                <span className="text-blue-600 font-bold">•</span>
                 <span>Click map to set position</span>
               </li>
               <li className="flex items-start gap-2">
-                <span className="text-blue-500 mt-0.5">•</span>
-                <span>Enter lat/lng to view encoding</span>
+                <span className="text-blue-600 font-bold">•</span>
+                <span>Enter coordinates manually</span>
               </li>
               <li className="flex items-start gap-2">
-                <span className="text-blue-500 mt-0.5">•</span>
-                <span>Adjust precision for granularity</span>
+                <span className="text-blue-600 font-bold">•</span>
+                <span>Adjust precision level</span>
               </li>
             </ul>
           </div>
         </div>
-      </div>
 
-      {/* Map - Apple Style */}
-      <div className="flex-1 flex flex-col items-center justify-center gap-6">
-        <div className="relative">
-          <svg
-            ref={svgRef}
-            width={MAP_WIDTH}
-            height={MAP_HEIGHT}
-            className="border border-gray-200 rounded-3xl bg-white cursor-crosshair shadow-xl shadow-gray-200/50"
-            onClick={handleMapClick}
-          >
-            {/* Background Grid */}
-            <defs>
-              <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
-                <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#F3F4F6" strokeWidth="1" />
-              </pattern>
-            </defs>
-            <rect width={MAP_WIDTH} height={MAP_HEIGHT} fill="url(#grid)" />
-
-            {/* Neighbor Regions */}
-            {showNeighbors && (
-              <>
-                {drawGeohashRect(neighbors.n, 'rgba(147, 197, 253, 0.15)')}
-                {drawGeohashRect(neighbors.ne, 'rgba(147, 197, 253, 0.15)')}
-                {drawGeohashRect(neighbors.e, 'rgba(147, 197, 253, 0.15)')}
-                {drawGeohashRect(neighbors.se, 'rgba(147, 197, 253, 0.15)')}
-                {drawGeohashRect(neighbors.s, 'rgba(147, 197, 253, 0.15)')}
-                {drawGeohashRect(neighbors.sw, 'rgba(147, 197, 253, 0.15)')}
-                {drawGeohashRect(neighbors.w, 'rgba(147, 197, 253, 0.15)')}
-                {drawGeohashRect(neighbors.nw, 'rgba(147, 197, 253, 0.15)')}
-              </>
-            )}
-
-            {/* Current GeoHash Region */}
-            {drawGeohashRect(geohash, 'rgba(59, 130, 246, 0.2)', 2)}
-
-            {/* Current Position Marker */}
-            <motion.g
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ type: "spring", stiffness: 500, damping: 20 }}
-            >
-              <circle
-                cx={currentPos.x}
-                cy={currentPos.y}
-                r={10}
-                fill="#EF4444"
-                stroke="white"
-                strokeWidth={3}
-                className="drop-shadow-lg"
-              />
-              <MapPin
-                x={currentPos.x - 12}
-                y={currentPos.y - 32}
-                size={24}
-                className="text-red-500 drop-shadow-lg"
-                fill="#EF4444"
-                stroke="white"
-                strokeWidth={2}
-              />
-            </motion.g>
-
-            {/* GeoHash Text Label */}
-            <text
-              x={currentPos.x}
-              y={currentPos.y + 28}
-              textAnchor="middle"
-              className="text-sm font-bold fill-blue-600"
-              style={{ textShadow: '0 0 8px white, 0 0 8px white, 0 0 8px white' }}
-            >
-              {geohash}
-            </text>
-          </svg>
-
-          {/* Legend - Apple Style */}
-          <div className="mt-6 flex items-center justify-center gap-8 text-sm text-gray-600">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-blue-500 bg-opacity-20 border-2 border-blue-500 rounded-lg"></div>
-              <span className="font-medium">Current GeoHash</span>
-            </div>
-            {showNeighbors && (
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 bg-blue-300 bg-opacity-15 border border-blue-300 rounded-lg"></div>
-                <span className="font-medium">Neighbors</span>
+        {/* Main Map Area - B2B Dashboard Style */}
+        <div className="lg:col-span-3">
+          <div className="bg-white border border-gray-200 rounded-lg p-6">
+            <div className="flex items-center justify-between mb-4 pb-4 border-b border-gray-200">
+              <h3 className="text-lg font-semibold text-gray-900">GeoHash Map Visualization</h3>
+              <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2 text-sm">
+                  <div className="w-3 h-3 bg-blue-500 rounded"></div>
+                  <span className="text-gray-600">Current Region</span>
+                </div>
+                {showNeighbors && (
+                  <div className="flex items-center gap-2 text-sm">
+                    <div className="w-3 h-3 bg-blue-300 rounded"></div>
+                    <span className="text-gray-600">Neighbors</span>
+                  </div>
+                )}
               </div>
-            )}
+            </div>
+
+            <div className="flex items-center justify-center">
+              <svg
+                ref={svgRef}
+                width={MAP_WIDTH}
+                height={MAP_HEIGHT}
+                className="border border-gray-300 rounded-lg bg-gray-50 cursor-crosshair"
+                onClick={handleMapClick}
+              >
+                {/* Background Grid */}
+                <defs>
+                  <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+                    <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#E5E7EB" strokeWidth="1" />
+                  </pattern>
+                </defs>
+                <rect width={MAP_WIDTH} height={MAP_HEIGHT} fill="url(#grid)" />
+
+                {/* Neighbor Regions */}
+                {showNeighbors && (
+                  <>
+                    {drawGeohashRect(neighbors.n, 'rgba(147, 197, 253, 0.2)')}
+                    {drawGeohashRect(neighbors.ne, 'rgba(147, 197, 253, 0.2)')}
+                    {drawGeohashRect(neighbors.e, 'rgba(147, 197, 253, 0.2)')}
+                    {drawGeohashRect(neighbors.se, 'rgba(147, 197, 253, 0.2)')}
+                    {drawGeohashRect(neighbors.s, 'rgba(147, 197, 253, 0.2)')}
+                    {drawGeohashRect(neighbors.sw, 'rgba(147, 197, 253, 0.2)')}
+                    {drawGeohashRect(neighbors.w, 'rgba(147, 197, 253, 0.2)')}
+                    {drawGeohashRect(neighbors.nw, 'rgba(147, 197, 253, 0.2)')}
+                  </>
+                )}
+
+                {/* Current GeoHash Region */}
+                {drawGeohashRect(geohash, 'rgba(59, 130, 246, 0.3)', 2)}
+
+                {/* Current Position Marker */}
+                <motion.g
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ type: "spring", stiffness: 500, damping: 20 }}
+                >
+                  <circle
+                    cx={currentPos.x}
+                    cy={currentPos.y}
+                    r={8}
+                    fill="#EF4444"
+                    stroke="white"
+                    strokeWidth={2}
+                  />
+                  <MapPin
+                    x={currentPos.x - 12}
+                    y={currentPos.y - 30}
+                    size={24}
+                    className="text-red-500"
+                    fill="#EF4444"
+                    stroke="white"
+                    strokeWidth={2}
+                  />
+                </motion.g>
+
+                {/* GeoHash Text Label */}
+                <text
+                  x={currentPos.x}
+                  y={currentPos.y + 24}
+                  textAnchor="middle"
+                  className="text-xs font-bold fill-blue-600"
+                  style={{ textShadow: '0 0 4px white, 0 0 4px white' }}
+                >
+                  {geohash}
+                </text>
+              </svg>
+            </div>
           </div>
         </div>
       </div>
