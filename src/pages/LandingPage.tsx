@@ -9,22 +9,19 @@ function LandingPage() {
 
   return (
     <div className="min-h-screen bg-warmWhite">
-      <div className="container mx-auto px-4 py-12">
+      <div className="container mx-auto px-6 py-20">
         {/* Header */}
         <motion.div
-          initial={{ opacity: 0, y: -20 }}
+          initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ type: "spring", stiffness: 300, damping: 25 }}
-          className="text-center mb-16"
+          transition={{ type: "spring", stiffness: 400, damping: 30 }}
+          className="text-center mb-20"
         >
-          <h1 className="text-6xl font-bold mb-4 bg-gradient-to-r from-borderBlue to-pastelBlue bg-clip-text text-transparent">
+          <h1 className="text-5xl font-bold mb-3 text-textPrimary tracking-tight">
             Algorithm Canvas
           </h1>
-          <p className="text-xl text-gray-600 mb-2">
-            Interactive Algorithm Visualization Platform
-          </p>
-          <p className="text-sm text-gray-500">
-            Explore data structures and algorithms in action
+          <p className="text-lg text-textSecondary font-light">
+            Explore data structures and algorithms through interactive visualizations
           </p>
         </motion.div>
 
@@ -41,7 +38,7 @@ function LandingPage() {
               }
             }
           }}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto"
+          className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto"
         >
           {algorithms.map((algo) => {
             const Icon = algo.icon;
@@ -49,11 +46,11 @@ function LandingPage() {
               <motion.div
                 key={algo.id}
                 variants={{
-                  hidden: { opacity: 0, y: 20 },
+                  hidden: { opacity: 0, y: 10 },
                   visible: {
                     opacity: 1,
                     y: 0,
-                    transition: { type: "spring", stiffness: 300, damping: 25 }
+                    transition: { type: "spring", stiffness: 400, damping: 30 }
                   }
                 }}
               >
@@ -62,19 +59,16 @@ function LandingPage() {
                   onClick={() => navigate(`/demo/${algo.id}`)}
                   className="h-full"
                 >
-                  <div className="flex flex-col items-center text-center gap-4">
-                    <div className="w-16 h-16 rounded-xl bg-pastelBlue flex items-center justify-center">
-                      <Icon size={32} className="text-borderBlue" />
+                  <div className="flex flex-col gap-5">
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 rounded-xl bg-pastelBlue flex items-center justify-center flex-shrink-0">
+                        <Icon size={24} className="text-accentBlue" />
+                      </div>
+                      <h2 className="text-2xl font-semibold text-textPrimary">{algo.name}</h2>
                     </div>
-                    <div>
-                      <h2 className="text-2xl font-bold mb-2">{algo.name}</h2>
-                      <p className="text-gray-600 text-sm leading-relaxed">
-                        {algo.description}
-                      </p>
-                    </div>
-                    <div className="mt-2 text-sm text-pastelBlue font-medium">
-                      Click to explore →
-                    </div>
+                    <p className="text-textSecondary leading-relaxed">
+                      {algo.description}
+                    </p>
                   </div>
                 </Card>
               </motion.div>
@@ -86,10 +80,10 @@ function LandingPage() {
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.5 }}
-          className="text-center mt-16 text-gray-500 text-sm"
+          transition={{ delay: 0.3 }}
+          className="text-center mt-24 text-textSecondary text-sm font-light"
         >
-          <p>Made with ❤️ using React, TypeScript, and Framer Motion</p>
+          <p>Made with React, TypeScript, and Framer Motion</p>
         </motion.div>
       </div>
     </div>

@@ -10,17 +10,17 @@ interface ControlPanelProps {
 function ControlPanel({ title, children, className = '' }: ControlPanelProps) {
   return (
     <motion.div
-      initial={{ opacity: 0, x: -20 }}
+      initial={{ opacity: 0, x: -10 }}
       animate={{ opacity: 1, x: 0 }}
-      transition={{ type: "spring", stiffness: 300, damping: 25 }}
-      className={`bg-white rounded-xl border-2 border-borderGray shadow-soft p-6 ${className}`}
+      transition={{ type: "spring", stiffness: 400, damping: 30 }}
+      className={`bg-white rounded-2xl border border-borderGray shadow-soft p-7 ${className}`}
     >
       {title && (
-        <h3 className="text-lg font-bold mb-4 pb-2 border-b-2 border-gray-200">
+        <h3 className="text-base font-semibold mb-5 pb-3 border-b border-borderGray/50 text-textPrimary">
           {title}
         </h3>
       )}
-      <div className="space-y-4">
+      <div className="space-y-5">
         {children}
       </div>
     </motion.div>

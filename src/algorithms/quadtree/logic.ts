@@ -136,6 +136,9 @@ export class QuadTree {
       this.southeast!.insert(point) ||
       this.southwest!.insert(point);
     }
+
+    // Clear parent points after subdivision
+    this.points = [];
   }
 
   /**

@@ -7,25 +7,25 @@ export default {
   theme: {
     extend: {
       colors: {
-        // 暖白色背景
+        // Warm, neutral background
         warmWhite: '#FAFAFA',
-        // 粉嫩色系主題色
-        pastelBlue: '#A8D8EA',
-        pastelGreen: '#AAE3A8',
-        pastelOrange: '#FFCBA4',
-        pastelPink: '#FFB3BA',
-        // 深灰/深藍線條色
-        borderGray: '#4A5568',
-        borderBlue: '#2C5F7C',
+        // Soft, refined accent colors
+        pastelBlue: '#E8F4F8',
+        pastelGreen: '#E8F5E9',
+        pastelOrange: '#FFF3E0',
+        pastelPink: '#FCE4EC',
+        // Refined text and border colors
+        borderGray: '#E0E0E0',
+        borderBlue: '#90A4AE',
+        textPrimary: '#37474F',
+        textSecondary: '#78909C',
+        accentBlue: '#5C6BC0',
       },
       borderRadius: {
-        'xl': '0.75rem',
-      },
-      borderWidth: {
-        '2': '2px',
+        'xl': '1rem',
+        '2xl': '1.5rem',
       },
       fontFamily: {
-        // 圓潤無襯線字體
         sans: [
           'ui-rounded',
           'system-ui',
@@ -39,8 +39,9 @@ export default {
         ],
       },
       boxShadow: {
-        'soft': '0 2px 8px rgba(0, 0, 0, 0.08)',
-        'soft-md': '0 4px 12px rgba(0, 0, 0, 0.1)',
+        'soft': '0 1px 3px rgba(0, 0, 0, 0.06)',
+        'soft-md': '0 4px 6px rgba(0, 0, 0, 0.07)',
+        'soft-lg': '0 10px 15px rgba(0, 0, 0, 0.08)',
       },
     },
   },

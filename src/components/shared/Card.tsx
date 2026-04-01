@@ -9,15 +9,14 @@ interface CardProps {
 }
 
 function Card({ children, onClick, className = '', hoverable = false }: CardProps) {
-  const baseClasses = "bg-white rounded-xl border-2 border-borderGray shadow-soft p-6";
-  const hoverClasses = hoverable ? "cursor-pointer hover:shadow-soft-md transition-shadow duration-200" : "";
+  const baseClasses = "bg-white rounded-2xl border border-borderGray shadow-soft p-8";
+  const hoverClasses = hoverable ? "cursor-pointer hover:shadow-soft-lg hover:border-accentBlue/30 transition-all duration-300" : "";
 
   if (onClick) {
     return (
       <motion.div
-        whileHover={{ scale: 1.02, translateY: -4 }}
-        whileTap={{ scale: 0.98 }}
-        transition={{ type: "spring", stiffness: 300, damping: 20 }}
+        whileHover={{ y: -2 }}
+        transition={{ type: "spring", stiffness: 400, damping: 30 }}
         className={`${baseClasses} ${hoverClasses} ${className}`}
         onClick={onClick}
       >
@@ -28,9 +27,9 @@ function Card({ children, onClick, className = '', hoverable = false }: CardProp
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ type: "spring", stiffness: 300, damping: 25 }}
+      transition={{ type: "spring", stiffness: 400, damping: 30 }}
       className={`${baseClasses} ${className}`}
     >
       {children}
