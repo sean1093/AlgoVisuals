@@ -1,13 +1,13 @@
 # Algorithm Canvas 🎨
 
-[![Deploy to GitHub Pages](https://github.com/YOUR_USERNAME/AlgoVisuals/workflows/Deploy%20to%20GitHub%20Pages/badge.svg)](https://github.com/YOUR_USERNAME/AlgoVisuals/actions)
+[![Deploy to GitHub Pages](https://github.com/sean1093/AlgoVisuals/workflows/Deploy%20to%20GitHub%20Pages/badge.svg)](https://github.com/sean1093/AlgoVisuals/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 > An interactive algorithm visualization platform built with React, TypeScript, and Framer Motion
 
 Explore data structures and algorithms through beautiful, interactive visualizations. Algorithm Canvas transforms abstract concepts into intuitive, animated demonstrations that make learning algorithms engaging and accessible.
 
-🌐 **[Live Demo](https://YOUR_USERNAME.github.io/AlgoVisuals/)**
+🌐 **[Live Demo](https://sean1093.github.io/AlgoVisuals/)**
 
 ## ✨ Features
 
@@ -29,7 +29,7 @@ Explore data structures and algorithms through beautiful, interactive visualizat
 
 ```bash
 # Clone the repository
-git clone https://github.com/YOUR_USERNAME/AlgoVisuals.git
+git clone https://github.com/sean1093/AlgoVisuals.git
 cd AlgoVisuals
 
 # Install dependencies
@@ -195,7 +195,7 @@ The project includes a GitHub Actions workflow that automatically deploys to Git
 
 **Access your site at:**
 ```
-https://YOUR_USERNAME.github.io/AlgoVisuals/
+https://sean1093.github.io/AlgoVisuals/
 ```
 
 ## 🤝 Contributing
