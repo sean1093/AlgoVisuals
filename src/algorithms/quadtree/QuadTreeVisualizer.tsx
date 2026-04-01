@@ -91,55 +91,41 @@ function QuadTreeVisualizer() {
   const allPoints = quadTree.getAllPoints();
 
   return (
-    <div className="space-y-6">
-      {/* Statistics Cards Row - B2B Dashboard Style */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-white border border-gray-200 rounded-lg p-4">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium text-gray-600">Total Points</span>
-            <div className="w-8 h-8 bg-blue-50 rounded flex items-center justify-center">
-              <span className="text-blue-600 text-xs font-bold">{allPoints.length}</span>
-            </div>
+    <div className="space-y-8 md:space-y-12">
+      {/* Stats Row */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-6">
+        <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 text-center">
+          <div className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-500 to-purple-500 bg-clip-text text-transparent mb-2">
+            {allPoints.length}
           </div>
-          <div className="text-2xl font-bold text-gray-900">{allPoints.length}</div>
-          <div className="text-xs text-gray-500 mt-1">Active data points</div>
+          <div className="text-sm text-gray-600">Total Points</div>
         </div>
 
-        <div className="bg-white border border-gray-200 rounded-lg p-4">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium text-gray-600">Tree Nodes</span>
-            <div className="w-8 h-8 bg-green-50 rounded flex items-center justify-center">
-              <span className="text-green-600 text-xs font-bold">{allNodes.length}</span>
-            </div>
+        <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 text-center">
+          <div className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-500 to-purple-500 bg-clip-text text-transparent mb-2">
+            {allNodes.length}
           </div>
-          <div className="text-2xl font-bold text-gray-900">{allNodes.length}</div>
-          <div className="text-xs text-gray-500 mt-1">Subdivided regions</div>
+          <div className="text-sm text-gray-600">Tree Nodes</div>
         </div>
 
-        <div className="bg-white border border-gray-200 rounded-lg p-4">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium text-gray-600">Capacity</span>
-            <div className="w-8 h-8 bg-purple-50 rounded flex items-center justify-center">
-              <span className="text-purple-600 text-xs font-bold">{capacity}</span>
-            </div>
+        <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 text-center">
+          <div className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-500 to-purple-500 bg-clip-text text-transparent mb-2">
+            {capacity}
           </div>
-          <div className="text-2xl font-bold text-gray-900">{capacity}</div>
-          <div className="text-xs text-gray-500 mt-1">Points per node</div>
+          <div className="text-sm text-gray-600">Node Capacity</div>
         </div>
       </div>
 
-      {/* Main Dashboard Layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        {/* Left Sidebar - Controls */}
-        <div className="lg:col-span-1 space-y-4">
-          <div className="bg-white border border-gray-200 rounded-lg p-5">
-            <h3 className="text-sm font-semibold text-gray-900 mb-4 pb-3 border-b border-gray-200">
-              Configuration
-            </h3>
+      {/* Main Content */}
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 md:gap-8">
+        {/* Controls */}
+        <div className="lg:col-span-1 space-y-6">
+          <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-6">Controls</h3>
 
-            <div className="space-y-5">
+            <div className="space-y-6">
               <Slider
-                label="Node Capacity"
+                label="Capacity"
                 value={capacity}
                 min={1}
                 max={10}
@@ -157,42 +143,34 @@ function QuadTreeVisualizer() {
             </div>
           </div>
 
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-5">
-            <h3 className="text-sm font-semibold text-blue-900 mb-3">Usage Guide</h3>
-            <ul className="space-y-2 text-sm text-blue-800">
-              <li className="flex items-start gap-2">
-                <span className="text-blue-600 font-bold">•</span>
+          <div className="bg-blue-50/50 backdrop-blur-sm rounded-2xl p-6">
+            <h3 className="text-sm font-semibold text-gray-700 mb-4">How to Use</h3>
+            <ul className="space-y-3 text-sm text-gray-600">
+              <li className="flex items-start gap-3">
+                <span className="text-blue-500 font-bold flex-shrink-0">→</span>
                 <span>Click canvas to add points</span>
               </li>
-              <li className="flex items-start gap-2">
-                <span className="text-blue-600 font-bold">•</span>
-                <span>Hover regions to highlight</span>
+              <li className="flex items-start gap-3">
+                <span className="text-blue-500 font-bold flex-shrink-0">→</span>
+                <span>Hover to highlight regions</span>
               </li>
-              <li className="flex items-start gap-2">
-                <span className="text-blue-600 font-bold">•</span>
-                <span>Adjust capacity threshold</span>
+              <li className="flex items-start gap-3">
+                <span className="text-blue-500 font-bold flex-shrink-0">→</span>
+                <span>Adjust capacity to see subdivision</span>
               </li>
             </ul>
           </div>
         </div>
 
-        {/* Main Canvas Area */}
+        {/* Canvas */}
         <div className="lg:col-span-3">
-          <div className="bg-white border border-gray-200 rounded-lg p-6">
-            <div className="flex items-center justify-between mb-4 pb-4 border-b border-gray-200">
-              <h3 className="text-lg font-semibold text-gray-900">Visualization Canvas</h3>
-              <div className="flex items-center gap-2 text-sm text-gray-600">
-                <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
-                <span>Interactive Mode</span>
-              </div>
-            </div>
-
+          <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 md:p-8">
             <div className="flex items-center justify-center">
               <svg
                 ref={svgRef}
                 width={CANVAS_SIZE}
                 height={CANVAS_SIZE}
-                className="border border-gray-300 rounded-lg bg-gray-50 cursor-crosshair"
+                className="max-w-full h-auto border-2 border-gray-200 rounded-xl bg-white cursor-crosshair shadow-sm"
                 onClick={handleCanvasClick}
                 onMouseMove={handleMouseMove}
                 onMouseLeave={handleMouseLeave}
@@ -212,10 +190,10 @@ function QuadTreeVisualizer() {
                       y={node.y}
                       width={node.width}
                       height={node.height}
-                      fill={isHovered ? 'rgba(59, 130, 246, 0.1)' : 'transparent'}
-                      stroke={isHovered ? '#3B82F6' : '#D1D5DB'}
+                      fill={isHovered ? 'rgba(147, 197, 253, 0.2)' : 'transparent'}
+                      stroke={isHovered ? '#3B82F6' : '#E5E7EB'}
                       strokeWidth={isHovered ? 2 : 1}
-                      className="transition-all duration-150"
+                      className="transition-all duration-200"
                     />
                   );
                 })}
@@ -227,7 +205,7 @@ function QuadTreeVisualizer() {
                     cx={point.x}
                     cy={point.y}
                     r={5}
-                    fill="#3B82F6"
+                    fill="url(#point-gradient)"
                     stroke="white"
                     strokeWidth={2}
                     initial={{ scale: 0 }}
@@ -235,6 +213,14 @@ function QuadTreeVisualizer() {
                     transition={{ type: "spring", stiffness: 500, damping: 20 }}
                   />
                 ))}
+
+                {/* Gradient definition */}
+                <defs>
+                  <linearGradient id="point-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="#3B82F6" />
+                    <stop offset="100%" stopColor="#8B5CF6" />
+                  </linearGradient>
+                </defs>
               </svg>
             </div>
           </div>

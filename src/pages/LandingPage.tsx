@@ -1,150 +1,73 @@
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
+import { Sparkles } from 'lucide-react';
 import { getAllAlgorithms } from '../registry';
-import { ArrowRight, BarChart3, GitBranch, Layers } from 'lucide-react';
 
 function LandingPage() {
-  const navigate = useNavigate();
   const algorithms = getAllAlgorithms();
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Professional Header */}
-      <header className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-blue-600 rounded flex items-center justify-center">
-              <Layers size={20} className="text-white" />
-            </div>
-            <h1 className="text-xl font-semibold text-gray-900">Algorithm Canvas</h1>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+      {/* Header */}
+      <header className="pt-12 md:pt-20 pb-8 md:pb-16 px-6">
+        <div className="max-w-4xl mx-auto text-center">
+          <div className="inline-flex items-center gap-2 bg-white/80 backdrop-blur-sm px-4 py-2 rounded-full shadow-sm mb-6 md:mb-8">
+            <Sparkles size={18} className="text-blue-500" />
+            <span className="text-sm font-medium text-gray-700">Algorithm Canvas</span>
           </div>
-          <nav className="hidden md:flex items-center gap-8">
-            <a href="#algorithms" className="text-sm font-medium text-gray-600 hover:text-gray-900">
-              Algorithms
-            </a>
-            <a href="#features" className="text-sm font-medium text-gray-600 hover:text-gray-900">
-              Features
-            </a>
-          </nav>
+
+          <h1 className="text-4xl md:text-6xl font-semibold text-gray-900 mb-6 md:mb-8 leading-tight px-4">
+            Visualize Algorithms
+            <br />
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-purple-500">
+              with Clarity
+            </span>
+          </h1>
+
+          <p className="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed px-4">
+            Interactive visualizations that help you understand data structures and algorithms through hands-on exploration
+          </p>
         </div>
       </header>
 
-      {/* Hero Section - B2B Professional */}
-      <section className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-6 py-20">
-          <div className="max-w-3xl">
-            <div className="inline-flex items-center gap-2 px-3 py-1 bg-blue-50 text-blue-700 text-sm font-medium rounded-full mb-6">
-              <BarChart3 size={16} />
-              Interactive Visualization Platform
-            </div>
-            <h1 className="text-5xl font-bold text-gray-900 mb-6 leading-tight">
-              Professional algorithm visualization and analysis tools
-            </h1>
-            <p className="text-xl text-gray-600 mb-8 leading-relaxed">
-              Understand complex data structures and algorithms through interactive dashboards.
-              Built for engineers, researchers, and technical teams.
-            </p>
-            <button
-              onClick={() => {
-                const element = document.getElementById('algorithms');
-                element?.scrollIntoView({ behavior: 'smooth' });
-              }}
-              className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors"
-            >
-              View Algorithms
-              <ArrowRight size={18} />
-            </button>
-          </div>
-        </div>
-      </section>
-
-      {/* Features Section */}
-      <section id="features" className="py-16 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="bg-white p-6 rounded-lg border border-gray-200">
-              <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
-                <GitBranch size={20} className="text-blue-600" />
-              </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Real-time Visualization</h3>
-              <p className="text-sm text-gray-600">
-                Interactive canvas with real-time updates and visual feedback for algorithm operations
-              </p>
-            </div>
-            <div className="bg-white p-6 rounded-lg border border-gray-200">
-              <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
-                <BarChart3 size={20} className="text-blue-600" />
-              </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Performance Metrics</h3>
-              <p className="text-sm text-gray-600">
-                Track algorithm performance with detailed statistics and performance indicators
-              </p>
-            </div>
-            <div className="bg-white p-6 rounded-lg border border-gray-200">
-              <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
-                <Layers size={20} className="text-blue-600" />
-              </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Configurable Parameters</h3>
-              <p className="text-sm text-gray-600">
-                Adjust algorithm parameters and see immediate visual feedback on behavior changes
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Algorithms Section - B2B Card Grid */}
-      <section id="algorithms" className="py-16 bg-white border-t border-gray-200">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="mb-8">
-            <h2 className="text-3xl font-bold text-gray-900 mb-2">Available Algorithms</h2>
-            <p className="text-gray-600">Select an algorithm to access the interactive dashboard</p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      {/* Main Content */}
+      <main className="px-6 pb-16 md:pb-24">
+        <div className="max-w-4xl mx-auto">
+          {/* Algorithms Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
             {algorithms.map((algo) => {
               const Icon = algo.icon;
               return (
-                <div
+                <Link
                   key={algo.id}
-                  onClick={() => navigate(`/demo/${algo.id}`)}
-                  className="group bg-white border border-gray-200 rounded-lg p-6 hover:border-blue-500 hover:shadow-md transition-all cursor-pointer"
+                  to={`/demo/${algo.id}`}
+                  className="group bg-white/80 backdrop-blur-sm rounded-2xl p-6 md:p-8 hover:bg-white hover:shadow-xl transition-all duration-300"
                 >
-                  <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:bg-blue-100 transition-colors">
-                      <Icon size={24} className="text-blue-600" />
+                  <div className="flex items-start gap-4 md:gap-5">
+                    <div className="w-12 h-12 md:w-14 md:h-14 bg-gradient-to-br from-blue-500 to-purple-500 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300 flex-shrink-0 shadow-md">
+                      <Icon size={24} className="text-white md:w-7 md:h-7" />
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between mb-2">
-                        <h3 className="text-lg font-semibold text-gray-900">{algo.name}</h3>
-                        <ArrowRight size={18} className="text-gray-400 group-hover:text-blue-600 group-hover:translate-x-1 transition-all flex-shrink-0" />
-                      </div>
-                      <p className="text-sm text-gray-600 leading-relaxed">
+                    <div className="flex-1">
+                      <h3 className="text-xl md:text-2xl font-semibold text-gray-900 mb-2 md:mb-3 group-hover:text-blue-600 transition-colors">
+                        {algo.name}
+                      </h3>
+                      <p className="text-gray-600 leading-relaxed text-sm md:text-base">
                         {algo.description}
                       </p>
-                      <div className="mt-3 inline-flex items-center gap-1 text-sm font-medium text-blue-600">
-                        <span>Open Dashboard</span>
-                      </div>
                     </div>
                   </div>
-                </div>
+                </Link>
               );
             })}
           </div>
         </div>
-      </section>
+      </main>
 
       {/* Footer */}
-      <footer className="bg-white border-t border-gray-200 py-8">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <div className="flex items-center gap-2 text-sm text-gray-600">
-              <span>Built with React, TypeScript, and Framer Motion</span>
-            </div>
-            <div className="flex items-center gap-6 text-sm text-gray-600">
-              <a href="#algorithms" className="hover:text-gray-900">Algorithms</a>
-              <a href="#features" className="hover:text-gray-900">Features</a>
-            </div>
-          </div>
+      <footer className="py-8 px-6">
+        <div className="max-w-4xl mx-auto text-center">
+          <p className="text-sm text-gray-500">
+            Built with React, TypeScript, and Framer Motion
+          </p>
         </div>
       </footer>
     </div>

@@ -58,7 +58,7 @@ function GeoHashVisualizer() {
         width={bottomRight.x - topLeft.x}
         height={bottomRight.y - topLeft.y}
         fill={color}
-        stroke="#2C5F7C"
+        stroke="#3B82F6"
         strokeWidth={strokeWidth}
       />
     );
@@ -67,50 +67,50 @@ function GeoHashVisualizer() {
   const currentPos = latLngToXY(lat, lng);
 
   return (
-    <div className="space-y-6">
-      {/* Statistics Cards Row - B2B Dashboard Style */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="bg-white border border-gray-200 rounded-lg p-4">
-          <div className="text-sm font-medium text-gray-600 mb-2">GeoHash Code</div>
-          <div className="text-xl font-bold text-gray-900 font-mono break-all">{geohash}</div>
-          <div className="text-xs text-gray-500 mt-1">{precision} character precision</div>
+    <div className="space-y-8 md:space-y-12">
+      {/* Stats Row */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+        <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 text-center">
+          <div className="text-sm text-gray-600 mb-3">GeoHash Code</div>
+          <div className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-blue-500 to-purple-500 bg-clip-text text-transparent font-mono break-all">
+            {geohash}
+          </div>
         </div>
 
-        <div className="bg-white border border-gray-200 rounded-lg p-4">
-          <div className="text-sm font-medium text-gray-600 mb-2">Latitude</div>
-          <div className="text-xl font-bold text-gray-900">{lat.toFixed(3)}°</div>
-          <div className="text-xs text-gray-500 mt-1 font-mono">
+        <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 text-center">
+          <div className="text-sm text-gray-600 mb-3">Latitude</div>
+          <div className="text-2xl md:text-3xl font-bold text-gray-900">{lat.toFixed(3)}°</div>
+          <div className="text-xs text-gray-500 mt-2 font-mono">
             {bounds.minLat.toFixed(4)} ~ {bounds.maxLat.toFixed(4)}
           </div>
         </div>
 
-        <div className="bg-white border border-gray-200 rounded-lg p-4">
-          <div className="text-sm font-medium text-gray-600 mb-2">Longitude</div>
-          <div className="text-xl font-bold text-gray-900">{lng.toFixed(3)}°</div>
-          <div className="text-xs text-gray-500 mt-1 font-mono">
+        <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 text-center">
+          <div className="text-sm text-gray-600 mb-3">Longitude</div>
+          <div className="text-2xl md:text-3xl font-bold text-gray-900">{lng.toFixed(3)}°</div>
+          <div className="text-xs text-gray-500 mt-2 font-mono">
             {bounds.minLng.toFixed(4)} ~ {bounds.maxLng.toFixed(4)}
           </div>
         </div>
 
-        <div className="bg-white border border-gray-200 rounded-lg p-4">
-          <div className="text-sm font-medium text-gray-600 mb-2">Precision Level</div>
-          <div className="text-xl font-bold text-gray-900">{precision}/8</div>
-          <div className="text-xs text-gray-500 mt-1">Character length</div>
+        <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 text-center">
+          <div className="text-sm text-gray-600 mb-3">Precision</div>
+          <div className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-blue-500 to-purple-500 bg-clip-text text-transparent">
+            {precision}/8
+          </div>
         </div>
       </div>
 
-      {/* Main Dashboard Layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        {/* Left Sidebar - Controls */}
-        <div className="lg:col-span-1 space-y-4">
-          <div className="bg-white border border-gray-200 rounded-lg p-5">
-            <h3 className="text-sm font-semibold text-gray-900 mb-4 pb-3 border-b border-gray-200">
-              Location Input
-            </h3>
+      {/* Main Content */}
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 md:gap-8">
+        {/* Controls */}
+        <div className="lg:col-span-1 space-y-6">
+          <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-6">Location</h3>
 
-            <div className="space-y-4">
+            <div className="space-y-5">
               <div>
-                <label className="text-xs font-medium text-gray-600 uppercase tracking-wider mb-2 block">
+                <label className="text-sm font-medium text-gray-700 mb-2 block">
                   Latitude
                 </label>
                 <input
@@ -120,12 +120,12 @@ function GeoHashVisualizer() {
                   step="0.001"
                   min="-90"
                   max="90"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none transition-colors"
                 />
               </div>
 
               <div>
-                <label className="text-xs font-medium text-gray-600 uppercase tracking-wider mb-2 block">
+                <label className="text-sm font-medium text-gray-700 mb-2 block">
                   Longitude
                 </label>
                 <input
@@ -135,7 +135,7 @@ function GeoHashVisualizer() {
                   step="0.001"
                   min="-180"
                   max="180"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none transition-colors"
                 />
               </div>
 
@@ -147,88 +147,76 @@ function GeoHashVisualizer() {
                 onChange={setPrecision}
               />
 
-              <label className="flex items-center gap-2 cursor-pointer">
+              <label className="flex items-center gap-3 cursor-pointer">
                 <input
                   type="checkbox"
                   checked={showNeighbors}
                   onChange={(e) => setShowNeighbors(e.target.checked)}
-                  className="w-4 h-4 accent-blue-600 cursor-pointer rounded"
+                  className="w-5 h-5 accent-blue-500 cursor-pointer rounded"
                 />
                 <span className="text-sm font-medium text-gray-700">Show neighbors</span>
               </label>
             </div>
           </div>
 
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-5">
-            <h3 className="text-sm font-semibold text-blue-900 mb-3">Usage Guide</h3>
-            <ul className="space-y-2 text-sm text-blue-800">
-              <li className="flex items-start gap-2">
-                <span className="text-blue-600 font-bold">•</span>
+          <div className="bg-blue-50/50 backdrop-blur-sm rounded-2xl p-6">
+            <h3 className="text-sm font-semibold text-gray-700 mb-4">How to Use</h3>
+            <ul className="space-y-3 text-sm text-gray-600">
+              <li className="flex items-start gap-3">
+                <span className="text-blue-500 font-bold flex-shrink-0">→</span>
                 <span>Click map to set position</span>
               </li>
-              <li className="flex items-start gap-2">
-                <span className="text-blue-600 font-bold">•</span>
+              <li className="flex items-start gap-3">
+                <span className="text-blue-500 font-bold flex-shrink-0">→</span>
                 <span>Enter coordinates manually</span>
               </li>
-              <li className="flex items-start gap-2">
-                <span className="text-blue-600 font-bold">•</span>
+              <li className="flex items-start gap-3">
+                <span className="text-blue-500 font-bold flex-shrink-0">→</span>
                 <span>Adjust precision level</span>
               </li>
             </ul>
           </div>
         </div>
 
-        {/* Main Map Area - B2B Dashboard Style */}
+        {/* Map */}
         <div className="lg:col-span-3">
-          <div className="bg-white border border-gray-200 rounded-lg p-6">
-            <div className="flex items-center justify-between mb-4 pb-4 border-b border-gray-200">
-              <h3 className="text-lg font-semibold text-gray-900">GeoHash Map Visualization</h3>
-              <div className="flex items-center gap-4">
-                <div className="flex items-center gap-2 text-sm">
-                  <div className="w-3 h-3 bg-blue-500 rounded"></div>
-                  <span className="text-gray-600">Current Region</span>
-                </div>
-                {showNeighbors && (
-                  <div className="flex items-center gap-2 text-sm">
-                    <div className="w-3 h-3 bg-blue-300 rounded"></div>
-                    <span className="text-gray-600">Neighbors</span>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            <div className="flex items-center justify-center">
+          <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 md:p-8">
+            <div className="flex items-center justify-center overflow-x-auto">
               <svg
                 ref={svgRef}
                 width={MAP_WIDTH}
                 height={MAP_HEIGHT}
-                className="border border-gray-300 rounded-lg bg-gray-50 cursor-crosshair"
+                className="max-w-full h-auto border-2 border-gray-200 rounded-xl bg-white cursor-crosshair shadow-sm"
                 onClick={handleMapClick}
               >
                 {/* Background Grid */}
                 <defs>
                   <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
-                    <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#E5E7EB" strokeWidth="1" />
+                    <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#F3F4F6" strokeWidth="1" />
                   </pattern>
+                  <linearGradient id="pin-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="#EF4444" />
+                    <stop offset="100%" stopColor="#DC2626" />
+                  </linearGradient>
                 </defs>
                 <rect width={MAP_WIDTH} height={MAP_HEIGHT} fill="url(#grid)" />
 
                 {/* Neighbor Regions */}
                 {showNeighbors && (
                   <>
-                    {drawGeohashRect(neighbors.n, 'rgba(147, 197, 253, 0.2)')}
-                    {drawGeohashRect(neighbors.ne, 'rgba(147, 197, 253, 0.2)')}
-                    {drawGeohashRect(neighbors.e, 'rgba(147, 197, 253, 0.2)')}
-                    {drawGeohashRect(neighbors.se, 'rgba(147, 197, 253, 0.2)')}
-                    {drawGeohashRect(neighbors.s, 'rgba(147, 197, 253, 0.2)')}
-                    {drawGeohashRect(neighbors.sw, 'rgba(147, 197, 253, 0.2)')}
-                    {drawGeohashRect(neighbors.w, 'rgba(147, 197, 253, 0.2)')}
-                    {drawGeohashRect(neighbors.nw, 'rgba(147, 197, 253, 0.2)')}
+                    {drawGeohashRect(neighbors.n, 'rgba(191, 219, 254, 0.3)')}
+                    {drawGeohashRect(neighbors.ne, 'rgba(191, 219, 254, 0.3)')}
+                    {drawGeohashRect(neighbors.e, 'rgba(191, 219, 254, 0.3)')}
+                    {drawGeohashRect(neighbors.se, 'rgba(191, 219, 254, 0.3)')}
+                    {drawGeohashRect(neighbors.s, 'rgba(191, 219, 254, 0.3)')}
+                    {drawGeohashRect(neighbors.sw, 'rgba(191, 219, 254, 0.3)')}
+                    {drawGeohashRect(neighbors.w, 'rgba(191, 219, 254, 0.3)')}
+                    {drawGeohashRect(neighbors.nw, 'rgba(191, 219, 254, 0.3)')}
                   </>
                 )}
 
                 {/* Current GeoHash Region */}
-                {drawGeohashRect(geohash, 'rgba(59, 130, 246, 0.3)', 2)}
+                {drawGeohashRect(geohash, 'rgba(147, 197, 253, 0.4)', 2)}
 
                 {/* Current Position Marker */}
                 <motion.g
@@ -240,7 +228,7 @@ function GeoHashVisualizer() {
                     cx={currentPos.x}
                     cy={currentPos.y}
                     r={8}
-                    fill="#EF4444"
+                    fill="url(#pin-gradient)"
                     stroke="white"
                     strokeWidth={2}
                   />
@@ -249,7 +237,7 @@ function GeoHashVisualizer() {
                     y={currentPos.y - 30}
                     size={24}
                     className="text-red-500"
-                    fill="#EF4444"
+                    fill="url(#pin-gradient)"
                     stroke="white"
                     strokeWidth={2}
                   />
