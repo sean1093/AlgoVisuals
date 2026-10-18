@@ -18,28 +18,49 @@ export interface SearchFrame {
 
 export type SearchAlgorithm = 'linear' | 'binary';
 
-export function linearSearch(list: number[], target: number): SearchFrame[] {
-  const frames: SearchFrame[] = [{ eliminated: [], note: `Look for ${target} by checking every box from left to right.`, checks: 0 }];
+/**
+ * Plain-language step descriptions; English by default, swapped for a translation by the UI
+ */
+export const SEARCH_MESSAGES = {
+  linearIntro: (target: number) => `Look for ${target} by checking every box from left to right.`,
+  linearFound: (box: number, target: number, checks: number) =>
+    `Box ${box} holds ${target} — found it after ${checks} check${checks > 1 ? 's' : ''}.`,
+  linearMiss: (box: number, value: number) => `Box ${box} holds ${value}. Not it — move on.`,
+  linearMissing: (count: number, target: number) => `Checked all ${count} boxes: ${target} isn’t in the list.`,
+  binaryIntro: 'The list is sorted, so start in the middle and throw away half each time.',
+  binaryFound: (target: number, checks: number) =>
+    `The middle box holds ${target} — found it in ${checks} check${checks > 1 ? 's' : ''}.`,
+  binaryGoRight: (middle: number, target: number) => `Middle is ${middle}, which is smaller than ${target}. So it must be to the right.`,
+  binaryGoLeft: (middle: number, target: number) => `Middle is ${middle}, which is bigger than ${target}. So it must be to the left.`,
+  binaryLeft: (remaining: number) => `Cross out that half. ${remaining} box${remaining === 1 ? '' : 'es'} left to search.`,
+  binaryNothingLeft: 'Nothing left to search.',
+  binaryMissing: (target: number, checks: number) => `${target} isn’t in the list — and we only needed ${checks} checks to be sure.`,
+};
+
+export type SearchMessages = typeof SEARCH_MESSAGES;
+
+export function linearSearch(list: number[], target: number, m: SearchMessages = SEARCH_MESSAGES): SearchFrame[] {
+  const frames: SearchFrame[] = [{ eliminated: [], note: m.linearIntro(target), checks: 0 }];
   const eliminated: number[] = [];
   for (let i = 0; i < list.length; i++) {
     const checks = i + 1;
     if (list[i] === target) {
-      frames.push({ index: i, eliminated: [...eliminated], found: i, note: `Box ${i + 1} holds ${target} — found it after ${checks} check${checks > 1 ? 's' : ''}.`, checks });
+      frames.push({ index: i, eliminated: [...eliminated], found: i, note: m.linearFound(i + 1, target, checks), checks });
       return frames;
     }
-    frames.push({ index: i, eliminated: [...eliminated], note: `Box ${i + 1} holds ${list[i]}. Not it — move on.`, checks });
+    frames.push({ index: i, eliminated: [...eliminated], note: m.linearMiss(i + 1, list[i]), checks });
     eliminated.push(i);
   }
-  frames.push({ eliminated: [...eliminated], missing: true, note: `Checked all ${list.length} boxes: ${target} isn’t in the list.`, checks: list.length });
+  frames.push({ eliminated: [...eliminated], missing: true, note: m.linearMissing(list.length, target), checks: list.length });
   return frames;
 }
 
 /**
  * Binary search; `list` must be sorted ascending
  */
-export function binarySearch(list: number[], target: number): SearchFrame[] {
+export function binarySearch(list: number[], target: number, m: SearchMessages = SEARCH_MESSAGES): SearchFrame[] {
   const frames: SearchFrame[] = [
-    { low: 0, high: list.length - 1, eliminated: [], note: `The list is sorted, so start in the middle and throw away half each time.`, checks: 0 },
+    { low: 0, high: list.length - 1, eliminated: [], note: m.binaryIntro, checks: 0 },
   ];
   const eliminated = new Set<number>();
   let low = 0;
@@ -49,7 +70,7 @@ export function binarySearch(list: number[], target: number): SearchFrame[] {
     const mid = Math.floor((low + high) / 2);
     checks++;
     if (list[mid] === target) {
-      frames.push({ index: mid, low, high, eliminated: [...eliminated], found: mid, note: `The middle box holds ${target} — found it in ${checks} check${checks > 1 ? 's' : ''}.`, checks });
+      frames.push({ index: mid, low, high, eliminated: [...eliminated], found: mid, note: m.binaryFound(target, checks), checks });
       return frames;
     }
     const goRight = list[mid] < target;
@@ -58,7 +79,7 @@ export function binarySearch(list: number[], target: number): SearchFrame[] {
       low,
       high,
       eliminated: [...eliminated],
-      note: `Middle is ${list[mid]}, which is ${goRight ? 'smaller' : 'bigger'} than ${target}. So it must be to the ${goRight ? 'right' : 'left'}.`,
+      note: goRight ? m.binaryGoRight(list[mid], target) : m.binaryGoLeft(list[mid], target),
       checks,
     });
     const [from, to] = goRight ? [low, mid] : [mid, high];
@@ -69,15 +90,15 @@ export function binarySearch(list: number[], target: number): SearchFrame[] {
       low,
       high,
       eliminated: [...eliminated],
-      note: low <= high ? `Cross out that half. ${high - low + 1} box${high - low ? 'es' : ''} left to search.` : `Nothing left to search.`,
+      note: low <= high ? m.binaryLeft(high - low + 1) : m.binaryNothingLeft,
       checks,
     });
   }
-  frames.push({ eliminated: [...eliminated], missing: true, note: `${target} isn’t in the list — and we only needed ${checks} checks to be sure.`, checks });
+  frames.push({ eliminated: [...eliminated], missing: true, note: m.binaryMissing(target, checks), checks });
   return frames;
 }
 
-export const SEARCHERS: Record<SearchAlgorithm, (list: number[], target: number) => SearchFrame[]> = {
+export const SEARCHERS: Record<SearchAlgorithm, (list: number[], target: number, m?: SearchMessages) => SearchFrame[]> = {
   linear: linearSearch,
   binary: binarySearch,
 };

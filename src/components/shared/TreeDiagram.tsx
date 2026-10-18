@@ -26,6 +26,8 @@ interface TreeDiagramProps {
   /** Minimum number of levels to reserve space for */
   minDepth?: number;
   emptyText?: string;
+  /** Accessible name for the whole diagram */
+  label?: string;
   onNodeClick?: (node: DiagramNode) => void;
 }
 
@@ -36,7 +38,7 @@ const R = 19;
 /**
  * Animated node-link tree; nodes glide to new positions when the tree changes
  */
-function TreeDiagram({ nodes, edges, accent, minDepth = 3, emptyText = 'Empty', onNodeClick }: TreeDiagramProps) {
+function TreeDiagram({ nodes, edges, accent, minDepth = 3, emptyText = '', label, onNodeClick }: TreeDiagramProps) {
   const depth = Math.max(minDepth, ...nodes.map((n) => n.depth + 1));
   const height = depth * LEVEL + 12;
   const pos = new Map(nodes.map((n) => [n.id, { x: 24 + n.x * (WIDTH - 48), y: 34 + n.depth * LEVEL }]));
@@ -45,7 +47,7 @@ function TreeDiagram({ nodes, edges, accent, minDepth = 3, emptyText = 'Empty', 
   const r = crowded > 12 ? 13 : crowded > 8 ? 16 : R;
 
   return (
-    <svg viewBox={`0 0 ${WIDTH} ${height}`} className="block w-full" role="img" aria-label="Tree diagram">
+    <svg viewBox={`0 0 ${WIDTH} ${height}`} className="block w-full" role="img" aria-label={label}>
       {nodes.length === 0 && (
         <text x={WIDTH / 2} y={height / 2} textAnchor="middle" className="fill-ink-mute font-display" fontSize={20}>
           {emptyText}

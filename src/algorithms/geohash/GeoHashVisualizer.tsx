@@ -8,23 +8,27 @@ import CloseUp from './CloseUp';
 import Slider from '../../components/shared/Slider';
 import Panel from '../../components/shared/Panel';
 import GuideSteps from '../../components/shared/GuideSteps';
+import Rich from '../../components/shared/Rich';
+import { useI18n } from '../../i18n';
 
 const ACCENT = '#c0553a';
 const SOFT = '#f5e1d8';
 const START = { lat: 25.033, lng: 121.565 };
 
 const PLACES = [
-  { name: 'Taipei', lat: 25.033, lng: 121.565 },
-  { name: 'Tokyo', lat: 35.676, lng: 139.65 },
-  { name: 'Paris', lat: 48.857, lng: 2.352 },
-  { name: 'New York', lat: 40.713, lng: -74.006 },
-  { name: 'São Paulo', lat: -23.551, lng: -46.633 },
-  { name: 'Sydney', lat: -33.869, lng: 151.209 },
-];
+  { id: 'taipei', lat: 25.033, lng: 121.565 },
+  { id: 'tokyo', lat: 35.676, lng: 139.65 },
+  { id: 'paris', lat: 48.857, lng: 2.352 },
+  { id: 'newYork', lat: 40.713, lng: -74.006 },
+  { id: 'saoPaulo', lat: -23.551, lng: -46.633 },
+  { id: 'sydney', lat: -33.869, lng: 151.209 },
+] as const;
 
 const round = (n: number) => Number(n.toFixed(4));
 
 function GeoHashVisualizer() {
+  const { t } = useI18n();
+  const tg = t.geohash;
   const [precision, setPrecision] = useState(4);
   const [lat, setLat] = useState(START.lat);
   const [lng, setLng] = useState(START.lng);
@@ -76,23 +80,8 @@ function GeoHashVisualizer() {
     );
   };
 
-  const steps = [
-    {
-      title: 'Pick a place',
-      detail: 'Click anywhere on the map, or choose one of the cities below.',
-      done: progress.moved,
-    },
-    {
-      title: 'Make the code longer',
-      detail: 'Drag “Code length” to 6 or more. Each extra letter zooms in about 32 times.',
-      done: progress.zoomed,
-    },
-    {
-      title: 'Step into a neighbour',
-      detail: 'In the close-up, click a box next to yours. Notice how its code starts the same way.',
-      done: progress.neighbor,
-    },
-  ];
+  const done = [progress.moved, progress.zoomed, progress.neighbor];
+  const steps = tg.steps.map((step, i) => ({ ...step, done: done[i] }));
   const allDone = steps.every((s) => s.done);
 
   return (
@@ -103,7 +92,7 @@ function GeoHashVisualizer() {
           <div className="rounded-3xl border border-line bg-card p-4 shadow-card md:p-6">
             <div className="mb-5 flex flex-wrap items-end justify-between gap-4 px-1">
               <div>
-                <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-ink-mute">Your code</p>
+                <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-ink-mute">{tg.yourCode}</p>
                 <div className="flex items-center gap-1.5">
                   <AnimatePresence mode="popLayout" initial={false}>
                     {geohash.split('').map((char, i) => (
@@ -129,8 +118,8 @@ function GeoHashVisualizer() {
                     type="button"
                     onClick={handleCopy}
                     className="ml-1 flex h-9 w-9 items-center justify-center rounded-full text-ink-mute transition-colors hover:bg-paper-deep hover:text-ink"
-                    aria-label="Copy code"
-                    title="Copy code"
+                    aria-label={tg.copyCode}
+                    title={tg.copyCode}
                   >
                     {copied ? <Check size={16} /> : <Copy size={16} />}
                   </button>
@@ -138,10 +127,9 @@ function GeoHashVisualizer() {
               </div>
               <div className="sm:text-right">
                 <p className="text-sm text-ink-soft">
-                  Covers about <b className="text-ink">{formatDistance(size.width)}</b> ×{' '}
-                  <b className="text-ink">{formatDistance(size.height)}</b>
+                  <Rich text={tg.covers(formatDistance(size.width), formatDistance(size.height))} />
                 </p>
-                <p className="mt-0.5 text-[13px] text-ink-mute">roughly the size of {sizeComparison(Math.max(size.width, size.height))}</p>
+                <p className="mt-0.5 text-[13px] text-ink-mute">{tg.roughly(tg.sizes[sizeComparison(Math.max(size.width, size.height))])}</p>
               </div>
             </div>
 
@@ -149,12 +137,11 @@ function GeoHashVisualizer() {
               <WorldMap lat={lat} lng={lng} bounds={bounds} firstChar={geohash[0]} onPick={moveTo} />
             </div>
             <p className="mt-3 px-1 text-[13px] text-ink-mute">
-              The world is first cut into 32 big tiles — the faint letters. Your code always starts with the
-              tile you’re in.
+              {tg.worldNote}
             </p>
           </div>
 
-          <Panel eyebrow="Close-up" title="Your box and its neighbours">
+          <Panel eyebrow={tg.closeUp} title={tg.closeUpTitle}>
             <div className="overflow-hidden rounded-2xl border border-line bg-paper/60">
               <CloseUp
                 geohash={geohash}
@@ -168,46 +155,44 @@ function GeoHashVisualizer() {
               />
             </div>
             <p className="mt-3 text-[13px] leading-relaxed text-ink-mute">
-              Grey letters are shared with your code; <span style={{ color: ACCENT }}>orange</span> ones differ.
-              The small letters inside your box are the choices for the next character.
+              <Rich text={tg.closeUpNote} />
             </p>
           </Panel>
         </div>
 
         {/* Side panel */}
         <div className="space-y-6">
-          <Panel eyebrow="Try this" title={allDone ? 'You’ve got it!' : 'Three small experiments'}>
+          <Panel eyebrow={t.common.tryThis} title={allDone ? t.common.gotIt : t.common.threeExperiments}>
             <GuideSteps steps={steps} accent={ACCENT} />
             {allDone && (
               <p className="mt-5 rounded-2xl p-4 text-[13px] leading-relaxed text-ink-soft" style={{ backgroundColor: SOFT }}>
-                Close places usually share a beginning. So “find everything near me” becomes “find codes that
-                start with these letters” — something databases are very fast at.
+                {tg.allDone}
               </p>
             )}
           </Panel>
 
-          <Panel eyebrow="Adjust">
+          <Panel eyebrow={t.common.adjust}>
             <div className="space-y-6">
               <Slider
-                label="Code length"
-                hint="More letters, smaller area"
+                label={tg.codeLength}
+                hint={tg.codeLengthHint}
                 value={precision}
                 min={1}
                 max={8}
                 onChange={handlePrecision}
-                minLabel="1 · continent"
-                maxLabel="8 · a house"
+                minLabel={tg.minLabel}
+                maxLabel={tg.maxLabel}
                 accent={ACCENT}
               />
 
               <div>
-                <p className="mb-2.5 text-sm font-medium text-ink">Jump to</p>
+                <p className="mb-2.5 text-sm font-medium text-ink">{tg.jumpTo}</p>
                 <div className="flex flex-wrap gap-2">
                   {PLACES.map((place) => {
                     const active = Math.abs(place.lat - lat) < 1e-6 && Math.abs(place.lng - lng) < 1e-6;
                     return (
                       <button
-                        key={place.name}
+                        key={place.id}
                         type="button"
                         onClick={() => moveTo(place.lat, place.lng)}
                         className={`rounded-full border px-3 py-1.5 text-[13px] transition-colors ${
@@ -215,7 +200,7 @@ function GeoHashVisualizer() {
                         }`}
                         style={active ? { backgroundColor: ACCENT } : undefined}
                       >
-                        {place.name}
+                        {tg.places[place.id]}
                       </button>
                     );
                   })}
@@ -225,13 +210,13 @@ function GeoHashVisualizer() {
                     className="inline-flex items-center gap-1.5 rounded-full border border-dashed border-line-strong px-3 py-1.5 text-[13px] text-ink-soft transition-colors hover:text-ink"
                   >
                     <LocateFixed size={13} className={locating ? 'animate-spin' : ''} />
-                    Where I am
+                    {tg.whereIAm}
                   </button>
                 </div>
               </div>
 
               <label className="flex cursor-pointer items-center justify-between gap-3">
-                <span className="text-sm font-medium text-ink">Show neighbours</span>
+                <span className="text-sm font-medium text-ink">{tg.showNeighbours}</span>
                 <span className="relative inline-flex">
                   <input
                     type="checkbox"
@@ -246,17 +231,17 @@ function GeoHashVisualizer() {
 
               <details className="group border-t border-line pt-4">
                 <summary className="cursor-pointer list-none text-sm font-medium text-ink-soft transition-colors hover:text-ink">
-                  <span className="inline-block transition-transform group-open:rotate-90">›</span> Exact coordinates
+                  <span className="inline-block transition-transform group-open:rotate-90">›</span> {tg.exactCoordinates}
                 </summary>
                 <div className="mt-3 grid grid-cols-2 gap-3">
-                  <CoordField label="Latitude" value={lat} min={-90} max={90} onCommit={(v) => moveTo(v, lng)} />
-                  <CoordField label="Longitude" value={lng} min={-180} max={180} onCommit={(v) => moveTo(lat, v)} />
+                  <CoordField label={tg.latitude} value={lat} min={-90} max={90} onCommit={(v) => moveTo(v, lng)} />
+                  <CoordField label={tg.longitude} value={lng} min={-180} max={180} onCommit={(v) => moveTo(lat, v)} />
                 </div>
               </details>
             </div>
           </Panel>
 
-          <Panel eyebrow="Read it letter by letter" title="Every letter zooms in">
+          <Panel eyebrow={tg.letterByLetter} title={tg.everyLetter}>
             <ol className="space-y-2.5">
               {geohash.split('').map((char, i) => {
                 const prefix = geohash.slice(0, i + 1);
@@ -289,8 +274,7 @@ function GeoHashVisualizer() {
               })}
             </ol>
             <p className="mt-4 text-[13px] leading-relaxed text-ink-mute">
-              Behind the scenes, each letter packs five yes/no answers: “east or west half?”, “north or south
-              half?” — over and over.
+              {tg.lettersNote}
             </p>
           </Panel>
         </div>
@@ -298,28 +282,17 @@ function GeoHashVisualizer() {
 
       {/* The idea */}
       <div className="grid gap-6 md:grid-cols-2">
-        <Panel eyebrow="The idea in a minute" title="Halve, halve, halve again">
+        <Panel eyebrow={t.common.ideaInAMinute} title={tg.ideaTitle}>
           <div className="space-y-3 leading-relaxed text-ink-soft">
-            <p>
-              Ask: is the place in the east or west half of the world? Then: north or south half of that?
-              Keep alternating. Every answer is a 0 or a 1.
-            </p>
-            <p>
-              Group the answers five at a time and write each group as one letter. That string of letters is
-              the GeoHash — a nested address, from “this part of the planet” down to “this doorstep”.
-            </p>
+            {tg.idea.map((p) => (
+              <p key={p}>{p}</p>
+            ))}
           </div>
         </Panel>
-        <Panel eyebrow="Where it’s used" title="“What’s near me?” in one lookup">
+        <Panel eyebrow={t.common.whereUsed} title={tg.usedTitle}>
           <div className="space-y-3 leading-relaxed text-ink-soft">
-            <p>
-              Ride-hailing apps, delivery services and nearby-search features store each location’s code.
-              To find what’s close, they look up everything that starts with the same few letters —
-              plus the 8 neighbours, because a place right on the edge of a box may have a different code.
-            </p>
-            <p className="text-[13px] text-ink-mute">
-              That’s why the close-up shows the neighbours: they’re the boxes you’d search too.
-            </p>
+            <p>{tg.used}</p>
+            <p className="text-[13px] text-ink-mute">{tg.usedNote}</p>
           </div>
         </Panel>
       </div>

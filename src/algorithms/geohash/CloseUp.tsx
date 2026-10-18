@@ -1,6 +1,7 @@
 import { MouseEvent, useRef } from 'react';
 import { BASE32, decode, encode } from './logic';
 import { clampLat, sharedPrefix, wrapLng } from './format';
+import { useI18n } from '../../i18n';
 
 const ACCENT = '#c0553a';
 const VIEW_W = 600;
@@ -19,6 +20,7 @@ interface CloseUpProps {
  * cells the next character would choose between.
  */
 function CloseUp({ geohash, lat, lng, showNeighbors, onPick }: CloseUpProps) {
+  const { t } = useI18n();
   const svgRef = useRef<SVGSVGElement>(null);
   const precision = geohash.length;
   const { bounds } = decode(geohash);
@@ -85,7 +87,7 @@ function CloseUp({ geohash, lat, lng, showNeighbors, onPick }: CloseUpProps) {
       className="block w-full cursor-pointer touch-manipulation"
       onClick={handleClick}
       role="img"
-      aria-label="Close-up of the current GeoHash cell and its neighbours"
+      aria-label={t.geohash.closeUpLabel}
     >
       {/* Neighbours */}
       {cells.map(({ dx, dy, code }) => {

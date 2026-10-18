@@ -11,11 +11,9 @@ export interface AlgorithmTheme {
 
 export type CategoryId = 'sorting' | 'searching' | 'graphs' | 'structures' | 'spatial';
 
+/** Names and blurbs live in the i18n dictionaries under `categories` */
 export interface Category {
   id: CategoryId;
-  name: string;
-  /** One sentence shown under the category heading */
-  blurb: string;
   theme: AlgorithmTheme;
 }
 
@@ -25,32 +23,22 @@ export interface Category {
 export const CATEGORIES: Category[] = [
   {
     id: 'sorting',
-    name: 'Sorting',
-    blurb: 'Different strategies for putting things in order — and why some are dramatically faster.',
     theme: { accent: '#4a5a9c', soft: '#e3e6f3' },
   },
   {
     id: 'searching',
-    name: 'Searching',
-    blurb: 'Finding one thing among many, and how a little order makes it almost instant.',
     theme: { accent: '#a8741a', soft: '#f5ead2' },
   },
   {
     id: 'graphs',
-    name: 'Graphs & paths',
-    blurb: 'Exploring a maze of connections to find the way from here to there.',
     theme: { accent: '#7a4f86', soft: '#ece1ee' },
   },
   {
     id: 'structures',
-    name: 'Data structures',
-    blurb: 'Clever ways to arrange data so the questions you ask most are cheap to answer.',
     theme: { accent: '#2f6f86', soft: '#dceaef' },
   },
   {
     id: 'spatial',
-    name: 'Spatial & maps',
-    blurb: 'Organising points on a plane or a planet so “what’s nearby?” is quick.',
     theme: { accent: '#3f6b5c', soft: '#e2ebe4' },
   },
 ];
@@ -60,19 +48,12 @@ export function getCategory(id: CategoryId): Category {
 }
 
 /**
- * Algorithm metadata interface
+ * Algorithm metadata. All visible text (name, tagline, facts…) lives in the
+ * i18n dictionaries under `algorithms[id]`.
  */
 export interface AlgorithmMetadata {
   id: string;
-  name: string;
   category: CategoryId;
-  /** One friendly sentence: what it does, in plain language */
-  tagline: string;
-  description: string;
-  /** Short list of everyday places you meet this algorithm */
-  usedIn: string[];
-  /** "At a glance" facts, e.g. { label: 'Time', value: 'O(n log n)' } */
-  facts?: { label: string; value: string }[];
   icon: LucideIcon;
   /** Defaults to the category theme */
   theme: AlgorithmTheme;

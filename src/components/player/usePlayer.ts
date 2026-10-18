@@ -2,7 +2,6 @@ import { useCallback, useEffect, useState } from 'react';
 
 /** Delay per step (ms) for each speed setting, slowest first */
 export const DEFAULT_SPEEDS = [800, 350, 120, 25];
-export const SPEED_LABELS = ['Slow', 'Normal', 'Fast', 'Turbo'];
 
 export interface Player {
   index: number;

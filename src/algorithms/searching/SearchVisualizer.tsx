@@ -13,37 +13,11 @@ import Legend from '../../components/shared/Legend';
 import FactList from '../../components/shared/FactList';
 import GuideSteps from '../../components/shared/GuideSteps';
 import { getCategory } from '../../registry';
+import { useI18n } from '../../i18n';
 
 const { accent: ACCENT, soft: SOFT } = getCategory('searching').theme;
 const FOUND = '#3f6b5c';
 const SPEEDS = [1300, 700, 300, 80];
-
-const CONTENT: Record<SearchAlgorithm, { idea: string[]; facts: { label: string; value: string; hint?: string }[] }> = {
-  linear: {
-    idea: [
-      'Start at the first box and check each one in turn until you find what you’re looking for — or run out of boxes.',
-      'It’s the only option when the list is in no particular order. The catch: if the list doubles, so does the work.',
-    ],
-    facts: [
-      { label: 'Best case', value: 'O(1)', hint: 'It’s in the first box' },
-      { label: 'Worst case', value: 'O(n)', hint: 'Last box, or not there at all' },
-      { label: 'Needs a sorted list', value: 'No' },
-      { label: 'Extra memory', value: 'O(1)' },
-    ],
-  },
-  binary: {
-    idea: [
-      'Look at the middle box. If your number is bigger, it can only be in the right half; if smaller, the left half. Throw the other half away.',
-      'Each check halves what’s left, so even a million sorted items need only about 20 checks. That’s the power of keeping things in order.',
-    ],
-    facts: [
-      { label: 'Best case', value: 'O(1)', hint: 'It’s right in the middle' },
-      { label: 'Worst case', value: 'O(log n)', hint: 'About 20 checks for a million items' },
-      { label: 'Needs a sorted list', value: 'Yes' },
-      { label: 'Extra memory', value: 'O(1)' },
-    ],
-  },
-};
 
 function pickMissing(list: number[]) {
   const present = new Set(list);
@@ -52,6 +26,8 @@ function pickMissing(list: number[]) {
 }
 
 function SearchVisualizer({ algorithm }: { algorithm: SearchAlgorithm }) {
+  const { t } = useI18n();
+  const ts = t.searching;
   // A new list always comes with a target that's in it
   const newData = (size: number) => {
     const sorted = makeSortedList(size);
@@ -64,10 +40,12 @@ function SearchVisualizer({ algorithm }: { algorithm: SearchAlgorithm }) {
   const [progress, setProgress] = useState({ played: false, picked: false, missing: false });
 
   const frames = useMemo(
-    () => (algorithm === 'linear' ? linearSearch(list, target) : binarySearch(list, target)),
-    [algorithm, list, target]
+    () => (algorithm === 'linear' ? linearSearch(list, target, ts.notes) : binarySearch(list, target, ts.notes)),
+    [algorithm, list, target, ts.notes]
   );
-  const player = usePlayer(frames.length, { resetKey: frames, speeds: SPEEDS });
+  // Rewind on a new search only; a language switch re-narrates the same frames in place
+  const searchKey = useMemo(() => ({}), [algorithm, list, target]);
+  const player = usePlayer(frames.length, { resetKey: searchKey, speeds: SPEEDS });
   const frame = frames[player.index];
 
   useEffect(() => {
@@ -84,11 +62,8 @@ function SearchVisualizer({ algorithm }: { algorithm: SearchAlgorithm }) {
   const binaryChecks = binarySearch(sorted, target).at(-1)!.checks;
   const eliminated = new Set(frame.eliminated);
 
-  const steps = [
-    { title: 'Press play', detail: `Watch how it hunts for ${target}. The sentence below explains every check.`, done: progress.played },
-    { title: 'Search for something else', detail: 'Click any box to make its number the new target.', done: progress.picked },
-    { title: 'Look for a number that isn’t there', detail: 'Press “Not in list”. How many checks does it take to be sure?', done: progress.missing },
-  ];
+  const done = [progress.played, progress.picked, progress.missing];
+  const steps = ts.steps.map((s, i) => ({ title: s.title, detail: s.detail(target), done: done[i] }));
 
   return (
     <div className="space-y-6">
@@ -97,7 +72,7 @@ function SearchVisualizer({ algorithm }: { algorithm: SearchAlgorithm }) {
           <div className="mb-5 flex flex-wrap items-end justify-between gap-4 px-1">
             <div className="flex items-end gap-8">
               <div>
-                <p className="mb-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-ink-mute">Looking for</p>
+                <p className="mb-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-ink-mute">{ts.lookingFor}</p>
                 <span
                   className="inline-flex h-12 min-w-12 items-center justify-center rounded-xl px-3 font-display text-3xl"
                   style={{ backgroundColor: SOFT, color: ACCENT }}
@@ -105,18 +80,18 @@ function SearchVisualizer({ algorithm }: { algorithm: SearchAlgorithm }) {
                   {target}
                 </span>
               </div>
-              <Stat label="Checks so far" value={frame.checks} />
+              <Stat label={ts.checksSoFar} value={frame.checks} />
             </div>
             <div className="flex flex-wrap gap-1.5">
               <Button variant="secondary" size="sm" onClick={() => pickTarget(list[Math.floor(Math.random() * list.length)], 'picked')}>
                 <Dices size={15} />
-                Random target
+                {ts.randomTarget}
               </Button>
               <Button variant="secondary" size="sm" onClick={() => pickTarget(pickMissing(list), 'missing')}>
                 <HelpCircle size={15} />
-                Not in list
+                {ts.notInList}
               </Button>
-              <Button variant="ghost" size="sm" onClick={() => setData(newData(size))} title="New list">
+              <Button variant="ghost" size="sm" onClick={() => setData(newData(size))} title={t.common.newList}>
                 <Shuffle size={15} />
               </Button>
             </div>
@@ -149,13 +124,13 @@ function SearchVisualizer({ algorithm }: { algorithm: SearchAlgorithm }) {
                               ? { borderColor: value === target ? ACCENT : undefined }
                               : undefined
                       }
-                      aria-label={`Search for ${value}`}
+                      aria-label={ts.searchFor(value)}
                     >
                       {value}
                     </motion.button>
                     <span className="h-4 text-[10px] font-semibold uppercase tracking-wide" style={{ color: ACCENT }}>
                       {algorithm === 'binary' && !frame.missing
-                        ? [frame.low === i && 'low', isCurrent && 'mid', frame.high === i && 'high'].filter(Boolean).join(' · ')
+                        ? [frame.low === i && ts.low, isCurrent && ts.mid, frame.high === i && ts.high].filter(Boolean).join(' · ')
                         : isCurrent
                           ? '↑'
                           : ''}
@@ -173,30 +148,30 @@ function SearchVisualizer({ algorithm }: { algorithm: SearchAlgorithm }) {
           <Legend
             className="mt-5 px-1"
             items={[
-              { color: ACCENT, label: 'Checking now' },
-              { color: '#d9d3c5', label: 'Ruled out' },
-              { color: FOUND, label: 'Found' },
+              { color: ACCENT, label: ts.legend.checking },
+              { color: '#d9d3c5', label: ts.legend.ruledOut },
+              { color: FOUND, label: ts.legend.found },
             ]}
           />
         </div>
 
         <div className="space-y-6 lg:sticky lg:top-20">
-          <Panel eyebrow="Try this" title="Three small experiments">
+          <Panel eyebrow={t.common.tryThis} title={t.common.threeExperiments}>
             <GuideSteps steps={steps} accent={ACCENT} />
           </Panel>
-          <Panel eyebrow="Adjust">
-            <Slider label="How many boxes" value={size} min={5} max={63} onChange={(n) => setData(newData(n))} accent={ACCENT} />
+          <Panel eyebrow={t.common.adjust}>
+            <Slider label={ts.howManyBoxes} value={size} min={5} max={63} onChange={(n) => setData(newData(n))} accent={ACCENT} />
           </Panel>
-          <Panel eyebrow="Head to head" title={`Finding ${target}`}>
+          <Panel eyebrow={ts.headToHead} title={ts.finding(target)}>
             <div className="space-y-3">
               {[
-                { label: 'Linear search', value: linearChecks, color: algorithm === 'linear' ? ACCENT : '#cfc7b6' },
-                { label: 'Binary search', value: binaryChecks, color: algorithm === 'binary' ? ACCENT : '#cfc7b6' },
+                { label: ts.linear, value: linearChecks, color: algorithm === 'linear' ? ACCENT : '#cfc7b6' },
+                { label: ts.binary, value: binaryChecks, color: algorithm === 'binary' ? ACCENT : '#cfc7b6' },
               ].map(({ label, value, color }) => (
                 <div key={label} className="text-[13px]">
                   <div className="mb-1 flex justify-between">
                     <span className="text-ink-soft">{label}</span>
-                    <span className="tabular-nums text-ink">{value} checks</span>
+                    <span className="tabular-nums text-ink">{ts.checks(value)}</span>
                   </div>
                   <div className="h-2 overflow-hidden rounded-full bg-paper-deep">
                     <motion.div
@@ -213,16 +188,16 @@ function SearchVisualizer({ algorithm }: { algorithm: SearchAlgorithm }) {
       </div>
 
       <div className="grid gap-6 md:grid-cols-[minmax(0,1fr)_minmax(0,0.8fr)]">
-        <Panel eyebrow="The idea in a minute" title={algorithm === 'linear' ? 'One by one' : 'Halve it, every time'}>
+        <Panel eyebrow={t.common.ideaInAMinute} title={ts.content[algorithm].title}>
           <div className="space-y-3 leading-relaxed text-ink-soft">
-            {CONTENT[algorithm].idea.map((p) => (
+            {ts.content[algorithm].idea.map((p) => (
               <p key={p}>{p}</p>
             ))}
           </div>
           {algorithm === 'binary' && <GuessingGame />}
         </Panel>
-        <Panel eyebrow="At a glance" title="How fast, how much memory">
-          <FactList facts={CONTENT[algorithm].facts} />
+        <Panel eyebrow={t.common.atAGlance} title={t.common.howFast}>
+          <FactList facts={ts.content[algorithm].facts} />
         </Panel>
       </div>
     </div>
@@ -234,25 +209,24 @@ function SearchVisualizer({ algorithm }: { algorithm: SearchAlgorithm }) {
  * and the player can try to do as well.
  */
 function GuessingGame() {
+  const tg = useI18n().t.searching.game;
   const [secret, setSecret] = useState(() => 1 + Math.floor(Math.random() * 100));
   const [guess, setGuess] = useState('');
-  const [history, setHistory] = useState<{ value: number; hint: string }[]>([]);
+  const [history, setHistory] = useState<{ value: number; hint: 'win' | 'higher' | 'lower' }[]>([]);
   const won = history.some((h) => h.value === secret);
 
   const submit = () => {
     const value = Number(guess);
     if (!Number.isInteger(value) || value < 1 || value > 100 || won) return;
-    const hint = value === secret ? 'Got it!' : value < secret ? 'Higher' : 'Lower';
+    const hint = value === secret ? 'win' : value < secret ? 'higher' : 'lower';
     setHistory((h) => [...h, { value, hint }]);
     setGuess('');
   };
 
   return (
     <div className="mt-6 rounded-2xl border border-line bg-paper/60 p-5">
-      <p className="font-display text-lg text-ink">Play: guess my number</p>
-      <p className="mt-1 text-[13px] leading-relaxed text-ink-soft">
-        I’m thinking of a number from 1 to 100. Binary search always gets it in 7 guesses or fewer — can you?
-      </p>
+      <p className="font-display text-lg text-ink">{tg.title}</p>
+      <p className="mt-1 text-[13px] leading-relaxed text-ink-soft">{tg.intro}</p>
       <div className="mt-4 flex gap-2">
         <input
           type="number"
@@ -265,10 +239,10 @@ function GuessingGame() {
           onKeyDown={(e) => e.key === 'Enter' && submit()}
           placeholder="1 – 100"
           className="h-10 w-28 rounded-xl border border-line bg-card px-3 text-sm text-ink focus:border-ink focus:outline-none"
-          aria-label="Your guess"
+          aria-label={tg.yourGuess}
         />
         <Button size="sm" onClick={submit} disabled={won || guess === ''} className="h-10">
-          Guess
+          {tg.guess}
         </Button>
         {history.length > 0 && (
           <Button
@@ -280,7 +254,7 @@ function GuessingGame() {
               setHistory([]);
             }}
           >
-            New game
+            {tg.newGame}
           </Button>
         )}
       </div>
@@ -290,18 +264,16 @@ function GuessingGame() {
             <li
               key={i}
               className="rounded-full px-3 py-1 text-xs"
-              style={h.hint === 'Got it!' ? { backgroundColor: FOUND, color: '#fff' } : { backgroundColor: SOFT, color: ACCENT }}
+              style={h.hint === 'win' ? { backgroundColor: FOUND, color: '#fff' } : { backgroundColor: SOFT, color: ACCENT }}
             >
-              {h.value} · {h.hint}
+              {h.value} · {h.hint === 'win' ? tg.gotIt : h.hint === 'higher' ? tg.higher : tg.lower}
             </li>
           ))}
         </ol>
       )}
       {won && (
         <p className="mt-3 text-[13px] text-ink-soft">
-          {history.length <= 7
-            ? `Nice — ${history.length} guess${history.length > 1 ? 'es' : ''}. You searched like a computer.`
-            : `${history.length} guesses. Try always guessing the middle of what’s left — that’s binary search.`}
+          {history.length <= 7 ? tg.winGood(history.length) : tg.winSlow(history.length)}
         </p>
       )}
     </div>

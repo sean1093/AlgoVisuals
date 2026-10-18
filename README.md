@@ -128,13 +128,22 @@ Each topic has one accent colour (defined in `CATEGORIES` in `src/registry.ts`);
 | **Framer Motion** | Animation library |
 | **Lucide React** | Icon library |
 
+## 🌐 Languages
+
+The interface is available in **English** (default), **繁體中文**, **日本語** and **한국어** — switch with the globe button in the header (the choice is remembered).
+
+- All text lives in `src/i18n/` — `en.ts` is the source of truth; `zh-TW.ts`, `ja.ts`, `ko.ts` must have exactly the same shape (TypeScript enforces it, and `src/i18n/i18n.test.ts` also checks array lengths, function arity and that sentences are actually translated).
+- Step-by-step narration is produced by the algorithm logic through a messages object (`SORT_MESSAGES`, `SEARCH_MESSAGES`, `BST_MESSAGES`, `HEAP_MESSAGES`), English by default, so the logic stays pure and testable.
+- Use `**double asterisks**` for emphasis inside translated sentences.
+- To add a language: copy `en.ts`, translate it, and add it to `LANGUAGES` and `DICTIONARIES` in `src/i18n/index.tsx`.
+
 ## 🧪 Adding New Algorithms
 
 1. Create `src/algorithms/your-algorithm/logic.ts` with pure logic. For step-by-step demos, return an array of frames
    (`{ ...state, note: 'What just happened, in plain words' }`).
 2. Add `logic.test.ts` next to it and run `npm test`.
 3. Build the visualizer with the shared pieces (`usePlayer`, `PlayerControls`, `Narration`, `Panel`, `GuideSteps`, …).
-4. Register it in `src/algorithms/index.tsx` with a `category` and a `preview`.
+4. Register it in `src/algorithms/index.tsx` with a `category` and a `preview`, and add its name, tagline and facts to `algorithms` in every dictionary under `src/i18n/`.
 
 That's it — the landing page, Browse menu and routes update automatically.
 

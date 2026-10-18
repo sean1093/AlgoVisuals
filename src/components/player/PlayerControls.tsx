@@ -1,6 +1,7 @@
 import { CSSProperties, useEffect, useRef } from 'react';
 import { ChevronLeft, ChevronRight, Pause, Play, RotateCcw } from 'lucide-react';
-import { Player, SPEED_LABELS } from './usePlayer';
+import { Player } from './usePlayer';
+import { useI18n } from '../../i18n';
 
 interface PlayerControlsProps {
   player: Player;
@@ -21,6 +22,7 @@ function isTyping(target: EventTarget | null) {
  */
 function PlayerControls({ player, accent, keyboard = true, className = '' }: PlayerControlsProps) {
   const { index, total, playing, atEnd } = player;
+  const tc = useI18n().t.common;
   // Latest player for the key handler, so we subscribe once instead of every frame
   const latest = useRef(player);
   latest.current = player;
@@ -49,10 +51,10 @@ function PlayerControls({ player, accent, keyboard = true, className = '' }: Pla
   return (
     <div className={`flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4 ${className}`}>
       <div className="flex items-center gap-1">
-        <button type="button" className={iconButton} onClick={player.restart} disabled={index === 0} aria-label="Back to start" title="Back to start">
+        <button type="button" className={iconButton} onClick={player.restart} disabled={index === 0} aria-label={tc.backToStart} title={tc.backToStart}>
           <RotateCcw size={17} />
         </button>
-        <button type="button" className={iconButton} onClick={player.stepBack} disabled={index === 0} aria-label="Previous step" title="Previous step (←)">
+        <button type="button" className={iconButton} onClick={player.stepBack} disabled={index === 0} aria-label={tc.previousStep} title={`${tc.previousStep} (←)`}>
           <ChevronLeft size={20} />
         </button>
         <button
@@ -60,12 +62,12 @@ function PlayerControls({ player, accent, keyboard = true, className = '' }: Pla
           onClick={player.toggle}
           className="flex h-12 w-12 items-center justify-center rounded-full text-white shadow-card transition-transform active:scale-95"
           style={{ backgroundColor: accent }}
-          aria-label={playing ? 'Pause' : atEnd ? 'Replay' : 'Play'}
-          title={playing ? 'Pause (space)' : 'Play (space)'}
+          aria-label={playing ? tc.pause : atEnd ? tc.replay : tc.play}
+          title={`${playing ? tc.pause : tc.play} (${tc.spaceKey})`}
         >
           {playing ? <Pause size={20} fill="currentColor" /> : atEnd ? <RotateCcw size={19} /> : <Play size={20} fill="currentColor" className="ml-0.5" />}
         </button>
-        <button type="button" className={iconButton} onClick={player.stepForward} disabled={atEnd} aria-label="Next step" title="Next step (→)">
+        <button type="button" className={iconButton} onClick={player.stepForward} disabled={atEnd} aria-label={tc.nextStep} title={`${tc.nextStep} (→)`}>
           <ChevronRight size={20} />
         </button>
       </div>
@@ -82,15 +84,15 @@ function PlayerControls({ player, accent, keyboard = true, className = '' }: Pla
           }}
           className="range min-w-0 flex-1"
           style={{ '--fill': `${fill}%`, '--accent': accent } as CSSProperties}
-          aria-label="Scrub through steps"
+          aria-label={tc.scrub}
         />
         <span className="w-20 flex-shrink-0 text-right text-xs tabular-nums text-ink-mute">
           {index + 1} / {total}
         </span>
       </div>
 
-      <div className="flex flex-shrink-0 rounded-full border border-line bg-paper/60 p-0.5" role="radiogroup" aria-label="Speed">
-        {SPEED_LABELS.map((label, i) => (
+      <div className="flex flex-shrink-0 rounded-full border border-line bg-paper/60 p-0.5" role="radiogroup" aria-label={tc.speed}>
+        {tc.speeds.map((label, i) => (
           <button
             key={label}
             type="button"
