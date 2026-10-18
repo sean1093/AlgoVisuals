@@ -32,7 +32,7 @@ function SortingRace() {
     [input, ts.notes]
   );
   const longest = Math.max(...lanes.map((l) => l.frames.length));
-  const player = usePlayer(longest, { resetKey: lanes, speeds: RACE_SPEEDS, initialSpeed: 1 });
+  const player = usePlayer(longest, { resetKey: input, speeds: RACE_SPEEDS, initialSpeed: 1 });
   const tick = player.index;
 
   // Finishing order: fewest steps wins

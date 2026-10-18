@@ -63,7 +63,7 @@ function PlayerControls({ player, accent, keyboard = true, className = '' }: Pla
           className="flex h-12 w-12 items-center justify-center rounded-full text-white shadow-card transition-transform active:scale-95"
           style={{ backgroundColor: accent }}
           aria-label={playing ? tc.pause : atEnd ? tc.replay : tc.play}
-          title={`${playing ? tc.pause : tc.play} (space)`}
+          title={`${playing ? tc.pause : tc.play} (${tc.spaceKey})`}
         >
           {playing ? <Pause size={20} fill="currentColor" /> : atEnd ? <RotateCcw size={19} /> : <Play size={20} fill="currentColor" className="ml-0.5" />}
         </button>

@@ -16,6 +16,7 @@ const ko: Messages = {
     backToStart: '처음으로',
     previousStep: '이전 단계',
     nextStep: '다음 단계',
+    spaceKey: '스페이스',
     scrub: '단계 이동하기',
     speed: '속도',
     speeds: ['느림', '보통', '빠름', '터보'],

@@ -32,7 +32,7 @@ function buildTable(words: string[], buckets: number): Table {
 }
 
 /** Narration is stored as a function of the dictionary so it follows language switches */
-type Note = (m: Messages['hash']) => string;
+type Note = (m: Messages['hash'], common: Messages['common']) => string;
 
 function HashTableVisualizer() {
   const { t } = useI18n();
@@ -42,7 +42,7 @@ function HashTableVisualizer() {
   const [highlight, setHighlight] = useState<Highlight | null>(null);
   const [note, setNoteFn] = useState<{ render: Note }>({ render: (m) => m.intro });
   const setNote = (render: Note) => setNoteFn({ render });
-  const noteText = note.render(th);
+  const noteText = note.render(th, t.common);
   const [lastKey, setLastKey] = useState('cat');
   const [progress, setProgress] = useState({ add: false, find: false, grow: false });
 
@@ -61,8 +61,8 @@ function HashTableVisualizer() {
       setNote((m) => m.exists(word, result.bucket));
     } else if (result.collision) {
       setHighlight({ bucket: result.bucket, key: word, kind: 'clash' });
-      const existing = table[result.bucket].map((k) => t.common.quote(k));
-      setNote((m) => m.collision(result.bucket, existing.join(t.common.listSeparator), word));
+      const existing = table[result.bucket];
+      setNote((m, c) => m.collision(result.bucket, existing.map(c.quote).join(c.listSeparator), word));
     } else {
       setHighlight({ bucket: result.bucket, key: word, kind: 'add' });
       setNote((m) => m.added(word, result.bucket));
@@ -106,7 +106,7 @@ function HashTableVisualizer() {
     setTable(next);
     setHighlight(null);
     setProgress((p) => ({ ...p, add: true }));
-    setNote((m) => (fresh.length ? m.addedMany(fresh.join(t.common.listSeparator)) : m.allIn));
+    setNote((m, c) => (fresh.length ? m.addedMany(fresh.join(c.listSeparator)) : m.allIn));
   };
 
   const done = [progress.add, progress.find, progress.grow];

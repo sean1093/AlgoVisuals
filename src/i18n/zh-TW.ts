@@ -16,6 +16,7 @@ const zhTW: Messages = {
     backToStart: '回到開頭',
     previousStep: '上一步',
     nextStep: '下一步',
+    spaceKey: '空白鍵',
     scrub: '拖曳瀏覽每個步驟',
     speed: '速度',
     speeds: ['慢', '一般', '快', '超快'],

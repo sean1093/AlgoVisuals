@@ -43,7 +43,9 @@ function SearchVisualizer({ algorithm }: { algorithm: SearchAlgorithm }) {
     () => (algorithm === 'linear' ? linearSearch(list, target, ts.notes) : binarySearch(list, target, ts.notes)),
     [algorithm, list, target, ts.notes]
   );
-  const player = usePlayer(frames.length, { resetKey: frames, speeds: SPEEDS });
+  // Rewind on a new search only; a language switch re-narrates the same frames in place
+  const searchKey = useMemo(() => ({}), [algorithm, list, target]);
+  const player = usePlayer(frames.length, { resetKey: searchKey, speeds: SPEEDS });
   const frame = frames[player.index];
 
   useEffect(() => {

@@ -22,6 +22,9 @@ export interface HeapFrame {
 
 let nextId = 1;
 
+/** A fresh item id; pass it to `push` so re-running the operation reuses it */
+export const newItemId = () => nextId++;
+
 /**
  * Plain-language step descriptions; English by default, swapped for a translation by the UI
  */
@@ -79,8 +82,8 @@ function siftDown(items: HeapItem[], start: number, frames: HeapFrame[], m: Heap
   return i;
 }
 
-export function push(heap: HeapItem[], value: number, m: HeapMessages = HEAP_MESSAGES): HeapFrame[] {
-  const items = [...heap, { id: nextId++, value }];
+export function push(heap: HeapItem[], value: number, m: HeapMessages = HEAP_MESSAGES, id: number = newItemId()): HeapFrame[] {
+  const items = [...heap, { id, value }];
   const frames: HeapFrame[] = [
     { items: [...items], settled: undefined, compare: undefined, note: m.pushIntro(value) },
   ];

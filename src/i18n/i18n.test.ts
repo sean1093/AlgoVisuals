@@ -3,6 +3,8 @@ import en from './en';
 import zhTW from './zh-TW';
 import ja from './ja';
 import ko from './ko';
+import { registerAllAlgorithms } from '../algorithms';
+import { CATEGORIES, getAllAlgorithms } from '../registry';
 
 const TRANSLATIONS = { 'zh-TW': zhTW, ja, ko } as Record<string, unknown>;
 
@@ -16,9 +18,17 @@ function compare(source: unknown, target: unknown, path: string, issues: Issue[]
   if (typeof source === 'function') {
     if (typeof target !== 'function') return issues.push(`${path}: expected a function`);
     if (target.length !== source.length) issues.push(`${path}: takes ${target.length} args, English takes ${source.length}`);
-    const args = Array.from({ length: source.length }, () => 2);
-    const out = (target as (...a: unknown[]) => unknown)(...args);
-    if (typeof out !== 'string' || !out.trim() || /undefined|NaN|\[object/.test(out)) issues.push(`${path}: returned ${JSON.stringify(out)}`);
+    // Try plural and singular forms (and `null`, used for "no path")
+    for (const value of [2, 1, null]) {
+      if (value === null && !path.endsWith('compareRow')) continue;
+      const args = Array.from({ length: source.length }, (_, i) => (value === null && i > 0 ? null : value ?? 2));
+      const out = (target as (...a: unknown[]) => unknown)(...args);
+      if (typeof out !== 'string' || !out.trim() || /undefined|NaN|null|\[object/.test(out)) {
+        issues.push(`${path}(${args.join(', ')}): returned ${JSON.stringify(out)}`);
+      } else if ((out.match(/\*\*/g) ?? []).length % 2) {
+        issues.push(`${path}(${args.join(', ')}): unbalanced ** markers`);
+      }
+    }
     return;
   }
   if (Array.isArray(source)) {
@@ -49,6 +59,16 @@ function compare(source: unknown, target: unknown, path: string, issues: Issue[]
 }
 
 describe('translations', () => {
+  it('every registered algorithm and category has text in every language', () => {
+    registerAllAlgorithms();
+    const ids = getAllAlgorithms().map((a) => a.id);
+    expect(ids.length).toBeGreaterThan(0);
+    for (const [lang, dict] of Object.entries({ en, ...TRANSLATIONS }) as [string, typeof en][]) {
+      for (const id of ids) expect(dict.algorithms[id]?.name, `${lang} algorithms.${id}`).toBeTruthy();
+      for (const c of CATEGORIES) expect(dict.categories[c.id]?.name, `${lang} categories.${c.id}`).toBeTruthy();
+    }
+  });
+
   for (const [lang, dict] of Object.entries(TRANSLATIONS)) {
     it(`${lang} matches the English dictionary`, () => {
       const issues: Issue[] = [];

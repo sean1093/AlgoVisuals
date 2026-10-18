@@ -20,6 +20,7 @@ const en = {
     backToStart: 'Back to start',
     previousStep: 'Previous step',
     nextStep: 'Next step',
+    spaceKey: 'Space',
     scrub: 'Scrub through steps',
     speed: 'Speed',
     speeds: ['Slow', 'Normal', 'Fast', 'Turbo'],

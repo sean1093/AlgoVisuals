@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowUpFromLine, Dices, Plus, Trash2 } from 'lucide-react';
-import { HeapFrame, HeapItem, fromValues, parent, pop, push } from './logic';
+import { HeapFrame, HeapItem, fromValues, newItemId, parent, pop, push } from './logic';
 import { usePlayer } from '../../components/player/usePlayer';
 import PlayerControls from '../../components/player/PlayerControls';
 import Narration from '../../components/player/Narration';
@@ -56,7 +56,7 @@ function heapToDiagram(frame: HeapFrame) {
 
 /** What the frames show: an operation on a heap, or just a heap with an intro line */
 type Scene =
-  | { kind: 'push'; base: HeapItem[]; value: number }
+  | { kind: 'push'; base: HeapItem[]; value: number; id: number }
   | { kind: 'pop'; base: HeapItem[] }
   | { kind: 'intro' | 'empty'; base: HeapItem[] }
   | { kind: 'built'; base: HeapItem[]; values: number[] };
@@ -67,7 +67,7 @@ function HeapVisualizer() {
   const [scene, setScene] = useState<Scene>(() => ({ kind: 'intro', base: fromValues(START) }));
   // Frames are derived from the scene so a language switch re-narrates them
   const frames = useMemo<HeapFrame[]>(() => {
-    if (scene.kind === 'push') return push(scene.base, scene.value, th.notes);
+    if (scene.kind === 'push') return push(scene.base, scene.value, th.notes, scene.id);
     if (scene.kind === 'pop') return pop(scene.base, th.notes);
     const note = scene.kind === 'built' ? th.built(scene.values.join(t.common.listSeparator)) : scene.kind === 'empty' ? th.emptyIntro : th.intro;
     return [{ items: scene.base, note }];
@@ -77,7 +77,7 @@ function HeapVisualizer() {
   const heap = frames[frames.length - 1].items;
   const [input, setInput] = useState('');
   const [progress, setProgress] = useState({ push: false, pop: false, drain: false });
-  const player = usePlayer(frames.length, { resetKey: frames, autoPlay: frames.length > 1, speeds: SPEEDS });
+  const player = usePlayer(frames.length, { resetKey: scene, autoPlay: frames.length > 1, speeds: SPEEDS });
   const frame = frames[player.index];
   const diagram = useMemo(() => heapToDiagram(frame), [frame]);
 
@@ -86,7 +86,7 @@ function HeapVisualizer() {
 
   const doPush = (value: number) => {
     if (heap.length >= 31) return;
-    setScene({ kind: 'push', base: heap, value });
+    setScene({ kind: 'push', base: heap, value, id: newItemId() });
     setProgress((p) => ({ ...p, push: true }));
   };
 

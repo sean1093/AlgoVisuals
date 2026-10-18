@@ -1,4 +1,4 @@
-import { ReactNode, createContext, useContext, useEffect, useMemo, useState } from 'react';
+import { ReactNode, createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import en, { Messages } from './en';
 import zhTW from './zh-TW';
 import ja from './ja';
@@ -27,7 +27,8 @@ const STORAGE_KEY = 'algovisuals.lang';
 function readSaved(): Lang {
   try {
     const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved && saved in DICTIONARIES) return saved as Lang;
+    const known = LANGUAGES.find((l) => l.id === saved);
+    if (known) return known.id;
   } catch {
     // Storage can be blocked (private mode); fall back to the default
   }
@@ -45,14 +46,14 @@ const I18nContext = createContext<I18nValue>({ lang: 'en', setLang: () => {}, t:
 export function I18nProvider({ children }: { children: ReactNode }) {
   const [lang, setLangState] = useState<Lang>(readSaved);
 
-  const setLang = (next: Lang) => {
+  const setLang = useCallback((next: Lang) => {
     setLangState(next);
     try {
       localStorage.setItem(STORAGE_KEY, next);
     } catch {
       // Not persisted; the choice still applies for this visit
     }
-  };
+  }, []);
 
   useEffect(() => {
     document.documentElement.lang = lang;
@@ -66,7 +67,7 @@ export function I18nProvider({ children }: { children: ReactNode }) {
     document.head.appendChild(link);
   }, [lang]);
 
-  const value = useMemo(() => ({ lang, setLang, t: DICTIONARIES[lang] }), [lang]);
+  const value = useMemo(() => ({ lang, setLang, t: DICTIONARIES[lang] }), [lang, setLang]);
   return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>;
 }
 

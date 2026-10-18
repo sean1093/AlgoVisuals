@@ -16,6 +16,7 @@ const ja: Messages = {
     backToStart: '最初に戻る',
     previousStep: '前のステップ',
     nextStep: '次のステップ',
+    spaceKey: 'スペース',
     scrub: 'ステップを移動',
     speed: '速さ',
     speeds: ['ゆっくり', 'ふつう', '速い', '最速'],

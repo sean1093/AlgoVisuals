@@ -25,6 +25,9 @@ export interface TreeFrame {
 
 let nextId = 1;
 
+/** A fresh node id; pass it to `insert` so re-running the operation reuses it */
+export const newNodeId = () => nextId++;
+
 /**
  * Plain-language step descriptions; English by default, swapped for a translation by the UI
  */
@@ -104,7 +107,7 @@ function descend(root: BSTNode | null, value: number, frames: TreeFrame[], m: BS
   return { node: null, parent, trail };
 }
 
-export function insert(root: BSTNode | null, value: number, m: BSTMessages = BST_MESSAGES): TreeFrame[] {
+export function insert(root: BSTNode | null, value: number, m: BSTMessages = BST_MESSAGES, id: number = newNodeId()): TreeFrame[] {
   const frames: TreeFrame[] = [{ root: clone(root), trail: [], note: m.insertIntro(value) }];
   const working = clone(root);
   const { node, parent, trail } = descend(working, value, frames, m);
@@ -112,7 +115,7 @@ export function insert(root: BSTNode | null, value: number, m: BSTMessages = BST
     frames.push({ root: clone(working), active: node.id, trail, done: node.id, note: m.insertExists(value) });
     return frames;
   }
-  const fresh: BSTNode = { id: nextId++, value, left: null, right: null };
+  const fresh: BSTNode = { id, value, left: null, right: null };
   let newRoot = working;
   if (!parent) newRoot = fresh;
   else if (value < parent.value) parent.left = fresh;

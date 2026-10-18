@@ -61,7 +61,6 @@ function LanguageMenu() {
         type="button"
         onClick={() => setOpen((o) => !o)}
         aria-expanded={open}
-        aria-haspopup="listbox"
         aria-label={t.common.language}
         title={t.common.language}
         className={`flex items-center gap-1.5 rounded-full px-3 py-2 text-sm transition-colors ${
@@ -74,7 +73,6 @@ function LanguageMenu() {
       <AnimatePresence>
         {open && (
           <motion.ul
-            role="listbox"
             aria-label={t.common.language}
             initial={{ opacity: 0, y: -6 }}
             animate={{ opacity: 1, y: 0 }}
@@ -86,8 +84,7 @@ function LanguageMenu() {
               <li key={l.id}>
                 <button
                   type="button"
-                  role="option"
-                  aria-selected={l.id === lang}
+                  aria-pressed={l.id === lang}
                   lang={l.id}
                   onClick={() => {
                     setLang(l.id);

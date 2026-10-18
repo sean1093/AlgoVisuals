@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { Dices, Plus, Search, Trash2, X } from 'lucide-react';
-import { BSTNode, TreeFrame, build, contains, height, inOrder, insert, layout, remove, search, size } from './logic';
+import { BSTNode, TreeFrame, build, newNodeId, contains, height, inOrder, insert, layout, remove, search, size } from './logic';
 import { usePlayer } from '../../components/player/usePlayer';
 import PlayerControls from '../../components/player/PlayerControls';
 import Narration from '../../components/player/Narration';
@@ -29,7 +29,7 @@ const PRESETS = [
 
 /** What the frames show: an operation on a tree, or just a tree with an intro line */
 type Scene =
-  | { kind: 'op'; op: 'insert' | 'search' | 'remove'; base: BSTNode | null; value: number }
+  | { kind: 'op'; op: 'insert' | 'search' | 'remove'; base: BSTNode | null; value: number; id: number }
   | { kind: 'intro' | 'empty'; base: BSTNode | null }
   | { kind: 'built'; base: BSTNode | null; values: number[] };
 
@@ -72,8 +72,8 @@ function BSTVisualizer() {
   // Frames are derived from the scene so a language switch re-narrates them
   const frames = useMemo<TreeFrame[]>(() => {
     if (scene.kind === 'op') {
-      const fn = scene.op === 'insert' ? insert : scene.op === 'search' ? search : remove;
-      return fn(scene.base, scene.value, tb.notes);
+      if (scene.op === 'insert') return insert(scene.base, scene.value, tb.notes, scene.id);
+      return (scene.op === 'search' ? search : remove)(scene.base, scene.value, tb.notes);
     }
     const note = scene.kind === 'built' ? tb.built(scene.values.join(t.common.listSeparator)) : scene.kind === 'empty' ? tb.emptyIntro : tb.intro;
     return [{ root: scene.base, trail: [], note }];
@@ -82,7 +82,7 @@ function BSTVisualizer() {
   const tree = frames[frames.length - 1].root;
   const [input, setInput] = useState('');
   const [progress, setProgress] = useState({ insert: false, search: false, degenerate: false });
-  const player = usePlayer(frames.length, { resetKey: frames, autoPlay: frames.length > 1, speeds: SPEEDS });
+  const player = usePlayer(frames.length, { resetKey: scene, autoPlay: frames.length > 1, speeds: SPEEDS });
   const frame = frames[player.index];
   const diagram = useMemo(() => treeToDiagram(frame), [frame]);
 
@@ -90,7 +90,7 @@ function BSTVisualizer() {
   const valid = input.trim() !== '' && Number.isInteger(parsed) && parsed >= 0 && parsed <= 999;
 
   const run = (op: 'insert' | 'search' | 'remove', value: number) => {
-    setScene({ kind: 'op', op, base: tree, value });
+    setScene({ kind: 'op', op, base: tree, value, id: newNodeId() });
     if (op === 'insert') setProgress((p) => ({ ...p, insert: true }));
     if (op === 'search') setProgress((p) => ({ ...p, search: true }));
   };

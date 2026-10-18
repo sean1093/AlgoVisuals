@@ -30,7 +30,8 @@ function SortingVisualizer({ algorithm }: { algorithm: SortAlgorithm }) {
   // `seed` forces a fresh shuffle when the user asks for one
   const input = useMemo(() => makeInput(size, shape), [size, shape, seed]);
   const frames = useMemo(() => SORTERS[algorithm](input, ts.notes), [algorithm, input, ts.notes]);
-  const player = usePlayer(frames.length, { resetKey: frames });
+  // Rewind on new input only; a language switch re-narrates the same frames in place
+  const player = usePlayer(frames.length, { resetKey: input });
   const frame = frames[player.index];
   const info = ts.info[algorithm];
   const complexity = SORT_COMPLEXITY[algorithm];
