@@ -56,7 +56,7 @@ const en = {
 
   landing: {
     badge: (demos: number, topics: number) => `${demos} interactive demos · ${topics} topics · free`,
-    titleStart: 'See how algorithms',
+    titleStart: 'See how algorithms ',
     titleEmphasis: 'think.',
     intro:
       'No code, no formulas. Press play, step through slowly, and watch an idea take shape in front of you — each one takes about two minutes to get.',

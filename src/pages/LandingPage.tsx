@@ -41,7 +41,7 @@ function LandingPage() {
             variants={fadeUp}
             className="font-display text-5xl leading-[1.05] tracking-tight text-ink md:text-7xl"
           >
-            {tl.titleStart} <em className="font-normal italic text-clay">{tl.titleEmphasis}</em>
+            {tl.titleStart}<em className="font-normal italic text-clay">{tl.titleEmphasis}</em>
           </motion.h1>
           <motion.p variants={fadeUp} className="mt-6 max-w-lg text-lg leading-relaxed text-ink-soft">
             {tl.intro}

@@ -111,7 +111,7 @@ function SortingRace() {
               const steps = lanes.find((l) => l.id === id)!.frames.length;
               return (
                 <li key={id} className="flex items-center gap-3 text-sm">
-                  <span className="w-8 text-ink-mute">{ordinal(i)}</span>
+                  <span className="min-w-8 flex-shrink-0 text-ink-mute">{ordinal(i)}</span>
                   <span className="w-28 text-ink">{ts.names[id]}</span>
                   <div className="h-2 flex-1 overflow-hidden rounded-full bg-paper-deep">
                     <div className="h-full rounded-full" style={{ width: `${(steps / longest) * 100}%`, backgroundColor: ACCENT, opacity: 0.75 }} />
