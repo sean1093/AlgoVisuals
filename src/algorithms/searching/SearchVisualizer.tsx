@@ -16,7 +16,7 @@ import { getCategory } from '../../registry';
 import { useI18n } from '../../i18n';
 
 const { accent: ACCENT, soft: SOFT } = getCategory('searching').theme;
-const FOUND = '#3f6b5c';
+const FOUND = 'var(--color-sage)';
 const SPEEDS = [1300, 700, 300, 80];
 
 function pickMissing(list: number[]) {
@@ -117,7 +117,7 @@ function SearchVisualizer({ algorithm }: { algorithm: SearchAlgorithm }) {
                       }`}
                       style={
                         isFound
-                          ? { backgroundColor: FOUND, borderColor: FOUND, color: '#fff' }
+                          ? { backgroundColor: FOUND, borderColor: FOUND, color: 'var(--color-on-accent)' }
                           : isCurrent
                             ? { borderColor: ACCENT, borderWidth: 2, color: ACCENT, backgroundColor: SOFT }
                             : !faded
@@ -149,7 +149,7 @@ function SearchVisualizer({ algorithm }: { algorithm: SearchAlgorithm }) {
             className="mt-5 px-1"
             items={[
               { color: ACCENT, label: ts.legend.checking },
-              { color: '#d9d3c5', label: ts.legend.ruledOut },
+              { color: 'var(--bar-idle)', label: ts.legend.ruledOut },
               { color: FOUND, label: ts.legend.found },
             ]}
           />
@@ -165,8 +165,8 @@ function SearchVisualizer({ algorithm }: { algorithm: SearchAlgorithm }) {
           <Panel eyebrow={ts.headToHead} title={ts.finding(target)}>
             <div className="space-y-3">
               {[
-                { label: ts.linear, value: linearChecks, color: algorithm === 'linear' ? ACCENT : '#cfc7b6' },
-                { label: ts.binary, value: binaryChecks, color: algorithm === 'binary' ? ACCENT : '#cfc7b6' },
+                { label: ts.linear, value: linearChecks, color: algorithm === 'linear' ? ACCENT : 'var(--color-line-strong)' },
+                { label: ts.binary, value: binaryChecks, color: algorithm === 'binary' ? ACCENT : 'var(--color-line-strong)' },
               ].map(({ label, value, color }) => (
                 <div key={label} className="text-[13px]">
                   <div className="mb-1 flex justify-between">
@@ -264,7 +264,7 @@ function GuessingGame() {
             <li
               key={i}
               className="rounded-full px-3 py-1 text-xs"
-              style={h.hint === 'win' ? { backgroundColor: FOUND, color: '#fff' } : { backgroundColor: SOFT, color: ACCENT }}
+              style={h.hint === 'win' ? { backgroundColor: FOUND, color: 'var(--color-on-accent)' } : { backgroundColor: SOFT, color: ACCENT }}
             >
               {h.value} · {h.hint === 'win' ? tg.gotIt : h.hint === 'higher' ? tg.higher : tg.lower}
             </li>

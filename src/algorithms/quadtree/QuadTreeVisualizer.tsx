@@ -11,8 +11,8 @@ import Rich from '../../components/shared/Rich';
 import { useI18n } from '../../i18n';
 
 const CANVAS_SIZE = 600;
-const ACCENT = '#3f6b5c';
-const SOFT = '#e2ebe4';
+const ACCENT = 'var(--color-sage)';
+const SOFT = 'var(--color-sage-soft)';
 
 interface Dot extends Point {
   id: number;
@@ -218,7 +218,7 @@ function QuadTreeVisualizer() {
                     animate={{ r: inside && hoveredNode ? 8.5 : 6.5, opacity: inside ? 1 : 0.35 }}
                     transition={{ type: 'spring', stiffness: 500, damping: 22 }}
                     fill={ACCENT}
-                    stroke="#fffdf8"
+                    stroke="var(--color-card)"
                     strokeWidth={2}
                     pointerEvents="none"
                   />
@@ -297,7 +297,7 @@ function QuadTreeVisualizer() {
             <Rich text={tq.whyFastBody(points.length, avgPerBox.toFixed(1))} />
           </p>
           <div className="mt-5 space-y-2.5">
-            <Bar label={tq.checkEverything} value={points.length} max={Math.max(points.length, 1)} color="#cfc7b6" />
+            <Bar label={tq.checkEverything} value={points.length} max={Math.max(points.length, 1)} color="var(--color-line-strong)" />
             <Bar label={tq.checkOneBox} value={avgPerBox} max={Math.max(points.length, 1)} color={ACCENT} />
           </div>
         </Panel>

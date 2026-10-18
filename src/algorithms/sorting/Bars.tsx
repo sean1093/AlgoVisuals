@@ -1,12 +1,12 @@
 import { SortFrame } from './logic';
 
 export const BAR_COLORS = {
-  idle: '#d9d3c5',
-  range: '#b9bfdc',
-  compare: '#4a5a9c',
-  swap: '#c0553a',
-  pivot: '#a8741a',
-  sorted: '#3f6b5c',
+  idle: 'var(--bar-idle)',
+  range: 'var(--bar-range)',
+  compare: 'var(--accent-sorting)',
+  swap: 'var(--color-clay)',
+  pivot: 'var(--accent-searching)',
+  sorted: 'var(--color-sage)',
 };
 
 /** Colours shown in the legend, in order (labels come from the dictionary) */

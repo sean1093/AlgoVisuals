@@ -113,7 +113,7 @@ function DemoPage() {
                 to={`/demo/${s.id}`}
                 aria-current={s.id === algorithm.id ? 'page' : undefined}
                 className={`rounded-full border px-3.5 py-1.5 text-sm transition-colors ${
-                  s.id === algorithm.id ? 'border-transparent text-white' : 'border-line bg-card/70 text-ink-soft hover:border-line-strong hover:text-ink'
+                  s.id === algorithm.id ? 'border-transparent text-on-accent' : 'border-line bg-card/70 text-ink-soft hover:border-line-strong hover:text-ink'
                 }`}
                 style={s.id === algorithm.id ? { backgroundColor: category.theme.accent } : undefined}
               >
@@ -142,7 +142,7 @@ function DemoPage() {
               </div>
             </div>
             <span
-              className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full text-white transition-transform group-hover:translate-x-1"
+              className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full text-on-accent transition-transform group-hover:translate-x-1"
               style={{ backgroundColor: next.theme.accent }}
             >
               <ArrowRight size={20} />

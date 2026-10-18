@@ -1,9 +1,10 @@
 import { ReactNode, useCallback, useEffect, useRef, useState } from 'react';
 import { Link, NavLink, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Check, ChevronDown, Globe } from 'lucide-react';
+import { Check, ChevronDown, Globe, Moon, Sun } from 'lucide-react';
 import { CATEGORIES, getAlgorithmsByCategory } from '../../registry';
 import { LANGUAGES, useI18n } from '../../i18n';
+import { useTheme } from '../../theme';
 
 function GithubMark() {
   return (
@@ -18,9 +19,9 @@ function Logo() {
   return (
     <Link to="/" className="group flex items-center gap-2.5" aria-label={t.nav.homeLabel}>
       <svg viewBox="0 0 32 32" className="h-8 w-8 transition-transform duration-300 group-hover:rotate-90" aria-hidden="true">
-        <rect width="32" height="32" rx="9" fill="#1f1d1a" />
-        <path d="M8 8h16v16H8zM16 8v16M8 16h8M16 12h8M20 8v8" fill="none" stroke="#f6f3ec" strokeWidth="1.6" strokeLinejoin="round" />
-        <circle cx="22" cy="20" r="2.2" fill="#c0553a" />
+        <rect width="32" height="32" rx="9" fill="var(--color-ink)" />
+        <path d="M8 8h16v16H8zM16 8v16M8 16h8M16 12h8M20 8v8" fill="none" stroke="var(--color-paper)" strokeWidth="1.6" strokeLinejoin="round" />
+        <circle cx="22" cy="20" r="2.2" fill="var(--color-clay)" />
       </svg>
       <span className="font-display text-xl tracking-tight text-ink">AlgoVisuals</span>
     </Link>
@@ -46,6 +47,23 @@ function useDismiss(open: boolean, close: () => void) {
     };
   }, [open, close]);
   return ref;
+}
+
+function ThemeToggle() {
+  const { theme, toggle } = useTheme();
+  const { t } = useI18n();
+  const label = theme === 'dark' ? t.common.lightMode : t.common.darkMode;
+  return (
+    <button
+      type="button"
+      onClick={toggle}
+      aria-label={label}
+      title={label}
+      className="flex h-9 w-9 items-center justify-center rounded-full text-ink-soft transition-colors hover:bg-paper-deep hover:text-ink"
+    >
+      {theme === 'dark' ? <Sun size={17} /> : <Moon size={17} />}
+    </button>
+  );
 }
 
 function LanguageMenu() {
@@ -191,6 +209,7 @@ function SiteHeader() {
           </Link>
           <BrowseMenu />
           <LanguageMenu />
+          <ThemeToggle />
           <a
             href="https://github.com/sean1093/AlgoVisuals"
             target="_blank"

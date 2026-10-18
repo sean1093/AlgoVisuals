@@ -11,8 +11,8 @@ import GuideSteps from '../../components/shared/GuideSteps';
 import Rich from '../../components/shared/Rich';
 import { useI18n } from '../../i18n';
 
-const ACCENT = '#c0553a';
-const SOFT = '#f5e1d8';
+const ACCENT = 'var(--color-clay)';
+const SOFT = 'var(--color-clay-soft)';
 const START = { lat: 25.033, lng: 121.565 };
 
 const PLACES = [
@@ -196,7 +196,7 @@ function GeoHashVisualizer() {
                         type="button"
                         onClick={() => moveTo(place.lat, place.lng)}
                         className={`rounded-full border px-3 py-1.5 text-[13px] transition-colors ${
-                          active ? 'border-transparent text-white' : 'border-line text-ink-soft hover:border-line-strong hover:text-ink'
+                          active ? 'border-transparent text-on-accent' : 'border-line text-ink-soft hover:border-line-strong hover:text-ink'
                         }`}
                         style={active ? { backgroundColor: ACCENT } : undefined}
                       >

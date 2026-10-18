@@ -64,7 +64,7 @@ function SortingRace() {
                   {done ? (
                     <span
                       className="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium"
-                      style={place === 0 ? { backgroundColor: ACCENT, color: '#fff' } : { backgroundColor: SOFT, color: ACCENT }}
+                      style={place === 0 ? { backgroundColor: ACCENT, color: 'var(--color-on-accent)' } : { backgroundColor: SOFT, color: ACCENT }}
                     >
                       {place === 0 && <Trophy size={12} />}
                       {ordinal(place)}

@@ -26,7 +26,7 @@ function GuideSteps({ steps, accent }: GuideStepsProps) {
           <li key={i} className="flex gap-3.5">
             <span
               className={`mt-0.5 flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full text-xs font-semibold transition-colors duration-300 ${
-                step.done ? 'text-white' : active ? 'border-2 bg-card' : 'border border-line bg-card text-ink-mute'
+                step.done ? 'text-on-accent' : active ? 'border-2 bg-card' : 'border border-line bg-card text-ink-mute'
               }`}
               style={
                 step.done

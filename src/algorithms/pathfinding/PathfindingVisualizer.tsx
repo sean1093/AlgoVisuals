@@ -22,15 +22,15 @@ const CELL = 20;
 const PATH_SPEEDS = [220, 80, 25, 6];
 
 const COLORS = {
-  empty: '#fffdf8',
-  wall: '#2f2b27',
-  mud: '#d9c7a1',
-  explored: '#dcc8e1',
-  frontier: '#f1e7f3',
+  empty: 'var(--color-card)',
+  wall: 'var(--path-wall)',
+  mud: 'var(--path-mud)',
+  explored: 'var(--path-explored)',
+  frontier: 'var(--path-frontier)',
   current: ACCENT,
-  path: '#e8b04b',
-  start: '#3f6b5c',
-  end: '#c0553a',
+  path: 'var(--path-route)',
+  start: 'var(--color-sage)',
+  end: 'var(--color-clay)',
 };
 
 const ALGORITHMS: PathAlgorithm[] = ['bfs', 'dfs', 'dijkstra', 'astar'];
@@ -252,7 +252,7 @@ function PathfindingVisualizer({ algorithm }: { algorithm: PathAlgorithm }) {
                 else if (result.discovered[i] !== -1 && result.discovered[i] <= exploredCount && player.index > 0) overlay = COLORS.frontier;
                 return (
                   <g key={i}>
-                    <rect x={x} y={y} width={CELL} height={CELL} fill={fill} stroke="#ece6da" strokeWidth={0.6} />
+                    <rect x={x} y={y} width={CELL} height={CELL} fill={fill} stroke="var(--color-line)" strokeWidth={0.6} />
                     {overlay && (
                       <rect
                         x={x + 0.5}
@@ -268,7 +268,7 @@ function PathfindingVisualizer({ algorithm }: { algorithm: PathAlgorithm }) {
                 );
               })}
               {/* Start and end */}
-              <circle cx={startCol * CELL + CELL / 2} cy={startRow * CELL + CELL / 2} r={CELL * 0.38} fill={COLORS.start} stroke="#fff" strokeWidth={2} />
+              <circle cx={startCol * CELL + CELL / 2} cy={startRow * CELL + CELL / 2} r={CELL * 0.38} fill={COLORS.start} stroke="var(--color-card)" strokeWidth={2} />
               <g transform={`translate(${endCol * CELL + 4} ${endRow * CELL + 3})`}>
                 <path d="M2 1v14" stroke={COLORS.end} strokeWidth={2} strokeLinecap="round" />
                 <path d="M3 2h10l-3 3.5 3 3.5H3z" fill={COLORS.end} />

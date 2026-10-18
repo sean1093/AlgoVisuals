@@ -40,6 +40,8 @@ const ja: Messages = {
     copy: 'コピー',
     whereUsed: '使われている場所',
     language: '言語',
+    darkMode: 'ダークモードに切り替え',
+    lightMode: 'ライトモードに切り替え',
     listSeparator: '、',
     quote: (s: string) => `「${s}」`,
   },

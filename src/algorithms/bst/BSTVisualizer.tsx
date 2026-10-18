@@ -16,8 +16,8 @@ import { useI18n } from '../../i18n';
 import Rich from '../../components/shared/Rich';
 
 const { accent: ACCENT, soft: SOFT } = getCategory('structures').theme;
-const FOUND = '#3f6b5c';
-const DOOMED = '#c0553a';
+const FOUND = 'var(--color-sage)';
+const DOOMED = 'var(--color-clay)';
 const START = [50, 30, 70, 20, 40, 60, 80, 35, 65];
 const SPEEDS = [1400, 800, 380, 120];
 
@@ -56,7 +56,7 @@ function treeToDiagram(frame: TreeFrame) {
       depth,
       fill: isDone ? FOUND : isDoomed ? DOOMED : isActive ? ACCENT : trail.has(node.id) ? SOFT : undefined,
       stroke: isDone ? FOUND : isDoomed ? DOOMED : trail.has(node.id) || isActive ? ACCENT : undefined,
-      text: isDone || isDoomed || isActive ? '#fff' : undefined,
+      text: isDone || isDoomed || isActive ? 'var(--color-on-accent)' : undefined,
     });
     for (const child of [node.left, node.right]) {
       if (child) edges.push({ from: node.id, to: child.id, highlight: trail.has(node.id) && trail.has(child.id) });

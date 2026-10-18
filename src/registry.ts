@@ -2,7 +2,7 @@ import { ComponentType } from 'react';
 import { LucideIcon } from 'lucide-react';
 
 /**
- * Accent palette for an algorithm (hex values, used both in CSS and SVG)
+ * Accent palette for an algorithm: CSS colour values (theme variables), usable in CSS and SVG
  */
 export interface AlgorithmTheme {
   accent: string;
@@ -23,23 +23,23 @@ export interface Category {
 export const CATEGORIES: Category[] = [
   {
     id: 'sorting',
-    theme: { accent: '#4a5a9c', soft: '#e3e6f3' },
+    theme: { accent: 'var(--accent-sorting)', soft: 'var(--soft-sorting)' },
   },
   {
     id: 'searching',
-    theme: { accent: '#a8741a', soft: '#f5ead2' },
+    theme: { accent: 'var(--accent-searching)', soft: 'var(--soft-searching)' },
   },
   {
     id: 'graphs',
-    theme: { accent: '#7a4f86', soft: '#ece1ee' },
+    theme: { accent: 'var(--accent-graphs)', soft: 'var(--soft-graphs)' },
   },
   {
     id: 'structures',
-    theme: { accent: '#2f6f86', soft: '#dceaef' },
+    theme: { accent: 'var(--accent-structures)', soft: 'var(--soft-structures)' },
   },
   {
     id: 'spatial',
-    theme: { accent: '#3f6b5c', soft: '#e2ebe4' },
+    theme: { accent: 'var(--color-sage)', soft: 'var(--color-sage-soft)' },
   },
 ];
 

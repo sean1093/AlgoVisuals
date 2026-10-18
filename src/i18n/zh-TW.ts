@@ -40,6 +40,8 @@ const zhTW: Messages = {
     copy: '複製',
     whereUsed: '實際應用',
     language: '語言',
+    darkMode: '切換到深色模式',
+    lightMode: '切換到淺色模式',
     listSeparator: '、',
     quote: (s: string) => `「${s}」`,
   },

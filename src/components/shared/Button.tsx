@@ -32,7 +32,7 @@ function Button({
 
   const variantClasses = {
     primary: 'bg-ink text-paper hover:bg-ink/85 shadow-card',
-    secondary: 'bg-card text-ink border border-line hover:border-line-strong hover:bg-white',
+    secondary: 'bg-card text-ink border border-line hover:border-line-strong hover:bg-paper',
     ghost: 'text-ink-soft hover:text-ink hover:bg-paper-deep',
   };
 
