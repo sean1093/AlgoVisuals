@@ -17,6 +17,9 @@ export interface Rectangle {
 }
 
 export class QuadTree {
+  /** Smallest box width/height that may be created by subdividing */
+  static MIN_SIZE = 4;
+
   boundary: Rectangle;
   capacity: number;
   points: Point[];
@@ -68,8 +71,11 @@ export class QuadTree {
       return false;
     }
 
-    // If there's capacity and not divided yet, insert directly
-    if (this.points.length < this.capacity && !this.divided) {
+    // If there's capacity and not divided yet, insert directly.
+    // Boxes that are already tiny keep extra points instead of splitting,
+    // otherwise identical points would subdivide endlessly.
+    const tooSmallToSplit = this.boundary.width / 2 < QuadTree.MIN_SIZE;
+    if (!this.divided && (this.points.length < this.capacity || tooSmallToSplit)) {
       this.points.push(point);
       return true;
     }

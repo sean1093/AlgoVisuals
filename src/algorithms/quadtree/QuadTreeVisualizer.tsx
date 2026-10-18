@@ -70,9 +70,10 @@ function QuadTreeVisualizer() {
   const toCanvas = (e: MouseEvent<SVGSVGElement>): Point | null => {
     if (!svgRef.current) return null;
     const rect = svgRef.current.getBoundingClientRect();
+    const clamp = (v: number) => Math.min(CANVAS_SIZE - 0.01, Math.max(0, v));
     return {
-      x: ((e.clientX - rect.left) / rect.width) * CANVAS_SIZE,
-      y: ((e.clientY - rect.top) / rect.height) * CANVAS_SIZE,
+      x: clamp(((e.clientX - rect.left) / rect.width) * CANVAS_SIZE),
+      y: clamp(((e.clientY - rect.top) / rect.height) * CANVAS_SIZE),
     };
   };
 
