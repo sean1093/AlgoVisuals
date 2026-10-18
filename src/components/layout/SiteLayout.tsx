@@ -1,6 +1,8 @@
-import { ReactNode, useEffect } from 'react';
+import { ReactNode, useEffect, useRef, useState } from 'react';
 import { Link, NavLink, useLocation } from 'react-router-dom';
-import { getAllAlgorithms } from '../../registry';
+import { AnimatePresence, motion } from 'framer-motion';
+import { ChevronDown } from 'lucide-react';
+import { CATEGORIES, getAlgorithmsByCategory } from '../../registry';
 
 function GithubMark() {
   return (
@@ -18,40 +20,105 @@ function Logo() {
         <path d="M8 8h16v16H8zM16 8v16M8 16h8M16 12h8M20 8v8" fill="none" stroke="#f6f3ec" strokeWidth="1.6" strokeLinejoin="round" />
         <circle cx="22" cy="20" r="2.2" fill="#c0553a" />
       </svg>
-      <span className="hidden font-display text-xl tracking-tight text-ink min-[400px]:inline">AlgoVisuals</span>
+      <span className="font-display text-xl tracking-tight text-ink">AlgoVisuals</span>
     </Link>
   );
 }
 
-function SiteHeader() {
-  const algorithms = getAllAlgorithms();
+function BrowseMenu() {
+  const [open, setOpen] = useState(false);
+  const { pathname } = useLocation();
+  const ref = useRef<HTMLDivElement>(null);
 
+  // Close on navigation, outside click and Escape
+  useEffect(() => setOpen(false), [pathname]);
+  useEffect(() => {
+    if (!open) return;
+    const onDown = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && setOpen(false);
+    document.addEventListener('mousedown', onDown);
+    document.addEventListener('keydown', onKey);
+    return () => {
+      document.removeEventListener('mousedown', onDown);
+      document.removeEventListener('keydown', onKey);
+    };
+  }, [open]);
+
+  return (
+    <div ref={ref}>
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        aria-expanded={open}
+        aria-haspopup="true"
+        className={`flex items-center gap-1.5 rounded-full px-3.5 py-2 text-sm transition-colors ${
+          open ? 'bg-card text-ink shadow-card' : 'text-ink-soft hover:text-ink'
+        }`}
+      >
+        Browse
+        <ChevronDown size={15} className={`transition-transform ${open ? 'rotate-180' : ''}`} />
+      </button>
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ opacity: 0, y: -6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -6 }}
+            transition={{ duration: 0.15 }}
+            className="absolute inset-x-0 top-full border-b border-line bg-paper/95 shadow-lift backdrop-blur-md"
+          >
+            <div className="mx-auto grid max-h-[75vh] max-w-6xl gap-x-8 gap-y-6 overflow-y-auto px-5 py-7 sm:grid-cols-2 md:px-8 lg:grid-cols-5">
+              {CATEGORIES.map((category) => {
+                const items = getAlgorithmsByCategory(category.id);
+                if (!items.length) return null;
+                return (
+                  <div key={category.id}>
+                    <p className="mb-3 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-ink-mute">
+                      <span className="h-2 w-2 rounded-full" style={{ backgroundColor: category.theme.accent }} />
+                      {category.name}
+                    </p>
+                    <ul className="space-y-0.5">
+                      {items.map((algo) => (
+                        <li key={algo.id}>
+                          <NavLink
+                            to={`/demo/${algo.id}`}
+                            className={({ isActive }) =>
+                              `block rounded-lg px-2.5 py-1.5 text-sm transition-colors ${
+                                isActive ? 'bg-card font-medium text-ink shadow-card' : 'text-ink-soft hover:bg-paper-deep hover:text-ink'
+                              }`
+                            }
+                          >
+                            {algo.name}
+                          </NavLink>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                );
+              })}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+function SiteHeader() {
   return (
     <header className="sticky top-0 z-30 border-b border-line/70 bg-paper/80 backdrop-blur-md">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-5 md:px-8">
         <Logo />
-        <nav className="flex items-center gap-0.5 sm:gap-1">
-          {algorithms.map((algo) => (
-            <NavLink
-              key={algo.id}
-              to={`/demo/${algo.id}`}
-              className={({ isActive }) =>
-                `flex items-center gap-2 rounded-full px-2.5 py-2 text-[13px] transition-colors sm:px-3.5 sm:text-sm ${
-                  isActive ? 'bg-card text-ink shadow-card' : 'text-ink-soft hover:text-ink'
-                }`
-              }
-            >
-              {({ isActive }) => (
-                <>
-                  <span
-                    className="h-2 w-2 rounded-full transition-opacity"
-                    style={{ backgroundColor: algo.theme.accent, opacity: isActive ? 1 : 0.5 }}
-                  />
-                  {algo.name}
-                </>
-              )}
-            </NavLink>
-          ))}
+        <nav className="flex items-center gap-1">
+          <Link
+            to="/"
+            className="hidden rounded-full px-3.5 py-2 text-sm text-ink-soft transition-colors hover:text-ink sm:block"
+          >
+            Home
+          </Link>
+          <BrowseMenu />
           <a
             href="https://github.com/sean1093/AlgoVisuals"
             target="_blank"
@@ -93,11 +160,14 @@ function SiteFooter() {
  * Shared page chrome: sticky header, content, footer
  */
 function SiteLayout({ children }: { children: ReactNode }) {
-  const { pathname } = useLocation();
+  const { pathname, hash } = useLocation();
 
+  // Scroll to top on navigation, or to the #section when the link has one
   useEffect(() => {
-    window.scrollTo(0, 0);
-  }, [pathname]);
+    const target = hash ? document.getElementById(hash.slice(1)) : null;
+    if (target) target.scrollIntoView({ behavior: 'smooth' });
+    else window.scrollTo(0, 0);
+  }, [pathname, hash]);
 
   return (
     <div className="paper-grain flex min-h-screen flex-col">

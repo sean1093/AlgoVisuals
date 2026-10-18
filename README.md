@@ -50,90 +50,70 @@ npm run preview  # Preview production build locally
 
 ## 📚 Algorithms
 
-### QuadTree
-**Spatial partitioning tree for efficient 2D spatial queries and collision detection**
+18 interactive demos across five topics. Every step-by-step demo has play / pause, step forward and back (← → keys),
+a scrubber, four speeds, and a one-sentence explanation of the current step.
 
-- **Features:**
-  - Click canvas to add points
-  - Adjustable capacity threshold
-  - Real-time subdivision visualization
-  - Hover to highlight regions
-
-- **Use Cases:**
-  - Game development (collision detection)
-  - Geographic information systems
-  - Image processing
-  - Database indexing
-
-### GeoHash
-**Geolocation encoding system that converts lat/lng to short strings**
-
-- **Features:**
-  - Click map or input coordinates
-  - Adjustable precision (1-8 characters)
-  - Neighbor cell visualization
-  - Real-time encoding/decoding
-
-- **Use Cases:**
-  - Location-based search
-  - Database sharding by geography
-  - URL-friendly location sharing
-  - Proximity queries
+| Topic | Demos |
+|-------|-------|
+| **Sorting** | Bubble, Selection, Insertion, Merge, Quick, Heap sort, plus a **Sorting Race** that runs all six on the same list |
+| **Searching** | Linear search, Binary search (with a "guess my number" game) |
+| **Graphs & paths** | BFS, DFS, Dijkstra, A* on a drawable grid (walls, mud, mazes) that is shared between the four pages |
+| **Data structures** | Binary Search Tree (insert / search / delete), Binary Heap, Hash Table (chaining, resize) |
+| **Spatial & maps** | QuadTree, GeoHash |
 
 ## 🏗️ Architecture
 
 ### Registry Pattern
 
-Algorithm Canvas uses a centralized registry system for algorithm management:
+Each algorithm is registered once with its category; the landing page, the Browse menu and routes are generated from it:
 
-```typescript
-// src/algorithms/index.ts
+```tsx
+// src/algorithms/index.tsx
 registerAlgorithm({
-  id: 'quadtree',
-  name: 'QuadTree',
-  description: 'Spatial partitioning tree...',
-  icon: Grid3x3,
-  component: QuadTreeVisualizer,
+  id: 'quick-sort',
+  name: 'Quick Sort',
+  category: 'sorting',
+  tagline: 'Pick a pivot, split into smaller and bigger, repeat.',
+  description: 'Partition around a pivot, then sort each side.',
+  usedIn: ['Standard libraries'],
+  facts: [{ label: 'Typical', value: 'O(n log n)' }],
+  icon: Shuffle,
+  component: () => <SortingVisualizer algorithm="quick" />,
+  preview: barsPreview([30, 18, 42, 25]),
 });
 ```
 
-**Benefits:**
-- Automatic route generation
-- Auto-populated landing page cards
-- Clean separation of concerns
-- Easy to add new algorithms
+### Step playback
+
+Algorithms are written as pure functions that **record frames** (a snapshot plus a plain-language note per step).
+`usePlayer` + `PlayerControls` (in `src/components/player/`) play those frames back, so the logic stays testable and the UI
+gets stepping, scrubbing and rewinding for free.
 
 ### Project Structure
 
 ```
 src/
-├── algorithms/           # Algorithm implementations
-│   ├── quadtree/
-│   │   ├── logic.ts     # Pure algorithm logic
-│   │   └── QuadTreeVisualizer.tsx
-│   └── geohash/
-│       ├── logic.ts
-│       └── GeoHashVisualizer.tsx
+├── algorithms/
+│   ├── sorting/        # 6 sorts as frame recorders, bars view, race
+│   ├── searching/      # linear + binary search
+│   ├── pathfinding/    # BFS, DFS, Dijkstra, A*, maze generation
+│   ├── bst/ heap/ hashtable/
+│   ├── quadtree/ geohash/
+│   ├── previews.tsx    # card illustrations
+│   └── index.tsx       # registrations
 ├── components/
-│   ├── layout/          # Layout components
-│   └── shared/          # Reusable UI components
-├── pages/               # Route pages
-├── registry.ts          # Algorithm registry
-└── App.tsx             # Main app with routing
+│   ├── layout/         # header with Browse menu, footer
+│   ├── player/         # usePlayer, PlayerControls, Narration
+│   └── shared/         # Panel, Slider, Chips, TreeDiagram, …
+├── pages/              # Landing + demo page
+└── registry.ts         # categories + algorithm registry
 ```
 
 ## 🎨 Design System
 
-### Color Palette
-- **Background**: Warm white (#FAFAFA)
-- **Pastels**: Blue (#A8D8EA), Green (#AAE3A8), Orange (#FFCBA4)
-- **Borders**: Dark gray (#4A5568), Dark blue (#2C5F7C)
-
-### UI Guidelines
-- **Borders**: 2px solid with rounded corners (0.75rem)
-- **Shadows**: Soft, subtle drop shadows
-- **Animations**: Spring physics (no linear easing)
-- **Typography**: Round sans-serif fonts
+A warm "paper and ink" look: off-white paper (`#f6f3ec`), ink text (`#1f1d1a`), Fraunces for headings and Inter for text.
+Each topic has one accent colour (defined in `CATEGORIES` in `src/registry.ts`); design tokens live in `@theme` in
+`src/index.css` (Tailwind v4).
 
 ## 🛠️ Tech Stack
 
@@ -142,45 +122,30 @@ src/
 | **React 18** | UI framework |
 | **TypeScript** | Type safety |
 | **Vite** | Build tool & dev server |
-| **React Router v6** | Client-side routing |
+| **React Router v7** | Client-side routing |
+| **Vitest** | Unit tests |
 | **Tailwind CSS** | Utility-first styling |
 | **Framer Motion** | Animation library |
 | **Lucide React** | Icon library |
 
 ## 🧪 Adding New Algorithms
 
-1. **Create algorithm directory:**
-   ```bash
-   mkdir -p src/algorithms/your-algorithm
-   ```
+1. Create `src/algorithms/your-algorithm/logic.ts` with pure logic. For step-by-step demos, return an array of frames
+   (`{ ...state, note: 'What just happened, in plain words' }`).
+2. Add `logic.test.ts` next to it and run `npm test`.
+3. Build the visualizer with the shared pieces (`usePlayer`, `PlayerControls`, `Narration`, `Panel`, `GuideSteps`, …).
+4. Register it in `src/algorithms/index.tsx` with a `category` and a `preview`.
 
-2. **Implement logic layer** (`logic.ts`):
-   ```typescript
-   export class YourAlgorithm {
-     // Pure algorithm logic, no UI dependencies
-   }
-   ```
+That's it — the landing page, Browse menu and routes update automatically.
 
-3. **Create visualizer** (`YourAlgorithmVisualizer.tsx`):
-   ```typescript
-   function YourAlgorithmVisualizer() {
-     // Interactive visualization using shared components
-     return <div>...</div>;
-   }
-   ```
+## ✅ Tests
 
-4. **Register in `src/algorithms/index.ts`:**
-   ```typescript
-   registerAlgorithm({
-     id: 'your-algorithm',
-     name: 'Your Algorithm',
-     description: 'Brief description...',
-     icon: YourIcon,
-     component: YourAlgorithmVisualizer,
-   });
-   ```
+```bash
+npm test        # Vitest unit tests for every algorithm's logic
+npm run build   # Type-check + production build
+```
 
-That's it! The landing page and routes update automatically.
+Both run on every pull request (`.github/workflows/ci.yml`).
 
 ## 🚀 Deployment
 

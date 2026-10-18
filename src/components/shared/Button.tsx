@@ -7,6 +7,7 @@ interface ButtonProps {
   size?: 'sm' | 'md';
   disabled?: boolean;
   title?: string;
+  type?: 'button' | 'submit';
   className?: string;
 }
 
@@ -17,6 +18,7 @@ function Button({
   size = 'md',
   disabled = false,
   title,
+  type = 'button',
   className = ''
 }: ButtonProps) {
   const baseClasses =
@@ -36,7 +38,7 @@ function Button({
 
   return (
     <button
-      type="button"
+      type={type}
       title={title}
       className={`${baseClasses} ${sizeClasses[size]} ${variantClasses[variant]} ${className}`}
       onClick={onClick}

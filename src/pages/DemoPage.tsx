@@ -1,7 +1,7 @@
 import { useParams, Navigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
-import { getAlgorithm, getAllAlgorithms } from '../registry';
+import { getAlgorithm, getAlgorithmsByCategory, getAllAlgorithms, getCategory } from '../registry';
 
 function DemoPage() {
   const { algoId } = useParams<{ algoId: string }>();
@@ -32,19 +32,24 @@ function DemoPage() {
   const all = getAllAlgorithms();
   const index = all.findIndex((a) => a.id === algorithm.id);
   const next = all.length > 1 ? all[(index + 1) % all.length] : undefined;
+  const category = getCategory(algorithm.category);
+  const siblings = getAlgorithmsByCategory(algorithm.category);
   const AlgorithmComponent = algorithm.component;
 
   return (
     <div key={algorithm.id}>
       {/* Intro */}
       <section className="mx-auto max-w-6xl px-5 pb-10 pt-10 md:px-8 md:pb-12 md:pt-14">
-        <Link
-          to="/"
-          className="group mb-8 inline-flex items-center gap-1.5 text-sm text-ink-mute transition-colors hover:text-ink"
-        >
-          <ArrowLeft size={15} className="transition-transform group-hover:-translate-x-0.5" />
-          Collection
-        </Link>
+        <nav aria-label="Breadcrumb" className="mb-8 flex items-center gap-1.5 text-sm text-ink-mute">
+          <Link to="/" className="group inline-flex items-center gap-1.5 transition-colors hover:text-ink">
+            <ArrowLeft size={15} className="transition-transform group-hover:-translate-x-0.5" />
+            Collection
+          </Link>
+          <span>/</span>
+          <Link to={`/#${category.id}`} className="transition-colors hover:text-ink">
+            {category.name}
+          </Link>
+        </nav>
 
         <motion.div
           initial={{ opacity: 0, y: 12 }}
@@ -55,10 +60,19 @@ function DemoPage() {
           <div className="max-w-2xl">
             <p className="mb-3 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-ink-mute">
               <span className="h-2 w-2 rounded-full" style={{ backgroundColor: algorithm.theme.accent }} />
-              No. {String(index + 1).padStart(2, '0')}
+              {category.name}
             </p>
             <h1 className="font-display text-5xl tracking-tight text-ink md:text-6xl">{algorithm.name}</h1>
             <p className="mt-4 text-lg leading-relaxed text-ink-soft md:text-xl">{algorithm.tagline}</p>
+            {algorithm.facts && (
+              <div className="mt-5 flex flex-wrap gap-2">
+                {algorithm.facts.map((f) => (
+                  <span key={f.label} className="rounded-lg border border-line bg-card/70 px-2.5 py-1 text-xs text-ink-soft">
+                    {f.label} <span className="ml-1 font-mono text-ink">{f.value}</span>
+                  </span>
+                ))}
+              </div>
+            )}
           </div>
           <div className="flex flex-wrap gap-2 md:justify-end">
             {algorithm.usedIn.map((use) => (
@@ -74,6 +88,28 @@ function DemoPage() {
       <section className="mx-auto max-w-6xl px-5 pb-20 md:px-8">
         <AlgorithmComponent />
       </section>
+
+      {/* More in this topic */}
+      {siblings.length > 1 && (
+        <section className="mx-auto max-w-6xl px-5 pb-8 md:px-8">
+          <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.14em] text-ink-mute">More in {category.name}</p>
+          <div className="flex flex-wrap gap-2">
+            {siblings.map((s) => (
+              <Link
+                key={s.id}
+                to={`/demo/${s.id}`}
+                aria-current={s.id === algorithm.id ? 'page' : undefined}
+                className={`rounded-full border px-3.5 py-1.5 text-sm transition-colors ${
+                  s.id === algorithm.id ? 'border-transparent text-white' : 'border-line bg-card/70 text-ink-soft hover:border-line-strong hover:text-ink'
+                }`}
+                style={s.id === algorithm.id ? { backgroundColor: category.theme.accent } : undefined}
+              >
+                {s.name}
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* Next */}
       {next && (
