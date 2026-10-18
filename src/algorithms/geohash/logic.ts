@@ -4,7 +4,7 @@
  */
 
 // Base32 character set (excludes a, i, l, o to avoid confusion)
-const BASE32 = '0123456789bcdefghjkmnpqrstuvwxyz';
+export const BASE32 = '0123456789bcdefghjkmnpqrstuvwxyz';
 
 export interface GeoPoint {
   lat: number;

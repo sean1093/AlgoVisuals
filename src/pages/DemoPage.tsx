@@ -1,6 +1,7 @@
 import { useParams, Navigate, Link } from 'react-router-dom';
-import { ArrowLeft } from 'lucide-react';
-import { getAlgorithm } from '../registry';
+import { motion } from 'framer-motion';
+import { ArrowLeft, ArrowRight } from 'lucide-react';
+import { getAlgorithm, getAllAlgorithms } from '../registry';
 
 function DemoPage() {
   const { algoId } = useParams<{ algoId: string }>();
@@ -13,62 +14,93 @@ function DemoPage() {
 
   if (!algorithm) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center px-6">
-        <div className="text-center space-y-6 max-w-md">
-          <h1 className="text-3xl md:text-4xl font-semibold text-gray-900">Algorithm Not Found</h1>
-          <p className="text-lg text-gray-600">Cannot find algorithm "{algoId}"</p>
-          <Link
-            to="/"
-            className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-xl hover:shadow-lg transition-all"
-          >
-            <ArrowLeft size={18} />
-            Back to Home
-          </Link>
-        </div>
+      <div className="mx-auto flex max-w-md flex-col items-center px-5 py-32 text-center">
+        <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.14em] text-ink-mute">Not found</p>
+        <h1 className="font-display text-4xl text-ink">We couldn’t find that one</h1>
+        <p className="mt-4 text-ink-soft">There’s no demo called “{algoId}” yet.</p>
+        <Link
+          to="/"
+          className="mt-8 inline-flex h-11 items-center gap-2 rounded-full bg-ink px-5 text-sm font-medium text-paper"
+        >
+          <ArrowLeft size={16} />
+          Back to the collection
+        </Link>
       </div>
     );
   }
 
+  const all = getAllAlgorithms();
+  const index = all.findIndex((a) => a.id === algorithm.id);
+  const next = all.length > 1 ? all[(index + 1) % all.length] : undefined;
   const AlgorithmComponent = algorithm.component;
-  const Icon = algorithm.icon;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
-      {/* Header */}
-      <header className="pt-8 md:pt-12 px-6">
-        <div className="max-w-7xl mx-auto">
-          <Link
-            to="/"
-            className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors mb-8 md:mb-12 group"
-          >
-            <ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform" />
-            <span className="text-sm font-medium">Back to Home</span>
-          </Link>
+    <div key={algorithm.id}>
+      {/* Intro */}
+      <section className="mx-auto max-w-6xl px-5 pb-10 pt-10 md:px-8 md:pb-12 md:pt-14">
+        <Link
+          to="/"
+          className="group mb-8 inline-flex items-center gap-1.5 text-sm text-ink-mute transition-colors hover:text-ink"
+        >
+          <ArrowLeft size={15} className="transition-transform group-hover:-translate-x-0.5" />
+          Collection
+        </Link>
 
-          <div className="text-center max-w-3xl mx-auto mb-8 md:mb-16">
-            <div className="inline-flex items-center gap-3 bg-white/80 backdrop-blur-sm px-5 py-3 rounded-2xl shadow-sm mb-6">
-              <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-500 rounded-xl flex items-center justify-center shadow-md">
-                <Icon size={20} className="text-white" />
-              </div>
-              <span className="text-sm font-medium text-gray-700">{algorithm.name}</span>
-            </div>
-
-            <h1 className="text-3xl md:text-5xl font-semibold text-gray-900 mb-4 md:mb-6 leading-tight px-4">
-              {algorithm.name}
-            </h1>
-            <p className="text-lg md:text-xl text-gray-600 leading-relaxed px-4">
-              {algorithm.description}
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+          className="grid gap-6 md:grid-cols-[1fr_auto] md:items-end"
+        >
+          <div className="max-w-2xl">
+            <p className="mb-3 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-ink-mute">
+              <span className="h-2 w-2 rounded-full" style={{ backgroundColor: algorithm.theme.accent }} />
+              No. {String(index + 1).padStart(2, '0')}
             </p>
+            <h1 className="font-display text-5xl tracking-tight text-ink md:text-6xl">{algorithm.name}</h1>
+            <p className="mt-4 text-lg leading-relaxed text-ink-soft md:text-xl">{algorithm.tagline}</p>
           </div>
-        </div>
-      </header>
+          <div className="flex flex-wrap gap-2 md:justify-end">
+            {algorithm.usedIn.map((use) => (
+              <span key={use} className="rounded-full border border-line bg-card/70 px-3 py-1 text-xs text-ink-soft">
+                {use}
+              </span>
+            ))}
+          </div>
+        </motion.div>
+      </section>
 
-      {/* Content */}
-      <main className="px-6 pb-16 md:pb-24">
-        <div className="max-w-7xl mx-auto">
-          <AlgorithmComponent />
-        </div>
-      </main>
+      {/* Playground */}
+      <section className="mx-auto max-w-6xl px-5 pb-20 md:px-8">
+        <AlgorithmComponent />
+      </section>
+
+      {/* Next */}
+      {next && (
+        <section className="mx-auto max-w-6xl px-5 pb-24 md:px-8">
+          <Link
+            to={`/demo/${next.id}`}
+            className="group flex items-center justify-between gap-6 rounded-3xl border border-line bg-card p-7 shadow-card transition-all hover:-translate-y-0.5 hover:shadow-lift md:p-9"
+          >
+            <div className="flex items-center gap-6">
+              <div className="hidden h-20 w-20 flex-shrink-0 items-center justify-center rounded-2xl sm:flex" style={{ backgroundColor: next.theme.soft }}>
+                <next.preview className="h-14 w-14 text-ink" />
+              </div>
+              <div>
+                <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-ink-mute">Up next</p>
+                <p className="mt-1 font-display text-3xl text-ink">{next.name}</p>
+                <p className="mt-1 text-ink-soft">{next.tagline}</p>
+              </div>
+            </div>
+            <span
+              className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full text-white transition-transform group-hover:translate-x-1"
+              style={{ backgroundColor: next.theme.accent }}
+            >
+              <ArrowRight size={20} />
+            </span>
+          </Link>
+        </section>
+      )}
     </div>
   );
 }
