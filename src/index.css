@@ -44,6 +44,8 @@ html {
   --font-sans: "Inter", "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", ui-sans-serif, system-ui, sans-serif;
   --font-display: "Fraunces", "Noto Serif KR", "AppleMyungjo", ui-serif, Georgia, serif;
   word-break: keep-all;
+  /* keep-all never breaks inside words; allow it only when a word can't fit at all */
+  overflow-wrap: anywhere;
 }
 
 body {

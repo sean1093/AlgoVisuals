@@ -75,9 +75,9 @@ function BSTVisualizer() {
       const fn = scene.op === 'insert' ? insert : scene.op === 'search' ? search : remove;
       return fn(scene.base, scene.value, tb.notes);
     }
-    const note = scene.kind === 'built' ? tb.built(scene.values.join(', ')) : scene.kind === 'empty' ? tb.emptyIntro : tb.intro;
+    const note = scene.kind === 'built' ? tb.built(scene.values.join(t.common.listSeparator)) : scene.kind === 'empty' ? tb.emptyIntro : tb.intro;
     return [{ root: scene.base, trail: [], note }];
-  }, [scene, tb]);
+  }, [scene, tb, t.common.listSeparator]);
   // The tree after the latest operation; earlier frames are just for playback
   const tree = frames[frames.length - 1].root;
   const [input, setInput] = useState('');

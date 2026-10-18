@@ -39,6 +39,8 @@ const zhTW: Messages = {
     copy: '複製',
     whereUsed: '實際應用',
     language: '語言',
+    listSeparator: '、',
+    quote: (s: string) => `「${s}」`,
   },
 
   nav: {
@@ -649,7 +651,7 @@ const zhTW: Messages = {
     intro: '每個單字都會被轉成一個數字，再由這個數字決定它的桶子。試著加一個看看。',
     exists: (word: string, bucket: number) => `「${word}」已經在第 ${bucket} 號桶子裡了。雜湊表裡每個鍵只會存一次。`,
     collision: (bucket: number, existing: string, word: string) =>
-      `碰撞了！第 ${bucket} 號桶子裡已經有 ${existing}。「${word}」排進同一條鏈裡。`,
+      `碰撞了！第 ${bucket} 號桶子裡已經有${existing}。「${word}」排進同一條鏈裡。`,
     added: (word: string, bucket: number) => `「${word}」直接放進空的第 ${bucket} 號桶子。一步到位，完全不用搜尋。`,
     found: (bucket: number, word: string, checked: number, total: number) =>
       `直接跳到第 ${bucket} 號桶子，只檢查了 ${checked} 個項目就找到「${word}」—— 全部共有 ${total} 個。`,

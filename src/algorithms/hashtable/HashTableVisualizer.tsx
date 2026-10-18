@@ -61,8 +61,8 @@ function HashTableVisualizer() {
       setNote((m) => m.exists(word, result.bucket));
     } else if (result.collision) {
       setHighlight({ bucket: result.bucket, key: word, kind: 'clash' });
-      const existing = table[result.bucket].map((k) => `“${k}”`).join(', ');
-      setNote((m) => m.collision(result.bucket, existing, word));
+      const existing = table[result.bucket].map((k) => t.common.quote(k));
+      setNote((m) => m.collision(result.bucket, existing.join(t.common.listSeparator), word));
     } else {
       setHighlight({ bucket: result.bucket, key: word, kind: 'add' });
       setNote((m) => m.added(word, result.bucket));
@@ -106,7 +106,7 @@ function HashTableVisualizer() {
     setTable(next);
     setHighlight(null);
     setProgress((p) => ({ ...p, add: true }));
-    setNote((m) => (fresh.length ? m.addedMany(fresh.join(', ')) : m.allIn));
+    setNote((m) => (fresh.length ? m.addedMany(fresh.join(t.common.listSeparator)) : m.allIn));
   };
 
   const done = [progress.add, progress.find, progress.grow];

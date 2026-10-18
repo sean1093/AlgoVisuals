@@ -43,6 +43,9 @@ const en = {
     copy: 'Copy',
     whereUsed: 'Where it’s used',
     language: 'Language',
+    /** Joins short lists inside sentences */
+    listSeparator: ', ',
+    quote: (s: string) => `“${s}”`,
   },
 
   nav: {

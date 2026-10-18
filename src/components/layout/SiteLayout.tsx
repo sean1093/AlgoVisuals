@@ -69,7 +69,7 @@ function LanguageMenu() {
         }`}
       >
         <Globe size={16} />
-        <span>{current.short}</span>
+        <span className="hidden sm:inline">{current.short}</span>
       </button>
       <AnimatePresence>
         {open && (

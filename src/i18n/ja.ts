@@ -39,6 +39,8 @@ const ja: Messages = {
     copy: 'コピー',
     whereUsed: '使われている場所',
     language: '言語',
+    listSeparator: '、',
+    quote: (s: string) => `「${s}」`,
   },
 
   nav: {
@@ -649,7 +651,7 @@ const ja: Messages = {
     intro: '単語はそれぞれ数に変換され、その数でバケツが決まります。1 つ追加してみましょう。',
     exists: (word: string, bucket: number) => `「${word}」はすでにバケツ ${bucket} にあります。ハッシュテーブルは同じキーを 1 つしか保存しません。`,
     collision: (bucket: number, existing: string, word: string) =>
-      `衝突！バケツ ${bucket} にはすでに ${existing} が入っていました。「${word}」は鎖の後ろにつながります。`,
+      `衝突！バケツ ${bucket} にはすでに${existing}が入っていました。「${word}」は鎖の後ろにつながります。`,
     added: (word: string, bucket: number) => `「${word}」は空のバケツ ${bucket} にそのまま入ります。1 ステップで、探す必要はありません。`,
     found: (bucket: number, word: string, checked: number, total: number) =>
       `バケツ ${bucket} へ一直線に飛び、全 ${total} 個のうち ${checked} 個を確認しただけで「${word}」が見つかりました。`,

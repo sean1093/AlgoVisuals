@@ -69,9 +69,9 @@ function HeapVisualizer() {
   const frames = useMemo<HeapFrame[]>(() => {
     if (scene.kind === 'push') return push(scene.base, scene.value, th.notes);
     if (scene.kind === 'pop') return pop(scene.base, th.notes);
-    const note = scene.kind === 'built' ? th.built(scene.values.join(', ')) : scene.kind === 'empty' ? th.emptyIntro : th.intro;
+    const note = scene.kind === 'built' ? th.built(scene.values.join(t.common.listSeparator)) : scene.kind === 'empty' ? th.emptyIntro : th.intro;
     return [{ items: scene.base, note }];
-  }, [scene, th]);
+  }, [scene, th, t.common.listSeparator]);
   const [taken, setTaken] = useState<number[]>([]);
   // The heap after the latest operation; earlier frames are just for playback
   const heap = frames[frames.length - 1].items;
