@@ -1,4 +1,4 @@
-import { CSSProperties, useEffect } from 'react';
+import { CSSProperties, useEffect, useRef } from 'react';
 import { ChevronLeft, ChevronRight, Pause, Play, RotateCcw } from 'lucide-react';
 import { Player, SPEED_LABELS } from './usePlayer';
 
@@ -21,6 +21,9 @@ function isTyping(target: EventTarget | null) {
  */
 function PlayerControls({ player, accent, keyboard = true, className = '' }: PlayerControlsProps) {
   const { index, total, playing, atEnd } = player;
+  // Latest player for the key handler, so we subscribe once instead of every frame
+  const latest = useRef(player);
+  latest.current = player;
 
   useEffect(() => {
     if (!keyboard) return;
@@ -28,16 +31,16 @@ function PlayerControls({ player, accent, keyboard = true, className = '' }: Pla
       if (isTyping(e.target) || e.metaKey || e.ctrlKey || e.altKey) return;
       if (e.key === ' ' && (e.target as HTMLElement)?.tagName !== 'BUTTON') {
         e.preventDefault();
-        player.toggle();
+        latest.current.toggle();
       } else if (e.key === 'ArrowRight') {
-        player.stepForward();
+        latest.current.stepForward();
       } else if (e.key === 'ArrowLeft') {
-        player.stepBack();
+        latest.current.stepBack();
       }
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [keyboard, player]);
+  }, [keyboard]);
 
   const fill = total > 1 ? (index / (total - 1)) * 100 : 0;
   const iconButton =

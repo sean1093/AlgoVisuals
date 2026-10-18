@@ -116,9 +116,10 @@ export function findPath(grid: Grid, algorithm: PathAlgorithm): PathResult {
   if (algorithm === 'bfs' || algorithm === 'dfs') {
     // BFS uses a queue, DFS a stack; both ignore mud
     const pending = [grid.start];
+    let head = 0; // BFS reads from the front without shifting the array
     discovered[grid.start] = 0;
-    while (pending.length) {
-      const cell = algorithm === 'bfs' ? pending.shift()! : pending.pop()!;
+    while (head < pending.length) {
+      const cell = algorithm === 'bfs' ? pending[head++] : pending.pop()!;
       if (explored[cell] !== -1) continue;
       explore(cell);
       if (cell === grid.end) {

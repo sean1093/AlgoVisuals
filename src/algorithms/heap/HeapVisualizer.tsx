@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowUpFromLine, Dices, Plus, Trash2 } from 'lucide-react';
-import { HeapFrame, HeapItem, fromValues, parent, pop, push } from './logic';
+import { HeapFrame, fromValues, parent, pop, push } from './logic';
 import { usePlayer } from '../../components/player/usePlayer';
 import PlayerControls from '../../components/player/PlayerControls';
 import Narration from '../../components/player/Narration';
@@ -18,6 +18,7 @@ const { accent: ACCENT, soft: SOFT } = getCategory('structures').theme;
 const SWAP = '#c0553a';
 const SETTLED = '#3f6b5c';
 const START = [12, 30, 18, 45, 37, 25, 60];
+const SPEEDS = [1400, 800, 380, 120];
 
 function colourFor(frame: HeapFrame, i: number) {
   if (frame.swap?.includes(i)) return SWAP;
@@ -52,12 +53,13 @@ function heapToDiagram(frame: HeapFrame) {
 }
 
 function HeapVisualizer() {
-  const [heap, setHeap] = useState<HeapItem[]>(() => fromValues(START));
-  const [frames, setFrames] = useState<HeapFrame[]>(() => [{ items: heap, note: 'The smallest value always sits at the top. Push a number or take the smallest.' }]);
+  const [frames, setFrames] = useState<HeapFrame[]>(() => [{ items: fromValues(START), note: 'The smallest value always sits at the top. Push a number or take the smallest.' }]);
   const [taken, setTaken] = useState<number[]>([]);
+  // The heap after the latest operation; earlier frames are just for playback
+  const heap = frames[frames.length - 1].items;
   const [input, setInput] = useState('');
   const [progress, setProgress] = useState({ push: false, pop: false, drain: false });
-  const player = usePlayer(frames.length, { resetKey: frames, autoPlay: frames.length > 1, speeds: [1400, 800, 380, 120] });
+  const player = usePlayer(frames.length, { resetKey: frames, autoPlay: frames.length > 1, speeds: SPEEDS });
   const frame = frames[player.index];
   const diagram = useMemo(() => heapToDiagram(frame), [frame]);
 
@@ -68,7 +70,6 @@ function HeapVisualizer() {
     if (heap.length >= 31) return;
     const next = push(heap, value);
     setFrames(next);
-    setHeap(next[next.length - 1].items);
     setProgress((p) => ({ ...p, push: true }));
   };
 
@@ -76,7 +77,6 @@ function HeapVisualizer() {
     const next = pop(heap);
     const last = next[next.length - 1];
     setFrames(next);
-    setHeap(last.items);
     if (last.taken) {
       const updated = [...taken, last.taken.value];
       setTaken(updated);
@@ -86,7 +86,6 @@ function HeapVisualizer() {
 
   const reset = (values: number[]) => {
     const items = fromValues(values);
-    setHeap(items);
     setTaken([]);
     setFrames([{ items, note: values.length ? `Built a heap from ${values.join(', ')}.` : 'Empty heap. Push some numbers.' }]);
   };

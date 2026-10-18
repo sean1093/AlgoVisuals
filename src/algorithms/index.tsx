@@ -17,7 +17,7 @@ import {
   Spline,
   Trophy,
 } from 'lucide-react';
-import { registerAlgorithm } from '../registry';
+import { getCategory, registerAlgorithm } from '../registry';
 import QuadTreeVisualizer from './quadtree/QuadTreeVisualizer';
 import QuadTreePreview from './quadtree/Preview';
 import GeoHashVisualizer from './geohash/GeoHashVisualizer';
@@ -41,7 +41,8 @@ import {
   gridPreview,
 } from './previews';
 
-const SORT_ACCENT = '#4a5a9c';
+const SORT_ACCENT = getCategory('sorting').theme.accent;
+const PIVOT = getCategory('searching').theme.accent;
 const DONE = '#3f6b5c';
 const MOVE = '#c0553a';
 
@@ -82,7 +83,7 @@ export function registerAllAlgorithms() {
     facts: sortFacts('selection'),
     icon: ListOrdered,
     component: () => <SortingVisualizer algorithm="selection" />,
-    preview: barsPreview([12, 25, 38, 80, 55, 20, 92, 66], { 0: DONE, 1: DONE, 2: DONE, 5: '#a8741a' }),
+    preview: barsPreview([12, 25, 38, 80, 55, 20, 92, 66], { 0: DONE, 1: DONE, 2: DONE, 5: PIVOT }),
   });
   registerAlgorithm({
     id: 'insertion-sort',
@@ -94,7 +95,7 @@ export function registerAllAlgorithms() {
     facts: sortFacts('insertion'),
     icon: Layers,
     component: () => <SortingVisualizer algorithm="insertion" />,
-    preview: barsPreview([18, 30, 52, 70, 40, 88, 24, 60], { 4: '#a8741a', 3: SORT_ACCENT }),
+    preview: barsPreview([18, 30, 52, 70, 40, 88, 24, 60], { 4: PIVOT, 3: SORT_ACCENT }),
   });
   registerAlgorithm({
     id: 'merge-sort',
@@ -118,7 +119,7 @@ export function registerAllAlgorithms() {
     facts: sortFacts('quick'),
     icon: Shuffle,
     component: () => <SortingVisualizer algorithm="quick" />,
-    preview: barsPreview([30, 18, 42, 25, 55, 88, 70, 95], { 4: '#a8741a' }),
+    preview: barsPreview([30, 18, 42, 25, 55, 88, 70, 95], { 4: PIVOT }),
   });
   registerAlgorithm({
     id: 'heap-sort',

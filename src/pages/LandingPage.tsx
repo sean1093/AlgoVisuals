@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowRight, MousePointerClick, Sparkles, Lightbulb } from 'lucide-react';
-import { CATEGORIES, getAlgorithmsByCategory, getAllAlgorithms } from '../registry';
+import { CATEGORIES, getAlgorithmsByCategory, getAllAlgorithms, getCategory } from '../registry';
 import HeroSortLoop from '../components/shared/HeroSortLoop';
 
 const fadeUp = {
@@ -31,6 +31,7 @@ function LandingPage() {
   const algorithms = getAllAlgorithms();
   const first = algorithms[0];
   const categories = CATEGORIES.filter((c) => getAlgorithmsByCategory(c.id).length);
+  const sortTheme = getCategory('sorting').theme;
 
   return (
     <div>
@@ -79,7 +80,7 @@ function LandingPage() {
           transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
           className="relative mx-auto w-full max-w-md"
         >
-          <div className="absolute -inset-3 -z-10 rounded-[2.5rem] bg-[#e3e6f3]/80 blur-2xl md:-inset-6" />
+          <div className="absolute -inset-3 -z-10 rounded-[2.5rem] opacity-80 blur-2xl md:-inset-6" style={{ backgroundColor: sortTheme.soft }} />
           <div className="rounded-[2rem] border border-line bg-card p-7 shadow-lift">
             <HeroSortLoop className="h-56" />
             <div className="mt-6 flex items-center justify-between border-t border-line pt-5">
@@ -87,7 +88,9 @@ function LandingPage() {
                 <p className="font-display text-lg text-ink">Insertion Sort</p>
                 <p className="text-xs text-ink-mute">Sorting a fresh list, over and over</p>
               </div>
-              <span className="rounded-full bg-[#e3e6f3] px-3 py-1 text-xs font-medium text-[#4a5a9c]">Live</span>
+              <span className="rounded-full px-3 py-1 text-xs font-medium" style={{ backgroundColor: sortTheme.soft, color: sortTheme.accent }}>
+                Live
+              </span>
             </div>
           </div>
         </motion.div>

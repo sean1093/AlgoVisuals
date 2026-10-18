@@ -16,6 +16,7 @@ import { getCategory } from '../../registry';
 
 const { accent: ACCENT, soft: SOFT } = getCategory('searching').theme;
 const FOUND = '#3f6b5c';
+const SPEEDS = [1300, 700, 300, 80];
 
 const CONTENT: Record<SearchAlgorithm, { idea: string[]; facts: { label: string; value: string; hint?: string }[] }> = {
   linear: {
@@ -51,24 +52,22 @@ function pickMissing(list: number[]) {
 }
 
 function SearchVisualizer({ algorithm }: { algorithm: SearchAlgorithm }) {
-  const [size, setSize] = useState(15);
-  const [seed, setSeed] = useState(0);
-  const sorted = useMemo(() => makeSortedList(size), [size, seed]);
-  const shuffled = useMemo(() => shuffle(sorted), [sorted]);
+  // A new list always comes with a target that's in it
+  const newData = (size: number) => {
+    const sorted = makeSortedList(size);
+    return { sorted, shuffled: shuffle(sorted), target: sorted[Math.floor(Math.random() * sorted.length)] };
+  };
+  const [{ sorted, shuffled, target }, setData] = useState(() => newData(15));
+  const setTarget = (value: number) => setData((d) => ({ ...d, target: value }));
+  const size = sorted.length;
   const list = algorithm === 'linear' ? shuffled : sorted;
-  const [target, setTarget] = useState(() => sorted[Math.floor(sorted.length * 0.7)]);
   const [progress, setProgress] = useState({ played: false, picked: false, missing: false });
-
-  // Keep the target valid when a new list is generated
-  useEffect(() => {
-    setTarget(sorted[Math.floor(Math.random() * sorted.length)]);
-  }, [sorted]);
 
   const frames = useMemo(
     () => (algorithm === 'linear' ? linearSearch(list, target) : binarySearch(list, target)),
     [algorithm, list, target]
   );
-  const player = usePlayer(frames.length, { resetKey: frames, speeds: [1300, 700, 300, 80] });
+  const player = usePlayer(frames.length, { resetKey: frames, speeds: SPEEDS });
   const frame = frames[player.index];
 
   useEffect(() => {
@@ -117,7 +116,7 @@ function SearchVisualizer({ algorithm }: { algorithm: SearchAlgorithm }) {
                 <HelpCircle size={15} />
                 Not in list
               </Button>
-              <Button variant="ghost" size="sm" onClick={() => setSeed((s) => s + 1)} title="New list">
+              <Button variant="ghost" size="sm" onClick={() => setData(newData(size))} title="New list">
                 <Shuffle size={15} />
               </Button>
             </div>
@@ -186,7 +185,7 @@ function SearchVisualizer({ algorithm }: { algorithm: SearchAlgorithm }) {
             <GuideSteps steps={steps} accent={ACCENT} />
           </Panel>
           <Panel eyebrow="Adjust">
-            <Slider label="How many boxes" value={size} min={5} max={63} onChange={setSize} accent={ACCENT} />
+            <Slider label="How many boxes" value={size} min={5} max={63} onChange={(n) => setData(newData(n))} accent={ACCENT} />
           </Panel>
           <Panel eyebrow="Head to head" title={`Finding ${target}`}>
             <div className="space-y-3">

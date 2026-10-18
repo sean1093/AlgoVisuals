@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { Dices, Plus, Search, Trash2, X } from 'lucide-react';
-import { BSTNode, TreeFrame, build, contains, height, inOrder, insert, layout, remove, search, size } from './logic';
+import { TreeFrame, build, contains, height, inOrder, insert, layout, remove, search, size } from './logic';
 import { usePlayer } from '../../components/player/usePlayer';
 import PlayerControls from '../../components/player/PlayerControls';
 import Narration from '../../components/player/Narration';
@@ -17,6 +17,7 @@ const { accent: ACCENT, soft: SOFT } = getCategory('structures').theme;
 const FOUND = '#3f6b5c';
 const DOOMED = '#c0553a';
 const START = [50, 30, 70, 20, 40, 60, 80, 35, 65];
+const SPEEDS = [1400, 800, 380, 120];
 
 const PRESETS = [
   { label: 'Bushy', values: START },
@@ -57,11 +58,12 @@ function treeToDiagram(frame: TreeFrame) {
 }
 
 function BSTVisualizer() {
-  const [tree, setTree] = useState<BSTNode | null>(() => build(START));
-  const [frames, setFrames] = useState<TreeFrame[]>(() => [{ root: tree, trail: [], note: 'Type a number and insert, search for or delete it.' }]);
+  const [frames, setFrames] = useState<TreeFrame[]>(() => [{ root: build(START), trail: [], note: 'Type a number and insert, search for or delete it.' }]);
+  // The tree after the latest operation; earlier frames are just for playback
+  const tree = frames[frames.length - 1].root;
   const [input, setInput] = useState('');
   const [progress, setProgress] = useState({ insert: false, search: false, degenerate: false });
-  const player = usePlayer(frames.length, { resetKey: frames, autoPlay: frames.length > 1, speeds: [1400, 800, 380, 120] });
+  const player = usePlayer(frames.length, { resetKey: frames, autoPlay: frames.length > 1, speeds: SPEEDS });
   const frame = frames[player.index];
   const diagram = useMemo(() => treeToDiagram(frame), [frame]);
 
@@ -72,7 +74,6 @@ function BSTVisualizer() {
     const fn = op === 'insert' ? insert : op === 'search' ? search : remove;
     const next = fn(tree, value);
     setFrames(next);
-    setTree(next[next.length - 1].root);
     if (op === 'insert') setProgress((p) => ({ ...p, insert: true }));
     if (op === 'search') setProgress((p) => ({ ...p, search: true }));
   };
@@ -86,7 +87,6 @@ function BSTVisualizer() {
   const loadPreset = (values: number[], label: string) => {
     const vals = values.length ? values : randomValues(10);
     const root = build(vals);
-    setTree(root);
     setFrames([{ root, trail: [], note: `Built a tree by inserting ${vals.join(', ')} in that order.` }]);
     if (label.startsWith('Sorted')) setProgress((p) => ({ ...p, degenerate: true }));
   };
@@ -205,7 +205,6 @@ function BSTVisualizer() {
               <button
                 type="button"
                 onClick={() => {
-                  setTree(null);
                   setFrames([{ root: null, trail: [], note: 'Empty tree. Insert a number to plant the root.' }]);
                 }}
                 className="inline-flex items-center gap-1.5 rounded-full border border-dashed border-line-strong px-3 py-1.5 text-[13px] text-ink-soft hover:text-ink"

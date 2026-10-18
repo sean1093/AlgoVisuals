@@ -56,13 +56,17 @@ function PathfindingVisualizer({ algorithm }: { algorithm: PathAlgorithm }) {
     pagesSeen.add(algorithm);
   }, [algorithm]);
 
-  const setGrid = (next: Grid) => {
-    savedGrid = next;
-    setGridState(next);
+  const setGrid = (update: Grid | ((g: Grid) => Grid)) => {
+    setGridState((g) => {
+      const next = typeof update === 'function' ? update(g) : update;
+      savedGrid = next;
+      return next;
+    });
   };
 
   const result = useMemo(() => findPath(grid, algorithm), [grid, algorithm]);
-  const total = 1 + result.order.length + result.path.length;
+  // One extra frame for the 'no way through' message when the flag can't be reached
+  const total = 1 + result.order.length + Math.max(result.path.length, 1);
   const player = usePlayer(total, { speeds: PATH_SPEEDS, initialSpeed: 2 });
   const info = PATH_INFO[algorithm];
 
@@ -103,15 +107,30 @@ function PathfindingVisualizer({ algorithm }: { algorithm: PathAlgorithm }) {
     return row * COLS + col;
   };
 
-  const paint = (cell: number, mode: 'add' | 'remove') => {
-    if (cell === grid.start || cell === grid.end) return;
-    const walls = new Set(grid.walls);
-    const mud = new Set(grid.mud);
-    walls.delete(cell);
-    mud.delete(cell);
-    if (mode === 'add' && tool === 'wall') walls.add(cell);
-    if (mode === 'add' && tool === 'mud') mud.add(cell);
-    setGrid({ ...grid, walls, mud });
+  const paint = (cells: number[], mode: 'add' | 'remove') => {
+    setGrid((g) => {
+      const walls = new Set(g.walls);
+      const mud = new Set(g.mud);
+      for (const cell of cells) {
+        if (cell === g.start || cell === g.end) continue;
+        walls.delete(cell);
+        mud.delete(cell);
+        if (mode === 'add' && tool === 'wall') walls.add(cell);
+        if (mode === 'add' && tool === 'mud') mud.add(cell);
+      }
+      return { ...g, walls, mud };
+    });
+  };
+
+  // Every cell on the straight line between two cells, so fast drags leave no gaps
+  const cellsBetween = (from: number, to: number) => {
+    const [r0, c0] = toRowCol(grid, from);
+    const [r1, c1] = toRowCol(grid, to);
+    const steps = Math.max(Math.abs(r1 - r0), Math.abs(c1 - c0));
+    return Array.from({ length: steps }, (_, i) => {
+      const t = (i + 1) / steps;
+      return Math.round(r0 + (r1 - r0) * t) * COLS + Math.round(c0 + (c1 - c0) * t);
+    });
   };
 
   const onPointerDown = (e: PointerEvent<SVGSVGElement>) => {
@@ -128,21 +147,22 @@ function PathfindingVisualizer({ algorithm }: { algorithm: PathAlgorithm }) {
     const has = tool === 'wall' ? grid.walls.has(cell) : tool === 'mud' ? grid.mud.has(cell) : true;
     const mode = tool === 'erase' || has ? 'remove' : 'add';
     drag.current = { mode, last: cell };
-    paint(cell, mode);
+    paint([cell], mode);
   };
 
   const onPointerMove = (e: PointerEvent<SVGSVGElement>) => {
     if (!drag.current) return;
     const cell = cellAt(e);
     if (cell < 0 || cell === drag.current.last) return;
+    const { mode, last } = drag.current;
     drag.current.last = cell;
-    const { mode } = drag.current;
     if (mode === 'start' || mode === 'end') {
-      const other = mode === 'start' ? grid.end : grid.start;
-      if (cell === other || grid.walls.has(cell)) return;
-      setGrid({ ...grid, [mode]: cell });
+      setGrid((g) => {
+        const other = mode === 'start' ? g.end : g.start;
+        return cell === other || g.walls.has(cell) ? g : { ...g, [mode]: cell };
+      });
     } else {
-      paint(cell, mode);
+      paint(cellsBetween(last, cell), mode);
     }
   };
 
@@ -166,7 +186,7 @@ function PathfindingVisualizer({ algorithm }: { algorithm: PathAlgorithm }) {
     {
       title: 'Compare on the same map',
       detail: 'Open another algorithm below — your map comes with you.',
-      done: pagesSeen.size > 1 || [...pagesSeen].some((a) => a !== algorithm),
+      done: [...pagesSeen].some((a) => a !== algorithm),
     },
   ];
 
