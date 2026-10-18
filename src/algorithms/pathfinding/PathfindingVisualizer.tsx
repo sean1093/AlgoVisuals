@@ -2,7 +2,6 @@ import { PointerEvent, useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Brush, Eraser, Grid3x3, Shuffle, Trash2, Waves } from 'lucide-react';
 import { Grid, PathAlgorithm, emptyGrid, findPath, mazeGrid, scatterGrid, starterGrid, toRowCol } from './logic';
-import { PATH_INFO, PATH_NAMES } from './content';
 import { usePlayer } from '../../components/player/usePlayer';
 import PlayerControls from '../../components/player/PlayerControls';
 import Narration from '../../components/player/Narration';
@@ -13,6 +12,8 @@ import Legend from '../../components/shared/Legend';
 import FactList from '../../components/shared/FactList';
 import GuideSteps from '../../components/shared/GuideSteps';
 import { getCategory } from '../../registry';
+import { useI18n } from '../../i18n';
+import Rich from '../../components/shared/Rich';
 
 const { accent: ACCENT, soft: SOFT } = getCategory('graphs').theme;
 const ROWS = 17;
@@ -35,17 +36,15 @@ const COLORS = {
 const ALGORITHMS: PathAlgorithm[] = ['bfs', 'dfs', 'dijkstra', 'astar'];
 
 type Tool = 'wall' | 'mud' | 'erase';
-const TOOLS: { id: Tool; label: string }[] = [
-  { id: 'wall', label: 'Walls' },
-  { id: 'mud', label: 'Mud' },
-  { id: 'erase', label: 'Eraser' },
-];
+const TOOLS: Tool[] = ['wall', 'mud', 'erase'];
 
 // Shared across the four pathfinding pages so you can compare on the same grid
 let savedGrid: Grid | null = null;
 const pagesSeen = new Set<PathAlgorithm>();
 
 function PathfindingVisualizer({ algorithm }: { algorithm: PathAlgorithm }) {
+  const { t } = useI18n();
+  const tp = t.pathfinding;
   const [grid, setGridState] = useState<Grid>(() => savedGrid ?? starterGrid(ROWS, COLS));
   const [tool, setTool] = useState<Tool>('wall');
   const [progress, setProgress] = useState({ played: false, edited: false });
@@ -68,7 +67,7 @@ function PathfindingVisualizer({ algorithm }: { algorithm: PathAlgorithm }) {
   // One extra frame for the 'no way through' message when the flag can't be reached
   const total = 1 + result.order.length + Math.max(result.path.length, 1);
   const player = usePlayer(total, { speeds: PATH_SPEEDS, initialSpeed: 2 });
-  const info = PATH_INFO[algorithm];
+  const info = tp.info[algorithm];
 
   // After an edit: once a run has started, show the new result instantly; otherwise rewind
   const showFinished = useRef(false);
@@ -88,10 +87,10 @@ function PathfindingVisualizer({ algorithm }: { algorithm: PathAlgorithm }) {
   const reachedEnd = result.path.length > 0;
 
   let note: string;
-  if (player.index === 0) note = 'Press play to start exploring from the green dot.';
-  else if (pathShown === 0) note = `${info.exploring} ${exploredCount} cell${exploredCount === 1 ? '' : 's'} explored.`;
-  else if (reachedEnd) note = `Found a way: ${result.path.length - 1} steps, costing ${result.cost}. Explored ${result.order.length} cells to get here.`;
-  else note = `No way through — the flag is walled off. Explored all ${result.order.length} reachable cells.`;
+  if (player.index === 0) note = tp.noteIdle;
+  else if (pathShown === 0) note = tp.noteExploring(info.exploring, exploredCount);
+  else if (reachedEnd) note = tp.noteFound(result.path.length - 1, result.cost, result.order.length);
+  else note = tp.noteBlocked(result.order.length);
 
   // Compare all four on the current grid
   const comparison = useMemo(
@@ -176,19 +175,8 @@ function PathfindingVisualizer({ algorithm }: { algorithm: PathAlgorithm }) {
     setGrid(next);
   };
 
-  const steps = [
-    { title: 'Press play', detail: 'Watch how it explores from the green dot until it reaches the flag.', done: progress.played },
-    {
-      title: 'Change the map',
-      detail: 'Drag on the grid to draw walls or mud, or drag the dot and flag. Try a maze, too.',
-      done: progress.edited,
-    },
-    {
-      title: 'Compare on the same map',
-      detail: 'Open another algorithm below — your map comes with you.',
-      done: [...pagesSeen].some((a) => a !== algorithm),
-    },
-  ];
+  const done = [progress.played, progress.edited, [...pagesSeen].some((a) => a !== algorithm)];
+  const steps = tp.steps.map((s, i) => ({ ...s, done: done[i] }));
 
   const [startRow, startCol] = toRowCol(grid, grid.start);
   const [endRow, endCol] = toRowCol(grid, grid.end);
@@ -199,15 +187,15 @@ function PathfindingVisualizer({ algorithm }: { algorithm: PathAlgorithm }) {
         <div className="rounded-3xl border border-line bg-card p-4 shadow-card md:p-6">
           <div className="mb-4 flex flex-wrap items-center justify-between gap-4 px-1">
             <div className="flex gap-8">
-              <Stat label="Cells explored" value={exploredCount} />
-              <Stat label="Path steps" value={pathShown > 0 && reachedEnd ? result.path.length - 1 : '–'} />
-              <Stat label="Path cost" value={pathShown > 0 && reachedEnd ? result.cost : '–'} />
+              <Stat label={tp.cellsExplored} value={exploredCount} />
+              <Stat label={tp.pathSteps} value={pathShown > 0 && reachedEnd ? result.path.length - 1 : '–'} />
+              <Stat label={tp.pathCost} value={pathShown > 0 && reachedEnd ? result.cost : '–'} />
             </div>
           </div>
 
           <div className="mb-3 flex flex-wrap items-center justify-between gap-3 px-1">
-            <div className="flex rounded-full border border-line bg-paper/60 p-0.5" role="radiogroup" aria-label="Drawing tool">
-              {TOOLS.map(({ id, label }) => (
+            <div className="flex rounded-full border border-line bg-paper/60 p-0.5" role="radiogroup" aria-label={tp.drawingTool}>
+              {TOOLS.map((id) => (
                 <button
                   key={id}
                   type="button"
@@ -219,22 +207,22 @@ function PathfindingVisualizer({ algorithm }: { algorithm: PathAlgorithm }) {
                   }`}
                 >
                   {id === 'wall' ? <Brush size={13} /> : id === 'mud' ? <Waves size={13} /> : <Eraser size={13} />}
-                  {label}
+                  {tp.tools[id]}
                 </button>
               ))}
             </div>
             <div className="flex flex-wrap gap-1.5">
               <Button variant="secondary" size="sm" onClick={() => replaceGrid(mazeGrid(ROWS, COLS))}>
                 <Grid3x3 size={15} />
-                Maze
+                {tp.maze}
               </Button>
               <Button variant="secondary" size="sm" onClick={() => replaceGrid(scatterGrid(grid))}>
                 <Shuffle size={15} />
-                Scatter
+                {tp.scatter}
               </Button>
               <Button variant="ghost" size="sm" onClick={() => replaceGrid({ ...emptyGrid(ROWS, COLS), start: grid.start, end: grid.end })}>
                 <Trash2 size={15} />
-                <span className="hidden sm:inline">Clear</span>
+                <span className="hidden sm:inline">{t.common.clear}</span>
               </Button>
             </div>
           </div>
@@ -250,7 +238,7 @@ function PathfindingVisualizer({ algorithm }: { algorithm: PathAlgorithm }) {
               onPointerUp={onPointerUp}
               onPointerCancel={onPointerUp}
               role="img"
-              aria-label="Grid. Drag to draw walls or mud; drag the start dot or flag to move them."
+              aria-label={tp.gridLabel}
             >
               {Array.from({ length: ROWS * COLS }, (_, i) => {
                 const x = (i % COLS) * CELL;
@@ -287,7 +275,7 @@ function PathfindingVisualizer({ algorithm }: { algorithm: PathAlgorithm }) {
               </g>
             </svg>
           </div>
-          <p className="mt-2 px-1 text-xs text-ink-mute">Drag to draw. Drag the green dot or the flag to move them.</p>
+          <p className="mt-2 px-1 text-xs text-ink-mute">{tp.dragHint}</p>
 
           <Narration stepKey={pathShown > 0 ? 'path' : player.index === 0 ? 'idle' : 'explore'} accent={ACCENT} className="mt-4">
             {note}
@@ -296,21 +284,21 @@ function PathfindingVisualizer({ algorithm }: { algorithm: PathAlgorithm }) {
           <Legend
             className="mt-5 px-1"
             items={[
-              { color: COLORS.current, label: 'Exploring now' },
-              { color: COLORS.explored, label: 'Explored' },
-              { color: COLORS.frontier, label: 'Waiting in line' },
-              { color: COLORS.path, label: 'Path' },
-              { color: COLORS.mud, label: 'Mud (costs 5)' },
-              { color: COLORS.wall, label: 'Wall' },
+              { color: COLORS.current, label: tp.legend.current },
+              { color: COLORS.explored, label: tp.legend.explored },
+              { color: COLORS.frontier, label: tp.legend.frontier },
+              { color: COLORS.path, label: tp.legend.path },
+              { color: COLORS.mud, label: tp.legend.mud },
+              { color: COLORS.wall, label: tp.legend.wall },
             ]}
           />
         </div>
 
         <div className="space-y-6 lg:sticky lg:top-20">
-          <Panel eyebrow="Try this" title="Three small experiments">
+          <Panel eyebrow={t.common.tryThis} title={t.common.threeExperiments}>
             <GuideSteps steps={steps} accent={ACCENT} />
           </Panel>
-          <Panel eyebrow="Same map, four algorithms" title="How they compare">
+          <Panel eyebrow={tp.compareEyebrow} title={tp.compareTitle}>
             <div className="space-y-1">
               {comparison.map((c) => {
                 const active = c.id === algorithm;
@@ -325,35 +313,28 @@ function PathfindingVisualizer({ algorithm }: { algorithm: PathAlgorithm }) {
                     style={active ? { backgroundColor: SOFT } : undefined}
                     aria-current={active ? 'page' : undefined}
                   >
-                    <span className={active ? 'font-medium text-ink' : 'text-ink-soft'}>{PATH_INFO[c.id].short}</span>
+                    <span className={active ? 'font-medium text-ink' : 'text-ink-soft'}>{tp.info[c.id].short}</span>
                     <span className="text-right text-xs tabular-nums text-ink-mute">
-                      <b className="font-medium text-ink">{c.order.length}</b> explored ·{' '}
-                      {found ? (
-                        <>
-                          cost <b className="font-medium text-ink">{c.cost}</b>
-                        </>
-                      ) : (
-                        'no path'
-                      )}
+                      <Rich text={tp.compareRow(c.order.length, found ? c.cost : null)} />
                     </span>
                   </Link>
                 );
               })}
             </div>
-            <p className="mt-3 text-xs leading-relaxed text-ink-mute">Fewer explored cells means less work. Lower cost means a better route.</p>
+            <p className="mt-3 text-xs leading-relaxed text-ink-mute">{tp.compareNote}</p>
           </Panel>
         </div>
       </div>
 
       <div className="grid gap-6 md:grid-cols-[minmax(0,1fr)_minmax(0,0.8fr)]">
-        <Panel eyebrow="The idea in a minute" title={info.title}>
+        <Panel eyebrow={t.common.ideaInAMinute} title={info.title}>
           <div className="space-y-3 leading-relaxed text-ink-soft">
             {info.idea.map((p) => (
               <p key={p}>{p}</p>
             ))}
           </div>
         </Panel>
-        <Panel eyebrow="At a glance" title={PATH_NAMES[algorithm]}>
+        <Panel eyebrow={t.common.atAGlance} title={t.algorithms[algorithm].name}>
           <FactList facts={info.facts} />
         </Panel>
       </div>

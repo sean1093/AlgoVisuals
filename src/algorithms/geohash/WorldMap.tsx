@@ -2,6 +2,7 @@ import { memo, MouseEvent, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { encode, GeoBounds } from './logic';
 import { LAND_ROWS } from './worldLand';
+import { useI18n } from '../../i18n';
 
 export const MAP_WIDTH = 720;
 export const MAP_HEIGHT = 360;
@@ -62,6 +63,7 @@ interface WorldMapProps {
 }
 
 function WorldMap({ lat, lng, bounds, firstChar, onPick }: WorldMapProps) {
+  const { t } = useI18n();
   const svgRef = useRef<SVGSVGElement>(null);
   const cellW = MAP_WIDTH / 8;
   const cellH = MAP_HEIGHT / 4;
@@ -88,7 +90,7 @@ function WorldMap({ lat, lng, bounds, firstChar, onPick }: WorldMapProps) {
       className="block w-full cursor-crosshair touch-manipulation"
       onClick={handleClick}
       role="img"
-      aria-label="World map. Click to choose a place."
+      aria-label={t.geohash.worldLabel}
     >
       <LandDots />
 

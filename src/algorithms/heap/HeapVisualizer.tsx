@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowUpFromLine, Dices, Plus, Trash2 } from 'lucide-react';
-import { HeapFrame, fromValues, parent, pop, push } from './logic';
+import { HeapFrame, HeapItem, fromValues, parent, pop, push } from './logic';
 import { usePlayer } from '../../components/player/usePlayer';
 import PlayerControls from '../../components/player/PlayerControls';
 import Narration from '../../components/player/Narration';
@@ -13,6 +13,8 @@ import FactList from '../../components/shared/FactList';
 import GuideSteps from '../../components/shared/GuideSteps';
 import TreeDiagram, { DiagramEdge, DiagramNode } from '../../components/shared/TreeDiagram';
 import { getCategory } from '../../registry';
+import { useI18n } from '../../i18n';
+import Rich from '../../components/shared/Rich';
 
 const { accent: ACCENT, soft: SOFT } = getCategory('structures').theme;
 const SWAP = '#c0553a';
@@ -52,8 +54,24 @@ function heapToDiagram(frame: HeapFrame) {
   return { nodes, edges };
 }
 
+/** What the frames show: an operation on a heap, or just a heap with an intro line */
+type Scene =
+  | { kind: 'push'; base: HeapItem[]; value: number }
+  | { kind: 'pop'; base: HeapItem[] }
+  | { kind: 'intro' | 'empty'; base: HeapItem[] }
+  | { kind: 'built'; base: HeapItem[]; values: number[] };
+
 function HeapVisualizer() {
-  const [frames, setFrames] = useState<HeapFrame[]>(() => [{ items: fromValues(START), note: 'The smallest value always sits at the top. Push a number or take the smallest.' }]);
+  const { t } = useI18n();
+  const th = t.heap;
+  const [scene, setScene] = useState<Scene>(() => ({ kind: 'intro', base: fromValues(START) }));
+  // Frames are derived from the scene so a language switch re-narrates them
+  const frames = useMemo<HeapFrame[]>(() => {
+    if (scene.kind === 'push') return push(scene.base, scene.value, th.notes);
+    if (scene.kind === 'pop') return pop(scene.base, th.notes);
+    const note = scene.kind === 'built' ? th.built(scene.values.join(', ')) : scene.kind === 'empty' ? th.emptyIntro : th.intro;
+    return [{ items: scene.base, note }];
+  }, [scene, th]);
   const [taken, setTaken] = useState<number[]>([]);
   // The heap after the latest operation; earlier frames are just for playback
   const heap = frames[frames.length - 1].items;
@@ -68,33 +86,25 @@ function HeapVisualizer() {
 
   const doPush = (value: number) => {
     if (heap.length >= 31) return;
-    const next = push(heap, value);
-    setFrames(next);
+    setScene({ kind: 'push', base: heap, value });
     setProgress((p) => ({ ...p, push: true }));
   };
 
   const doPop = () => {
-    const next = pop(heap);
-    const last = next[next.length - 1];
-    setFrames(next);
-    if (last.taken) {
-      const updated = [...taken, last.taken.value];
-      setTaken(updated);
-      setProgress((p) => ({ ...p, pop: true, drain: p.drain || updated.length >= 4 }));
-    }
+    if (!heap.length) return;
+    setScene({ kind: 'pop', base: heap });
+    const updated = [...taken, heap[0].value];
+    setTaken(updated);
+    setProgress((p) => ({ ...p, pop: true, drain: p.drain || updated.length >= 4 }));
   };
 
   const reset = (values: number[]) => {
-    const items = fromValues(values);
     setTaken([]);
-    setFrames([{ items, note: values.length ? `Built a heap from ${values.join(', ')}.` : 'Empty heap. Push some numbers.' }]);
+    setScene(values.length ? { kind: 'built', base: fromValues(values), values } : { kind: 'empty', base: [] });
   };
 
-  const steps = [
-    { title: 'Push a number', detail: 'It starts at the bottom and swaps upward while it’s smaller than its parent.', done: progress.push },
-    { title: 'Take the smallest', detail: 'Press “Take smallest”. The last item jumps to the top and sinks back down.', done: progress.pop },
-    { title: 'Keep taking', detail: 'Take four or more. Notice they come out in sorted order — that’s heap sort.', done: progress.drain },
-  ];
+  const done = [progress.push, progress.pop, progress.drain];
+  const steps = th.steps.map((s, i) => ({ ...s, done: done[i] }));
 
   return (
     <div className="space-y-6">
@@ -102,9 +112,9 @@ function HeapVisualizer() {
         <div className="rounded-3xl border border-line bg-card p-4 shadow-card md:p-6">
           <div className="mb-5 flex flex-wrap items-end justify-between gap-4 px-1">
             <div className="flex gap-8">
-              <Stat label="Items" value={heap.length} />
-              <Stat label="Smallest" value={heap[0]?.value ?? '–'} />
-              <Stat label="Levels" value={heap.length ? Math.floor(Math.log2(heap.length)) + 1 : 0} />
+              <Stat label={th.items} value={heap.length} />
+              <Stat label={th.smallest} value={heap[0]?.value ?? '–'} />
+              <Stat label={th.levels} value={heap.length ? Math.floor(Math.log2(heap.length)) + 1 : 0} />
             </div>
           </div>
 
@@ -123,31 +133,31 @@ function HeapVisualizer() {
               inputMode="numeric"
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder="e.g. 7"
+              placeholder={th.placeholder}
               className="h-10 w-24 rounded-xl border border-line bg-paper/50 px-3 text-sm text-ink focus:border-ink focus:outline-none"
-              aria-label="Value"
+              aria-label={th.value}
             />
             <Button size="sm" className="h-10" type="submit" disabled={!valid || heap.length >= 31}>
               <Plus size={15} />
-              Push
+              {th.push}
             </Button>
             <Button variant="secondary" size="sm" className="h-10" onClick={doPop} disabled={!heap.length}>
               <ArrowUpFromLine size={15} />
-              Take smallest
+              {th.takeSmallest}
             </Button>
             <Button variant="ghost" size="sm" className="h-10" onClick={() => doPush(1 + Math.floor(Math.random() * 99))} disabled={heap.length >= 31}>
               <Dices size={15} />
-              <span className="hidden sm:inline">Random</span>
+              <span className="hidden sm:inline">{t.common.random}</span>
             </Button>
           </form>
 
           <div className="rounded-2xl border border-line bg-paper/60 px-2 py-3">
-            <TreeDiagram nodes={diagram.nodes} edges={diagram.edges} accent={ACCENT} minDepth={4} emptyText="Empty heap" />
+            <TreeDiagram nodes={diagram.nodes} edges={diagram.edges} accent={ACCENT} minDepth={4} emptyText={th.emptyHeap} label={t.algorithms['binary-heap'].name} />
           </div>
 
           {/* The same heap as it is really stored: a plain array */}
           <div className="mt-4 px-1">
-            <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-ink-mute">Stored as an array</p>
+            <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-ink-mute">{th.storedAsArray}</p>
             <div className="flex flex-wrap gap-1.5">
               {frame.items.map((item, i) => {
                 const colour = colourFor(frame, i);
@@ -179,18 +189,18 @@ function HeapVisualizer() {
           <Legend
             className="mt-5 px-1"
             items={[
-              { color: ACCENT, label: 'Comparing', shape: 'dot' },
-              { color: SWAP, label: 'Swapping', shape: 'dot' },
-              { color: SETTLED, label: 'Settled', shape: 'dot' },
+              { color: ACCENT, label: th.legend.compare, shape: 'dot' },
+              { color: SWAP, label: th.legend.swap, shape: 'dot' },
+              { color: SETTLED, label: th.legend.settled, shape: 'dot' },
             ]}
           />
         </div>
 
         <div className="space-y-6 lg:sticky lg:top-20">
-          <Panel eyebrow="Try this" title="Three small experiments">
+          <Panel eyebrow={t.common.tryThis} title={t.common.threeExperiments}>
             <GuideSteps steps={steps} accent={ACCENT} />
           </Panel>
-          <Panel eyebrow="Taken out so far">
+          <Panel eyebrow={th.takenSoFar}>
             {taken.length ? (
               <div className="flex flex-wrap gap-1.5">
                 {taken.map((v, i) => (
@@ -200,7 +210,7 @@ function HeapVisualizer() {
                 ))}
               </div>
             ) : (
-              <p className="text-sm text-ink-mute">Nothing yet. Press “Take smallest”.</p>
+              <p className="text-sm text-ink-mute">{th.nothingTaken}</p>
             )}
             <div className="mt-5 flex flex-wrap gap-2 border-t border-line pt-4">
               <button
@@ -208,7 +218,7 @@ function HeapVisualizer() {
                 onClick={() => reset(Array.from({ length: 10 }, () => 1 + Math.floor(Math.random() * 99)))}
                 className="rounded-full border border-line px-3 py-1.5 text-[13px] text-ink-soft transition-colors hover:border-line-strong hover:text-ink"
               >
-                Random 10
+                {th.random10}
               </button>
               <button
                 type="button"
@@ -216,7 +226,7 @@ function HeapVisualizer() {
                 className="inline-flex items-center gap-1.5 rounded-full border border-dashed border-line-strong px-3 py-1.5 text-[13px] text-ink-soft hover:text-ink"
               >
                 <Trash2 size={13} />
-                Empty
+                {t.common.empty}
               </button>
             </div>
           </Panel>
@@ -224,32 +234,20 @@ function HeapVisualizer() {
       </div>
 
       <div className="grid gap-6 md:grid-cols-[minmax(0,1fr)_minmax(0,0.8fr)]">
-        <Panel eyebrow="The idea in a minute" title="A to-do list that always knows what’s next">
+        <Panel eyebrow={t.common.ideaInAMinute} title={th.ideaTitle}>
           <div className="space-y-3 leading-relaxed text-ink-soft">
-            <p>
-              A heap only promises one thing: every parent is smaller than its children. It doesn’t keep everything sorted — just
-              enough that the smallest item is always on top.
-            </p>
-            <p>
-              That makes it the perfect <b className="text-ink">priority queue</b>: hospitals triaging patients, your computer
-              deciding which task runs next, and Dijkstra’s route finder all use one.
-            </p>
+            {th.idea.map((p) => (
+              <p key={p}>
+                <Rich text={p} />
+              </p>
+            ))}
           </div>
           <div className="mt-5 rounded-2xl p-4 text-[13px] leading-relaxed text-ink-soft" style={{ backgroundColor: SOFT }}>
-            <b className="text-ink">No pointers needed.</b> The tree lives inside a plain array: the children of position{' '}
-            <span className="font-mono">i</span> are at <span className="font-mono">2i + 1</span> and{' '}
-            <span className="font-mono">2i + 2</span>.
+            <Rich text={th.callout} />
           </div>
         </Panel>
-        <Panel eyebrow="At a glance" title="How fast, how much memory">
-          <FactList
-            facts={[
-              { label: 'Peek at smallest', value: 'O(1)' },
-              { label: 'Push', value: 'O(log n)' },
-              { label: 'Take smallest', value: 'O(log n)' },
-              { label: 'Memory', value: 'O(n)', hint: 'Just an array' },
-            ]}
-          />
+        <Panel eyebrow={t.common.atAGlance} title={t.common.howFast}>
+          <FactList facts={th.facts} />
         </Panel>
       </div>
     </div>

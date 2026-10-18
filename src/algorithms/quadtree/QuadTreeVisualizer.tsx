@@ -7,6 +7,8 @@ import Slider from '../../components/shared/Slider';
 import Panel from '../../components/shared/Panel';
 import Stat from '../../components/shared/Stat';
 import GuideSteps from '../../components/shared/GuideSteps';
+import Rich from '../../components/shared/Rich';
+import { useI18n } from '../../i18n';
 
 const CANVAS_SIZE = 600;
 const ACCENT = '#3f6b5c';
@@ -40,6 +42,8 @@ function scatter(count: number, startId: number): Dot[] {
 }
 
 function QuadTreeVisualizer() {
+  const { t } = useI18n();
+  const tq = t.quadtree;
   const [capacity, setCapacity] = useState(4);
   const [points, setPoints] = useState<Dot[]>([]);
   const [hoveredNode, setHoveredNode] = useState<Rectangle | null>(null);
@@ -113,28 +117,8 @@ function QuadTreeVisualizer() {
   };
 
   const hoveredPoints = hoveredNode ? points.filter((p) => QuadTree.contains(hoveredNode, p)) : [];
-  const steps = [
-    {
-      title: 'Fill a box until it splits',
-      detail: (
-        <>
-          A box holds up to <b className="text-ink">{capacity}</b> points. Click the canvas to add more — or
-          press <b className="text-ink">Scatter</b> — and watch it break into four.
-        </>
-      ),
-      done: allNodes.length > 1,
-    },
-    {
-      title: 'Hover over a region',
-      detail: 'Move your cursor around. The highlighted box is where that spot “lives” in the tree.',
-      done: hasHovered,
-    },
-    {
-      title: 'Change how much a box can hold',
-      detail: 'Drag the slider. A smaller limit means more, tinier boxes; a bigger limit means fewer.',
-      done: hasChangedCapacity,
-    },
-  ];
+  const done = [allNodes.length > 1, hasHovered, hasChangedCapacity];
+  const steps = tq.steps.map((step, i) => ({ title: step.title, detail: <Rich text={step.detail(capacity)} />, done: done[i] }));
   const allDone = steps.every((s) => s.done);
 
   return (
@@ -144,24 +128,24 @@ function QuadTreeVisualizer() {
         <div className="rounded-3xl border border-line bg-card p-4 shadow-card md:p-6">
           <div className="mb-4 flex flex-wrap items-center justify-between gap-3 px-1">
             <div className="flex gap-8">
-              <Stat label="Points" value={points.length} />
-              <Stat label="Boxes" value={leaves.length} />
-              <Stat label="Levels deep" value={maxDepth} />
+              <Stat label={tq.points} value={points.length} />
+              <Stat label={tq.boxes} value={leaves.length} />
+              <Stat label={tq.levelsDeep} value={maxDepth} />
             </div>
             <div className="flex items-center gap-1.5">
-              <Button variant="secondary" size="sm" onClick={handleScatter} title="Add 12 random points">
+              <Button variant="secondary" size="sm" onClick={handleScatter} title={tq.scatterTitle}>
                 <Shuffle size={15} />
-                Scatter
+                {tq.scatter}
               </Button>
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => setPoints((prev) => prev.slice(0, -1))}
                 disabled={points.length === 0}
-                title="Remove the last point"
+                title={tq.undoTitle}
               >
                 <Undo2 size={15} />
-                <span className="hidden sm:inline">Undo</span>
+                <span className="hidden sm:inline">{t.common.undo}</span>
               </Button>
               <Button
                 variant="ghost"
@@ -171,10 +155,10 @@ function QuadTreeVisualizer() {
                   setHoveredNode(null);
                 }}
                 disabled={points.length === 0}
-                title="Remove all points"
+                title={tq.clearTitle}
               >
                 <Eraser size={15} />
-                <span className="hidden sm:inline">Clear</span>
+                <span className="hidden sm:inline">{t.common.clear}</span>
               </Button>
             </div>
           </div>
@@ -188,7 +172,7 @@ function QuadTreeVisualizer() {
               onPointerMove={handlePointerMove}
               onPointerLeave={() => setHoveredNode(null)}
               role="img"
-              aria-label="QuadTree canvas. Click to add points."
+              aria-label={tq.canvasLabel}
             >
               {/* Boxes, tinted a little deeper at each level */}
               {leaves.map((node) => (
@@ -257,8 +241,8 @@ function QuadTreeVisualizer() {
                   >
                     <MousePointerClick size={24} />
                   </span>
-                  <p className="font-display text-2xl text-ink">Click anywhere to drop a point</p>
-                  <p className="text-sm text-ink-mute">or press Scatter to add a handful at once</p>
+                  <p className="font-display text-2xl text-ink">{tq.emptyTitle}</p>
+                  <p className="text-sm text-ink-mute">{tq.emptyHint}</p>
                 </motion.div>
               )}
             </AnimatePresence>
@@ -266,8 +250,7 @@ function QuadTreeVisualizer() {
             {/* Hover readout */}
             {hoveredNode && points.length > 0 && (
               <div className="pointer-events-none absolute bottom-3 left-3 rounded-xl border border-line bg-card/95 px-3.5 py-2 text-[13px] text-ink-soft shadow-card backdrop-blur">
-                Level <b className="text-ink">{depthOf(hoveredNode)}</b> box ·{' '}
-                <b className="text-ink">{hoveredPoints.length}</b> of {capacity} spots used
+                <Rich text={tq.hoverReadout(depthOf(hoveredNode), hoveredPoints.length, capacity)} />
               </div>
             )}
           </div>
@@ -275,26 +258,25 @@ function QuadTreeVisualizer() {
 
         {/* Side panel */}
         <div className="space-y-6 lg:sticky lg:top-20">
-          <Panel eyebrow="Try this" title={allDone ? 'You’ve got it!' : 'Three small experiments'}>
+          <Panel eyebrow={t.common.tryThis} title={allDone ? t.common.gotIt : t.common.threeExperiments}>
             <GuideSteps steps={steps} accent={ACCENT} />
             {allDone && (
               <p className="mt-5 rounded-2xl p-4 text-[13px] leading-relaxed text-ink-soft" style={{ backgroundColor: SOFT }}>
-                That’s the whole trick. To find what’s near a point, you only look inside its own box —
-                not at every point on the canvas.
+                {tq.allDone}
               </p>
             )}
           </Panel>
 
-          <Panel eyebrow="Adjust">
+          <Panel eyebrow={t.common.adjust}>
             <Slider
-              label="Points per box"
-              hint="How many points a box can hold before it splits"
+              label={tq.pointsPerBox}
+              hint={tq.pointsPerBoxHint}
               value={capacity}
               min={1}
               max={10}
               onChange={handleCapacityChange}
-              minLabel="1 · split often"
-              maxLabel="10 · split rarely"
+              minLabel={tq.splitOften}
+              maxLabel={tq.splitRarely}
               accent={ACCENT}
             />
           </Panel>
@@ -303,27 +285,20 @@ function QuadTreeVisualizer() {
 
       {/* The idea */}
       <div className="grid gap-6 md:grid-cols-2">
-        <Panel eyebrow="The idea in a minute" title="Divide only where it’s crowded">
+        <Panel eyebrow={t.common.ideaInAMinute} title={tq.ideaTitle}>
           <div className="space-y-3 leading-relaxed text-ink-soft">
-            <p>
-              Start with one big box. When it gets too full, cut it into four equal quarters and hand each
-              point to the quarter it falls in. Keep doing that, but only where things are crowded.
-            </p>
-            <p>
-              Empty areas stay as big boxes; busy areas become a fine mesh. The shape of the tree ends up
-              mirroring the shape of your data.
-            </p>
+            {tq.idea.map((p) => (
+              <p key={p}>{p}</p>
+            ))}
           </div>
         </Panel>
-        <Panel eyebrow="Why it’s fast" title="Look in one box, not everywhere">
+        <Panel eyebrow={tq.whyFast} title={tq.whyFastTitle}>
           <p className="leading-relaxed text-ink-soft">
-            To find neighbours of a point without a QuadTree, you’d compare it with{' '}
-            <b className="text-ink">every one of the {points.length} points</b>. With the tree, you only check
-            its own box — about <b className="text-ink">{avgPerBox.toFixed(1)}</b> points on average right now.
+            <Rich text={tq.whyFastBody(points.length, avgPerBox.toFixed(1))} />
           </p>
           <div className="mt-5 space-y-2.5">
-            <Bar label="Check everything" value={points.length} max={Math.max(points.length, 1)} color="#cfc7b6" />
-            <Bar label="Check one box" value={avgPerBox} max={Math.max(points.length, 1)} color={ACCENT} />
+            <Bar label={tq.checkEverything} value={points.length} max={Math.max(points.length, 1)} color="#cfc7b6" />
+            <Bar label={tq.checkOneBox} value={avgPerBox} max={Math.max(points.length, 1)} color={ACCENT} />
           </div>
         </Panel>
       </div>

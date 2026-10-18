@@ -9,12 +9,8 @@ export const BAR_COLORS = {
   sorted: '#3f6b5c',
 };
 
-export const LEGEND: { key: keyof typeof BAR_COLORS; label: string }[] = [
-  { key: 'compare', label: 'Comparing' },
-  { key: 'swap', label: 'Moving' },
-  { key: 'pivot', label: 'Pivot / current' },
-  { key: 'sorted', label: 'In final place' },
-];
+/** Colours shown in the legend, in order (labels come from the dictionary) */
+export const LEGEND_KEYS = ['compare', 'swap', 'pivot', 'sorted'] as const;
 
 export function barColor(frame: SortFrame, i: number, sorted: Set<number>) {
   if (frame.swap?.includes(i) || frame.write === i) return BAR_COLORS.swap;

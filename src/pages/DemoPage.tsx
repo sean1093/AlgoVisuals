@@ -1,10 +1,21 @@
+import { useEffect } from 'react';
 import { useParams, Navigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { getAlgorithm, getAlgorithmsByCategory, getAllAlgorithms, getCategory } from '../registry';
+import { useI18n } from '../i18n';
 
 function DemoPage() {
   const { algoId } = useParams<{ algoId: string }>();
+  const { t } = useI18n();
+  const text = algoId ? t.algorithms[algoId] : undefined;
+
+  useEffect(() => {
+    document.title = text ? t.meta.demoTitle(text.name) : t.meta.title;
+    return () => {
+      document.title = t.meta.title;
+    };
+  }, [text, t]);
 
   if (!algoId) {
     return <Navigate to="/" replace />;
@@ -12,18 +23,18 @@ function DemoPage() {
 
   const algorithm = getAlgorithm(algoId);
 
-  if (!algorithm) {
+  if (!algorithm || !text) {
     return (
       <div className="mx-auto flex max-w-md flex-col items-center px-5 py-32 text-center">
-        <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.14em] text-ink-mute">Not found</p>
-        <h1 className="font-display text-4xl text-ink">We couldn’t find that one</h1>
-        <p className="mt-4 text-ink-soft">There’s no demo called “{algoId}” yet.</p>
+        <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.14em] text-ink-mute">{t.demo.notFound}</p>
+        <h1 className="font-display text-4xl text-ink">{t.demo.notFoundTitle}</h1>
+        <p className="mt-4 text-ink-soft">{t.demo.notFoundBody(algoId)}</p>
         <Link
           to="/"
           className="mt-8 inline-flex h-11 items-center gap-2 rounded-full bg-ink px-5 text-sm font-medium text-paper"
         >
           <ArrowLeft size={16} />
-          Back to the collection
+          {t.demo.backToCollection}
         </Link>
       </div>
     );
@@ -35,19 +46,21 @@ function DemoPage() {
   const category = getCategory(algorithm.category);
   const siblings = getAlgorithmsByCategory(algorithm.category);
   const AlgorithmComponent = algorithm.component;
+  const categoryName = t.categories[category.id].name;
+  const nextText = next && t.algorithms[next.id];
 
   return (
     <div key={algorithm.id}>
       {/* Intro */}
       <section className="mx-auto max-w-6xl px-5 pb-10 pt-10 md:px-8 md:pb-12 md:pt-14">
-        <nav aria-label="Breadcrumb" className="mb-8 flex items-center gap-1.5 text-sm text-ink-mute">
+        <nav aria-label={t.demo.breadcrumb} className="mb-8 flex items-center gap-1.5 text-sm text-ink-mute">
           <Link to="/" className="group inline-flex items-center gap-1.5 transition-colors hover:text-ink">
             <ArrowLeft size={15} className="transition-transform group-hover:-translate-x-0.5" />
-            Collection
+            {t.demo.collection}
           </Link>
           <span>/</span>
           <Link to={`/#${category.id}`} className="transition-colors hover:text-ink">
-            {category.name}
+            {categoryName}
           </Link>
         </nav>
 
@@ -60,22 +73,22 @@ function DemoPage() {
           <div className="max-w-2xl">
             <p className="mb-3 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-ink-mute">
               <span className="h-2 w-2 rounded-full" style={{ backgroundColor: algorithm.theme.accent }} />
-              {category.name}
+              {categoryName}
             </p>
-            <h1 className="font-display text-5xl tracking-tight text-ink md:text-6xl">{algorithm.name}</h1>
-            <p className="mt-4 text-lg leading-relaxed text-ink-soft md:text-xl">{algorithm.tagline}</p>
-            {algorithm.facts && (
+            <h1 className="font-display text-5xl tracking-tight text-ink md:text-6xl">{text.name}</h1>
+            <p className="mt-4 text-lg leading-relaxed text-ink-soft md:text-xl">{text.tagline}</p>
+            {text.facts.length > 0 && (
               <div className="mt-5 flex flex-wrap gap-2">
-                {algorithm.facts.map((f) => (
-                  <span key={f.label} className="rounded-lg border border-line bg-card/70 px-2.5 py-1 text-xs text-ink-soft">
-                    {f.label} <span className="ml-1 font-mono text-ink">{f.value}</span>
+                {text.facts.map(([label, value]) => (
+                  <span key={label} className="rounded-lg border border-line bg-card/70 px-2.5 py-1 text-xs text-ink-soft">
+                    {label} <span className="ml-1 font-mono text-ink">{value}</span>
                   </span>
                 ))}
               </div>
             )}
           </div>
           <div className="flex flex-wrap gap-2 md:justify-end">
-            {algorithm.usedIn.map((use) => (
+            {text.usedIn.map((use) => (
               <span key={use} className="rounded-full border border-line bg-card/70 px-3 py-1 text-xs text-ink-soft">
                 {use}
               </span>
@@ -92,7 +105,7 @@ function DemoPage() {
       {/* More in this topic */}
       {siblings.length > 1 && (
         <section className="mx-auto max-w-6xl px-5 pb-8 md:px-8">
-          <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.14em] text-ink-mute">More in {category.name}</p>
+          <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.14em] text-ink-mute">{t.demo.moreIn(categoryName)}</p>
           <div className="flex flex-wrap gap-2">
             {siblings.map((s) => (
               <Link
@@ -104,7 +117,7 @@ function DemoPage() {
                 }`}
                 style={s.id === algorithm.id ? { backgroundColor: category.theme.accent } : undefined}
               >
-                {s.name}
+                {t.algorithms[s.id].name}
               </Link>
             ))}
           </div>
@@ -112,7 +125,7 @@ function DemoPage() {
       )}
 
       {/* Next */}
-      {next && (
+      {next && nextText && (
         <section className="mx-auto max-w-6xl px-5 pb-24 md:px-8">
           <Link
             to={`/demo/${next.id}`}
@@ -123,9 +136,9 @@ function DemoPage() {
                 <next.preview className="h-14 w-14 text-ink" />
               </div>
               <div>
-                <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-ink-mute">Up next</p>
-                <p className="mt-1 font-display text-3xl text-ink">{next.name}</p>
-                <p className="mt-1 text-ink-soft">{next.tagline}</p>
+                <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-ink-mute">{t.demo.upNext}</p>
+                <p className="mt-1 font-display text-3xl text-ink">{nextText.name}</p>
+                <p className="mt-1 text-ink-soft">{nextText.tagline}</p>
               </div>
             </div>
             <span

@@ -25,15 +25,17 @@ export function formatDistance(km: number): string {
 /**
  * Something familiar of roughly the same size as the cell
  */
-export function sizeComparison(km: number): string {
-  if (km > 2000) return 'a continent';
-  if (km > 400) return 'a large country';
-  if (km > 80) return 'a small country';
-  if (km > 15) return 'a city';
-  if (km > 3) return 'a neighbourhood';
-  if (km > 0.4) return 'a few streets';
-  if (km > 0.08) return 'a city block';
-  return 'a house';
+export type SizeKey = 'continent' | 'largeCountry' | 'smallCountry' | 'city' | 'neighbourhood' | 'streets' | 'block' | 'house';
+
+export function sizeComparison(km: number): SizeKey {
+  if (km > 2000) return 'continent';
+  if (km > 400) return 'largeCountry';
+  if (km > 80) return 'smallCountry';
+  if (km > 15) return 'city';
+  if (km > 3) return 'neighbourhood';
+  if (km > 0.4) return 'streets';
+  if (km > 0.08) return 'block';
+  return 'house';
 }
 
 /**

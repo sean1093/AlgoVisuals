@@ -9,6 +9,8 @@ import FactList from '../../components/shared/FactList';
 import GuideSteps from '../../components/shared/GuideSteps';
 import Narration from '../../components/player/Narration';
 import { getCategory } from '../../registry';
+import { Messages, useI18n } from '../../i18n';
+import Rich from '../../components/shared/Rich';
 
 const { accent: ACCENT, soft: SOFT } = getCategory('structures').theme;
 const FOUND = '#3f6b5c';
@@ -29,11 +31,18 @@ function buildTable(words: string[], buckets: number): Table {
   return table;
 }
 
+/** Narration is stored as a function of the dictionary so it follows language switches */
+type Note = (m: Messages['hash']) => string;
+
 function HashTableVisualizer() {
+  const { t } = useI18n();
+  const th = t.hash;
   const [table, setTable] = useState<Table>(() => buildTable(STARTER, 8));
   const [input, setInput] = useState('');
   const [highlight, setHighlight] = useState<Highlight | null>(null);
-  const [note, setNote] = useState('Each word is turned into a number, and that number picks its bucket. Try adding one.');
+  const [note, setNoteFn] = useState<{ render: Note }>({ render: (m) => m.intro });
+  const setNote = (render: Note) => setNoteFn({ render });
+  const noteText = note.render(th);
   const [lastKey, setLastKey] = useState('cat');
   const [progress, setProgress] = useState({ add: false, find: false, grow: false });
 
@@ -49,13 +58,14 @@ function HashTableVisualizer() {
     setProgress((p) => ({ ...p, add: true }));
     if (result.existed) {
       setHighlight({ bucket: result.bucket, key: word, kind: 'found' });
-      setNote(`“${word}” is already in bucket ${result.bucket}. A hash table stores each key only once.`);
+      setNote((m) => m.exists(word, result.bucket));
     } else if (result.collision) {
       setHighlight({ bucket: result.bucket, key: word, kind: 'clash' });
-      setNote(`Collision! Bucket ${result.bucket} already had ${table[result.bucket].map((k) => `“${k}”`).join(', ')}. “${word}” joins the chain.`);
+      const existing = table[result.bucket].map((k) => `“${k}”`).join(', ');
+      setNote((m) => m.collision(result.bucket, existing, word));
     } else {
       setHighlight({ bucket: result.bucket, key: word, kind: 'add' });
-      setNote(`“${word}” goes straight into empty bucket ${result.bucket}. One step, no searching.`);
+      setNote((m) => m.added(word, result.bucket));
     }
   };
 
@@ -65,10 +75,11 @@ function HashTableVisualizer() {
     setProgress((p) => ({ ...p, find: true }));
     if (position >= 0) {
       setHighlight({ bucket, key: word, kind: 'found' });
-      setNote(`Jumped straight to bucket ${bucket} and found “${word}” after checking ${checked} item${checked > 1 ? 's' : ''} — out of ${s.items}.`);
+      const total = s.items;
+      setNote((m) => m.found(bucket, word, checked, total));
     } else {
       setHighlight({ bucket, kind: 'missing' });
-      setNote(`“${word}” would live in bucket ${bucket}. ${checked ? `Checked its ${checked} item${checked > 1 ? 's' : ''}:` : 'It’s empty, so'} it isn’t here.`);
+      setNote((m) => m.notFound(word, bucket, checked));
     }
   };
 
@@ -77,7 +88,7 @@ function HashTableVisualizer() {
     setLastKey(word);
     setTable(result.table);
     setHighlight({ bucket: result.bucket, kind: result.removed ? 'removed' : 'missing' });
-    setNote(result.removed ? `Removed “${word}” from bucket ${result.bucket}.` : `“${word}” isn’t in the table.`);
+    setNote((m) => (result.removed ? m.removed(word, result.bucket) : m.notInTable(word)));
   };
 
   const grow = () => {
@@ -85,7 +96,7 @@ function HashTableVisualizer() {
     setTable(next);
     setHighlight(null);
     setProgress((p) => ({ ...p, grow: true }));
-    setNote(`Doubled to ${next.length} buckets. Every word was re-hashed and moved — chains got shorter.`);
+    setNote((m) => m.grown(next.length));
   };
 
   const addMany = () => {
@@ -95,14 +106,11 @@ function HashTableVisualizer() {
     setTable(next);
     setHighlight(null);
     setProgress((p) => ({ ...p, add: true }));
-    setNote(fresh.length ? `Added ${fresh.join(', ')}. Watch the chains grow as the table fills up.` : 'All the sample animals are already in.');
+    setNote((m) => (fresh.length ? m.addedMany(fresh.join(', ')) : m.allIn));
   };
 
-  const steps = [
-    { title: 'Add a word', detail: 'Type an animal and press Add. See which bucket its letters send it to.', done: progress.add },
-    { title: 'Find a word', detail: 'Search jumps straight to one bucket instead of checking everything.', done: progress.find },
-    { title: 'Fill it up, then grow', detail: 'Add more animals until chains get long, then press “Double buckets”.', done: progress.grow },
-  ];
+  const done = [progress.add, progress.find, progress.grow];
+  const steps = th.steps.map((s, i) => ({ ...s, done: done[i] }));
 
   const colourFor = (bucket: number, word?: string) => {
     if (!highlight || highlight.bucket !== bucket) return null;
@@ -117,10 +125,10 @@ function HashTableVisualizer() {
       <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_340px]">
         <div className="rounded-3xl border border-line bg-card p-4 shadow-card md:p-6">
           <div className="mb-5 flex flex-wrap gap-8 px-1">
-            <Stat label="Items" value={s.items} />
-            <Stat label="Buckets" value={s.buckets} />
-            <Stat label="Items per bucket" value={s.load.toFixed(2)} />
-            <Stat label="Longest chain" value={s.longest} />
+            <Stat label={th.items} value={s.items} />
+            <Stat label={th.buckets} value={s.buckets} />
+            <Stat label={th.perBucket} value={s.load.toFixed(2)} />
+            <Stat label={th.longest} value={s.longest} />
           </div>
 
           <form
@@ -136,22 +144,23 @@ function HashTableVisualizer() {
             <input
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder="e.g. tiger"
+              placeholder={th.placeholder}
+              title={th.lettersOnly}
               maxLength={12}
               className="h-10 w-32 rounded-xl border border-line bg-paper/50 px-3 text-sm text-ink focus:border-ink focus:outline-none"
-              aria-label="Word"
+              aria-label={th.word}
             />
             <Button size="sm" className="h-10" type="submit" disabled={!valid}>
               <Plus size={15} />
-              Add
+              {th.add}
             </Button>
             <Button variant="secondary" size="sm" className="h-10" disabled={!valid} onClick={() => doFind(key)}>
               <Search size={15} />
-              Find
+              {th.find}
             </Button>
             <Button variant="secondary" size="sm" className="h-10" disabled={!valid} onClick={() => doRemove(key)}>
               <X size={15} />
-              Remove
+              {th.remove}
             </Button>
           </form>
 
@@ -172,7 +181,7 @@ function HashTableVisualizer() {
                       {bucket}
                     </span>
                     <div className="flex flex-wrap items-center gap-1.5">
-                      {chain.length === 0 && <span className="text-xs text-ink-mute/60">empty</span>}
+                      {chain.length === 0 && <span className="text-xs text-ink-mute/60">{th.emptyBucket}</span>}
                       {chain.map((word, i) => {
                         const colour = colourFor(bucket, word);
                         return (
@@ -196,18 +205,18 @@ function HashTableVisualizer() {
             </div>
           </LayoutGroup>
 
-          <Narration stepKey={note} accent={highlight?.kind === 'clash' ? CLASH : ACCENT} className="mt-4">
-            {note}
+          <Narration stepKey={noteText} accent={highlight?.kind === 'clash' ? CLASH : ACCENT} className="mt-4">
+            {noteText}
           </Narration>
 
           <div className="mt-4 flex flex-wrap gap-2 px-1">
             <Button variant="secondary" size="sm" onClick={addMany}>
               <Sparkles size={15} />
-              Add 5 animals
+              {th.addFive}
             </Button>
             <Button variant="secondary" size="sm" onClick={grow} disabled={table.length >= 32}>
               <Expand size={15} />
-              Double buckets
+              {th.double}
             </Button>
             <Button
               variant="ghost"
@@ -215,20 +224,20 @@ function HashTableVisualizer() {
               onClick={() => {
                 setTable(createTable(8));
                 setHighlight(null);
-                setNote('Empty table with 8 buckets.');
+                setNote((m) => m.emptied);
               }}
             >
               <Trash2 size={15} />
-              Empty
+              {t.common.empty}
             </Button>
           </div>
         </div>
 
         <div className="space-y-6 lg:sticky lg:top-20">
-          <Panel eyebrow="Try this" title="Three small experiments">
+          <Panel eyebrow={t.common.tryThis} title={t.common.threeExperiments}>
             <GuideSteps steps={steps} accent={ACCENT} />
           </Panel>
-          <Panel eyebrow="The hash, worked out" title={`“${lastKey}”`}>
+          <Panel eyebrow={th.workedOut} title={`“${lastKey}”`}>
             <div className="flex flex-wrap gap-1.5">
               {breakdown.codes.map(({ char, code }, i) => (
                 <span key={i} className="flex flex-col items-center rounded-lg bg-paper-deep/70 px-2 py-1">
@@ -238,46 +247,31 @@ function HashTableVisualizer() {
               ))}
             </div>
             <p className="mt-3 font-mono text-[13px] leading-relaxed text-ink-soft">
-              sum = {breakdown.sum}
+              {th.sum} = {breakdown.sum}
               <br />
               {breakdown.sum} mod {table.length} = <b style={{ color: ACCENT }}>{breakdown.index}</b>
             </p>
-            <p className="mt-3 text-xs leading-relaxed text-ink-mute">
-              Each letter has a number. Add them up, take the remainder after dividing by the number of buckets — that’s the bucket.
-            </p>
+            <p className="mt-3 text-xs leading-relaxed text-ink-mute">{th.workedNote}</p>
           </Panel>
         </div>
       </div>
 
       <div className="grid gap-6 md:grid-cols-[minmax(0,1fr)_minmax(0,0.8fr)]">
-        <Panel eyebrow="The idea in a minute" title="Know exactly where to look">
+        <Panel eyebrow={t.common.ideaInAMinute} title={th.ideaTitle}>
           <div className="space-y-3 leading-relaxed text-ink-soft">
-            <p>
-              A hash function turns a key — a word, a name, an ID — into a number. That number says which bucket to use. To find
-              the key again, compute the same number and look in just that one bucket.
-            </p>
-            <p>
-              Sometimes two keys land in the same bucket: a <b className="text-ink">collision</b>. Here they simply line up in a
-              chain. Keep chains short by adding buckets as the table fills, and lookups stay almost instant.
-            </p>
+            {th.idea.map((p) => (
+              <p key={p}>
+                <Rich text={p} />
+              </p>
+            ))}
           </div>
           <div className="mt-5 rounded-2xl p-4 text-[13px] leading-relaxed text-ink-soft" style={{ backgroundColor: SOFT }}>
-            <b className="text-ink">Try “listen” and “silent”.</b> Same letters, same sum, same bucket — a sign this hash is too
-            simple. Real hash functions mix the letters’ positions in too.
+            <Rich text={th.callout} />
           </div>
         </Panel>
-        <Panel eyebrow="At a glance" title="How fast, how much memory">
-          <FactList
-            facts={[
-              { label: 'Add / find / remove', hint: 'With short chains', value: 'O(1)' },
-              { label: 'Worst case', hint: 'Everything in one bucket', value: 'O(n)' },
-              { label: 'Kept in order', value: 'No' },
-              { label: 'Memory', value: 'O(n)' },
-            ]}
-          />
-          <p className="mt-4 text-[13px] leading-relaxed text-ink-mute">
-            You meet these every day: dictionaries in Python, objects in JavaScript, database indexes and caches.
-          </p>
+        <Panel eyebrow={t.common.atAGlance} title={t.common.howFast}>
+          <FactList facts={th.facts} />
+          <p className="mt-4 text-[13px] leading-relaxed text-ink-mute">{th.everyday}</p>
         </Panel>
       </div>
     </div>

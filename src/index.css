@@ -31,6 +31,21 @@ html {
   background: var(--color-paper);
 }
 
+/* CJK text falls back to Noto (loaded on demand by the i18n provider), then the system's own fonts */
+:root[data-lang="zh-TW"] {
+  --font-sans: "Inter", "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Fraunces", "Noto Serif TC", "Songti TC", ui-serif, Georgia, serif;
+}
+:root[data-lang="ja"] {
+  --font-sans: "Inter", "Noto Sans JP", "Hiragino Sans", "Yu Gothic", "Meiryo", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Fraunces", "Noto Serif JP", "Hiragino Mincho ProN", "Yu Mincho", ui-serif, Georgia, serif;
+}
+:root[data-lang="ko"] {
+  --font-sans: "Inter", "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Fraunces", "Noto Serif KR", "AppleMyungjo", ui-serif, Georgia, serif;
+  word-break: keep-all;
+}
+
 body {
   margin: 0;
   background: var(--color-paper);

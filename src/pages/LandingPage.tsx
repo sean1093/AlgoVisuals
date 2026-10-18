@@ -1,33 +1,25 @@
+import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowRight, MousePointerClick, Sparkles, Lightbulb } from 'lucide-react';
 import { CATEGORIES, getAlgorithmsByCategory, getAllAlgorithms, getCategory } from '../registry';
 import HeroSortLoop from '../components/shared/HeroSortLoop';
+import { useI18n } from '../i18n';
 
 const fadeUp = {
   hidden: { opacity: 0, y: 16 },
   show: { opacity: 1, y: 0 },
 };
 
-const STEPS = [
-  {
-    icon: Sparkles,
-    title: 'Pick an idea',
-    body: 'Each page is one idea, explained in a sentence you can actually remember.',
-  },
-  {
-    icon: MousePointerClick,
-    title: 'Play with it',
-    body: 'Press play, step through slowly, or change the input. The picture reacts instantly — nothing to install, no code to read.',
-  },
-  {
-    icon: Lightbulb,
-    title: 'See it click',
-    body: 'A short checklist guides you to the “aha” moment, then tells you where it shows up in real life.',
-  },
-];
+const STEP_ICONS = [Sparkles, MousePointerClick, Lightbulb];
 
 function LandingPage() {
+  const { t } = useI18n();
+  const tl = t.landing;
+
+  useEffect(() => {
+    document.title = t.meta.title;
+  }, [t]);
   const algorithms = getAllAlgorithms();
   const first = algorithms[0];
   const categories = CATEGORIES.filter((c) => getAlgorithmsByCategory(c.id).length);
@@ -43,17 +35,16 @@ function LandingPage() {
             className="mb-5 inline-flex items-center gap-2 rounded-full border border-line bg-card/70 px-3.5 py-1.5 text-xs font-medium text-ink-soft"
           >
             <span className="h-1.5 w-1.5 rounded-full bg-clay" />
-            {algorithms.length} interactive demos · {categories.length} topics · free
+            {tl.badge(algorithms.length, categories.length)}
           </motion.p>
           <motion.h1
             variants={fadeUp}
             className="font-display text-5xl leading-[1.05] tracking-tight text-ink md:text-7xl"
           >
-            See how algorithms <em className="font-normal italic text-clay">think.</em>
+            {tl.titleStart} <em className="font-normal italic text-clay">{tl.titleEmphasis}</em>
           </motion.h1>
           <motion.p variants={fadeUp} className="mt-6 max-w-lg text-lg leading-relaxed text-ink-soft">
-            No code, no formulas. Press play, step through slowly, and watch an idea take shape in front of
-            you — each one takes about two minutes to get.
+            {tl.intro}
           </motion.p>
           <motion.div variants={fadeUp} className="mt-9 flex flex-wrap items-center gap-3">
             {first && (
@@ -61,7 +52,7 @@ function LandingPage() {
                 to={`/demo/${first.id}`}
                 className="group inline-flex h-12 items-center gap-2 rounded-full bg-ink px-6 text-sm font-medium text-paper shadow-card transition-all hover:bg-ink/85"
               >
-                Start with {first.name}
+                {tl.start(t.algorithms[first.id].name)}
                 <ArrowRight size={16} className="transition-transform group-hover:translate-x-0.5" />
               </Link>
             )}
@@ -69,7 +60,7 @@ function LandingPage() {
               href="#collection"
               className="inline-flex h-12 items-center rounded-full px-5 text-sm font-medium text-ink-soft transition-colors hover:bg-paper-deep hover:text-ink"
             >
-              Browse the collection
+              {tl.browseCollection}
             </a>
           </motion.div>
         </motion.div>
@@ -85,11 +76,11 @@ function LandingPage() {
             <HeroSortLoop className="h-56" />
             <div className="mt-6 flex items-center justify-between border-t border-line pt-5">
               <div>
-                <p className="font-display text-lg text-ink">Insertion Sort</p>
-                <p className="text-xs text-ink-mute">Sorting a fresh list, over and over</p>
+                <p className="font-display text-lg text-ink">{t.algorithms['insertion-sort'].name}</p>
+                <p className="text-xs text-ink-mute">{tl.heroCaption}</p>
               </div>
               <span className="rounded-full px-3 py-1 text-xs font-medium" style={{ backgroundColor: sortTheme.soft, color: sortTheme.accent }}>
-                Live
+                {tl.live}
               </span>
             </div>
           </div>
@@ -97,7 +88,7 @@ function LandingPage() {
       </section>
 
       {/* Topic jump links */}
-      <nav aria-label="Topics" className="mx-auto max-w-6xl px-5 pb-14 md:px-8">
+      <nav aria-label={tl.topics} className="mx-auto max-w-6xl px-5 pb-14 md:px-8">
         <div className="flex flex-wrap gap-2">
           {categories.map((c) => (
             <a
@@ -106,7 +97,7 @@ function LandingPage() {
               className="inline-flex items-center gap-2 rounded-full border border-line bg-card/70 px-4 py-2 text-sm text-ink-soft transition-colors hover:border-line-strong hover:text-ink"
             >
               <span className="h-2 w-2 rounded-full" style={{ backgroundColor: c.theme.accent }} />
-              {c.name}
+              {t.categories[c.id].name}
               <span className="text-xs text-ink-mute">{getAlgorithmsByCategory(c.id).length}</span>
             </a>
           ))}
@@ -124,16 +115,17 @@ function LandingPage() {
                   <div>
                     <p className="mb-2 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-ink-mute">
                       <span className="h-2 w-2 rounded-full" style={{ backgroundColor: category.theme.accent }} />
-                      Topic {String(ci + 1).padStart(2, '0')}
+                      {tl.topicNumber(String(ci + 1).padStart(2, '0'))}
                     </p>
-                    <h2 className="font-display text-4xl tracking-tight text-ink">{category.name}</h2>
+                    <h2 className="font-display text-4xl tracking-tight text-ink">{t.categories[category.id].name}</h2>
                   </div>
-                  <p className="max-w-md text-ink-soft">{category.blurb}</p>
+                  <p className="max-w-md text-ink-soft">{t.categories[category.id].blurb}</p>
                 </div>
 
                 <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
                   {items.map((algo, i) => {
                     const Preview = algo.preview;
+                    const text = t.algorithms[algo.id];
                     return (
                       <motion.div
                         key={algo.id}
@@ -149,13 +141,13 @@ function LandingPage() {
                             <Preview className="h-28 w-28 text-ink transition-transform duration-500 group-hover:scale-105" />
                           </div>
                           <div className="flex flex-1 flex-col p-6">
-                            <h3 className="font-display text-2xl text-ink">{algo.name}</h3>
-                            <p className="mt-2 text-[15px] leading-relaxed text-ink-soft">{algo.tagline}</p>
-                            {algo.facts && (
+                            <h3 className="font-display text-2xl text-ink">{text.name}</h3>
+                            <p className="mt-2 text-[15px] leading-relaxed text-ink-soft">{text.tagline}</p>
+                            {text.facts.length > 0 && (
                               <div className="mt-4 flex flex-wrap gap-1.5">
-                                {algo.facts.map((f) => (
-                                  <span key={f.label} className="rounded-md bg-paper-deep/70 px-2 py-0.5 text-[11px] text-ink-soft">
-                                    {f.label} <span className="font-mono text-ink">{f.value}</span>
+                                {text.facts.map(([label, value]) => (
+                                  <span key={label} className="rounded-md bg-paper-deep/70 px-2 py-0.5 text-[11px] text-ink-soft">
+                                    {label} <span className="font-mono text-ink">{value}</span>
                                   </span>
                                 ))}
                               </div>
@@ -164,7 +156,7 @@ function LandingPage() {
                               className="mt-auto inline-flex items-center gap-1.5 pt-6 text-sm font-medium"
                               style={{ color: algo.theme.accent }}
                             >
-                              Open the demo
+                              {tl.openDemo}
                               <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" />
                             </span>
                           </div>
@@ -182,10 +174,12 @@ function LandingPage() {
       {/* How it works */}
       <section className="mx-auto max-w-6xl px-5 py-20 md:px-8 md:py-24">
         <h2 className="mb-12 max-w-xl font-display text-3xl tracking-tight text-ink md:text-4xl">
-          Built for curious people, not just engineers.
+          {tl.builtFor}
         </h2>
         <div className="grid gap-10 md:grid-cols-3">
-          {STEPS.map(({ icon: Icon, title, body }, i) => (
+          {tl.steps.map(({ title, body }, i) => {
+            const Icon = STEP_ICONS[i];
+            return (
             <div key={title}>
               <div className="mb-5 flex items-center gap-3">
                 <span className="flex h-10 w-10 items-center justify-center rounded-2xl border border-line bg-card text-ink">
@@ -196,7 +190,8 @@ function LandingPage() {
               <h3 className="mb-2 text-lg font-semibold text-ink">{title}</h3>
               <p className="leading-relaxed text-ink-soft">{body}</p>
             </div>
-          ))}
+            );
+          })}
         </div>
       </section>
     </div>

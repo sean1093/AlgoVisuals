@@ -16,7 +16,7 @@ describe('sorting algorithms', () => {
     describe(algo, () => {
       it('sorts every input shape and size', () => {
         const random = seeded(42);
-        for (const { id } of INPUT_SHAPES) {
+        for (const id of INPUT_SHAPES) {
           for (const size of [1, 2, 3, 8, 25, 40]) {
             const input = makeInput(size, id, random);
             const frames = SORTERS[algo](input);
