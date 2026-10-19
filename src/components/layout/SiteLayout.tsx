@@ -1,10 +1,10 @@
 import { ReactNode, useCallback, useEffect, useRef, useState } from 'react';
 import { Link, NavLink, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Check, ChevronDown, Globe, Moon, Sun } from 'lucide-react';
+import { Check, ChevronDown, Globe, Monitor, Moon, Sun } from 'lucide-react';
 import { CATEGORIES, getAlgorithmsByCategory } from '../../registry';
 import { LANGUAGES, useI18n } from '../../i18n';
-import { useTheme } from '../../theme';
+import { ThemePreference, useTheme } from '../../theme';
 
 function GithubMark() {
   return (
@@ -49,20 +49,72 @@ function useDismiss(open: boolean, close: () => void) {
   return ref;
 }
 
-function ThemeToggle() {
-  const { theme, toggle } = useTheme();
+const THEME_ICONS = { light: Sun, dark: Moon, system: Monitor };
+
+function ThemeMenu() {
+  const { preference, setPreference } = useTheme();
   const { t } = useI18n();
-  const label = theme === 'dark' ? t.common.lightMode : t.common.darkMode;
+  const [open, setOpen] = useState(false);
+  const close = useCallback(() => setOpen(false), []);
+  const ref = useDismiss(open, close);
+  const options: { id: ThemePreference; label: string }[] = [
+    { id: 'light', label: t.common.themeLight },
+    { id: 'dark', label: t.common.themeDark },
+    { id: 'system', label: t.common.themeSystem },
+  ];
+  const Current = THEME_ICONS[preference];
+
   return (
-    <button
-      type="button"
-      onClick={toggle}
-      aria-label={label}
-      title={label}
-      className="flex h-9 w-9 items-center justify-center rounded-full text-ink-soft transition-colors hover:bg-paper-deep hover:text-ink"
-    >
-      {theme === 'dark' ? <Sun size={17} /> : <Moon size={17} />}
-    </button>
+    <div ref={ref} className="relative">
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        aria-expanded={open}
+        aria-label={t.common.theme}
+        title={t.common.theme}
+        className={`flex h-9 w-9 items-center justify-center rounded-full transition-colors ${
+          open ? 'bg-card text-ink shadow-card' : 'text-ink-soft hover:bg-paper-deep hover:text-ink'
+        }`}
+      >
+        <Current size={17} />
+      </button>
+      <AnimatePresence>
+        {open && (
+          <motion.ul
+            aria-label={t.common.theme}
+            initial={{ opacity: 0, y: -6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -6 }}
+            transition={{ duration: 0.15 }}
+            className="absolute right-0 top-full mt-2 w-48 overflow-hidden rounded-2xl border border-line bg-card p-1.5 shadow-lift"
+          >
+            {options.map(({ id, label }) => {
+              const Icon = THEME_ICONS[id];
+              const active = id === preference;
+              return (
+                <li key={id}>
+                  <button
+                    type="button"
+                    aria-pressed={active}
+                    onClick={() => {
+                      setPreference(id);
+                      close();
+                    }}
+                    className={`flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-left text-sm transition-colors ${
+                      active ? 'bg-paper-deep/70 font-medium text-ink' : 'text-ink-soft hover:bg-paper-deep/60 hover:text-ink'
+                    }`}
+                  >
+                    <Icon size={15} />
+                    <span className="flex-1">{label}</span>
+                    {active && <Check size={15} />}
+                  </button>
+                </li>
+              );
+            })}
+          </motion.ul>
+        )}
+      </AnimatePresence>
+    </div>
   );
 }
 
@@ -209,7 +261,7 @@ function SiteHeader() {
           </Link>
           <BrowseMenu />
           <LanguageMenu />
-          <ThemeToggle />
+          <ThemeMenu />
           <a
             href="https://github.com/sean1093/AlgoVisuals"
             target="_blank"

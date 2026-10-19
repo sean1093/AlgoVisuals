@@ -1,6 +1,8 @@
 import { ReactNode, createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
 export type Theme = 'light' | 'dark';
+/** What the visitor picked; 'system' follows the OS setting */
+export type ThemePreference = Theme | 'system';
 
 // The inline script in index.html repeats this key and these colours to theme the page before React loads
 const STORAGE_KEY = 'algovisuals.theme';
@@ -20,15 +22,17 @@ function systemTheme(): Theme {
 }
 
 interface ThemeValue {
+  /** The theme actually shown */
   theme: Theme;
-  toggle: () => void;
+  preference: ThemePreference;
+  setPreference: (preference: ThemePreference) => void;
 }
 
-const ThemeContext = createContext<ThemeValue>({ theme: 'light', toggle: () => {} });
+const ThemeContext = createContext<ThemeValue>({ theme: 'light', preference: 'system', setPreference: () => {} });
 
 /**
- * Light / dark theme. Follows the system setting until the visitor picks one,
- * then remembers the choice. index.html applies it before first paint.
+ * Light / dark / follow-system theme. 'system' is stored as no saved value, so the
+ * inline script in index.html can apply the right theme before first paint.
  */
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [saved, setSaved] = useState<Theme | null>(readSaved);
@@ -63,17 +67,20 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     document.querySelector('meta[name="theme-color"]')?.setAttribute('content', META_COLORS[theme]);
   }, [theme]);
 
-  const toggle = useCallback(() => {
-    const next: Theme = theme === 'dark' ? 'light' : 'dark';
-    setSaved(next);
+  const setPreference = useCallback((preference: ThemePreference) => {
+    setSaved(preference === 'system' ? null : preference);
     try {
-      localStorage.setItem(STORAGE_KEY, next);
+      if (preference === 'system') localStorage.removeItem(STORAGE_KEY);
+      else localStorage.setItem(STORAGE_KEY, preference);
     } catch {
       // Not persisted; the choice still applies for this visit
     }
-  }, [theme]);
+  }, []);
 
-  const value = useMemo(() => ({ theme, toggle }), [theme, toggle]);
+  const value = useMemo(
+    () => ({ theme, preference: saved ?? ('system' as const), setPreference }),
+    [theme, saved, setPreference]
+  );
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
 }
 
