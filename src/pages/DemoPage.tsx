@@ -59,6 +59,10 @@ function DemoPage() {
             {t.demo.collection}
           </Link>
           <span>/</span>
+          <Link to={`/#${category.shelf}`} className="hidden transition-colors hover:text-ink sm:inline">
+            {t.shelves[category.shelf].name}
+          </Link>
+          <span className="hidden sm:inline">/</span>
           <Link to={`/#${category.id}`} className="transition-colors hover:text-ink">
             {categoryName}
           </Link>

@@ -9,39 +9,45 @@ export interface AlgorithmTheme {
   soft: string;
 }
 
-export type CategoryId = 'sorting' | 'searching' | 'graphs' | 'structures' | 'spatial';
+/** The two top-level sections of the site */
+export type ShelfId = 'structures' | 'algorithms';
+
+export type CategoryId =
+  | 'lists'
+  | 'trees'
+  | 'indexes'
+  | 'sorting'
+  | 'searching'
+  | 'paths'
+  | 'graphs'
+  | 'dp';
 
 /** Names and blurbs live in the i18n dictionaries under `categories` */
 export interface Category {
   id: CategoryId;
+  shelf: ShelfId;
   theme: AlgorithmTheme;
 }
 
+export const SHELVES: ShelfId[] = ['structures', 'algorithms'];
+
 /**
- * Categories in display order
+ * Topics in display order, grouped by shelf
  */
 export const CATEGORIES: Category[] = [
-  {
-    id: 'sorting',
-    theme: { accent: 'var(--accent-sorting)', soft: 'var(--soft-sorting)' },
-  },
-  {
-    id: 'searching',
-    theme: { accent: 'var(--accent-searching)', soft: 'var(--soft-searching)' },
-  },
-  {
-    id: 'graphs',
-    theme: { accent: 'var(--accent-graphs)', soft: 'var(--soft-graphs)' },
-  },
-  {
-    id: 'structures',
-    theme: { accent: 'var(--accent-structures)', soft: 'var(--soft-structures)' },
-  },
-  {
-    id: 'spatial',
-    theme: { accent: 'var(--color-sage)', soft: 'var(--color-sage-soft)' },
-  },
+  { id: 'lists', shelf: 'structures', theme: { accent: 'var(--accent-lists)', soft: 'var(--soft-lists)' } },
+  { id: 'trees', shelf: 'structures', theme: { accent: 'var(--accent-trees)', soft: 'var(--soft-trees)' } },
+  { id: 'indexes', shelf: 'structures', theme: { accent: 'var(--color-sage)', soft: 'var(--color-sage-soft)' } },
+  { id: 'sorting', shelf: 'algorithms', theme: { accent: 'var(--accent-sorting)', soft: 'var(--soft-sorting)' } },
+  { id: 'searching', shelf: 'algorithms', theme: { accent: 'var(--accent-searching)', soft: 'var(--soft-searching)' } },
+  { id: 'paths', shelf: 'algorithms', theme: { accent: 'var(--accent-paths)', soft: 'var(--soft-paths)' } },
+  { id: 'graphs', shelf: 'algorithms', theme: { accent: 'var(--accent-graphs)', soft: 'var(--soft-graphs)' } },
+  { id: 'dp', shelf: 'algorithms', theme: { accent: 'var(--accent-dp)', soft: 'var(--soft-dp)' } },
 ];
+
+export function getCategoriesByShelf(shelf: ShelfId): Category[] {
+  return CATEGORIES.filter((c) => c.shelf === shelf);
+}
 
 export function getCategory(id: CategoryId): Category {
   return CATEGORIES.find((c) => c.id === id)!;

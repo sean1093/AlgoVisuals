@@ -50,33 +50,42 @@ npm run preview  # Preview production build locally
 
 ## 📚 Algorithms
 
-18 interactive demos across five topics. Every step-by-step demo has play / pause, step forward and back (← → keys),
-a scrubber, four speeds, and a one-sentence explanation of the current step.
+27 interactive demos, arranged in two parts and eight topics. Every step-by-step demo has play / pause, step forward and
+back (← → keys), a scrubber, four speeds, and a one-sentence explanation of the current step.
+
+**Part 1 — Data structures**
+
+| Topic | Demos |
+|-------|-------|
+| **Lists, stacks & queues** | Linked List (add front / end, find, remove, reverse with prev·cur·next), Stack & Queue side by side |
+| **Trees & heaps** | Binary Search Tree (insert / search / delete), Binary Heap, Trie (prefix search / autocomplete) |
+| **Hashing & spatial indexes** | Hash Table (chaining, resize), QuadTree, GeoHash |
+
+**Part 2 — Algorithms**
 
 | Topic | Demos |
 |-------|-------|
 | **Sorting** | Bubble, Selection, Insertion, Merge, Quick, Heap sort, plus a **Sorting Race** that runs all six on the same list |
 | **Searching** | Linear search, Binary search (with a "guess my number" game) |
-| **Graphs & paths** | BFS, DFS, Dijkstra, A* on a drawable grid (walls, mud, mazes) that is shared between the four pages |
-| **Data structures** | Binary Search Tree (insert / search / delete), Binary Heap, Hash Table (chaining, resize) |
-| **Spatial & maps** | QuadTree, GeoHash |
+| **Paths & mazes** | BFS, DFS, Dijkstra, A* on a drawable grid (walls, mud, mazes) that is shared between the four pages |
+| **Graph problems** | Topological Sort (Kahn, with loop detection), Minimum Spanning Tree (Kruskal), Union-Find (union by size + path compression) |
+| **Recursion & dynamic programming** | Fibonacci (plain recursion vs. memo), Edit Distance (DP table + trace back), N-Queens (backtracking) |
+
+Parts and topics are defined once in `SHELVES` / `CATEGORIES` in `src/registry.ts`; the landing page and the Browse menu
+group demos by part, then topic.
 
 ## 🏗️ Architecture
 
 ### Registry Pattern
 
-Each algorithm is registered once with its category; the landing page, the Browse menu and routes are generated from it:
+Each algorithm is registered once with its category; the landing page, the Browse menu and routes are generated from it.
+Its name, tagline and facts live in the dictionaries under `src/i18n/`:
 
 ```tsx
 // src/algorithms/index.tsx
 registerAlgorithm({
   id: 'quick-sort',
-  name: 'Quick Sort',
   category: 'sorting',
-  tagline: 'Pick a pivot, split into smaller and bigger, repeat.',
-  description: 'Partition around a pivot, then sort each side.',
-  usedIn: ['Standard libraries'],
-  facts: [{ label: 'Typical', value: 'O(n log n)' }],
   icon: Shuffle,
   component: () => <SortingVisualizer algorithm="quick" />,
   preview: barsPreview([30, 18, 42, 25]),
@@ -97,14 +106,17 @@ src/
 │   ├── sorting/        # 6 sorts as frame recorders, bars view, race
 │   ├── searching/      # linear + binary search
 │   ├── pathfinding/    # BFS, DFS, Dijkstra, A*, maze generation
-│   ├── bst/ heap/ hashtable/
+│   ├── linkedlist/ stackqueue/
+│   ├── bst/ heap/ trie/ hashtable/
 │   ├── quadtree/ geohash/
+│   ├── graphs/         # topological sort, Kruskal, union-find
+│   ├── dp/             # Fibonacci, edit distance, N-Queens
 │   ├── previews.tsx    # card illustrations
 │   └── index.tsx       # registrations
 ├── components/
 │   ├── layout/         # header with Browse menu, footer
 │   ├── player/         # usePlayer, PlayerControls, Narration
-│   └── shared/         # Panel, Slider, Chips, TreeDiagram, …
+│   └── shared/         # Panel, Slider, Chips, TreeDiagram, GraphView, …
 ├── pages/              # Landing + demo page
 └── registry.ts         # categories + algorithm registry
 ```
@@ -139,7 +151,7 @@ All colours are CSS variables (`src/index.css`): the Tailwind tokens (`--color-p
 The interface is available in **English** (default), **繁體中文**, **日本語** and **한국어** — switch with the globe button in the header (the choice is remembered).
 
 - All text lives in `src/i18n/` — `en.ts` is the source of truth; `zh-TW.ts`, `ja.ts`, `ko.ts` must have exactly the same shape (TypeScript enforces it, and `src/i18n/i18n.test.ts` also checks array lengths, function arity and that sentences are actually translated).
-- Step-by-step narration is produced by the algorithm logic through a messages object (`SORT_MESSAGES`, `SEARCH_MESSAGES`, `BST_MESSAGES`, `HEAP_MESSAGES`), English by default, so the logic stays pure and testable.
+- Step-by-step narration is produced by the algorithm logic through a messages object (`SORT_MESSAGES`, `HEAP_MESSAGES`, `LIST_MESSAGES`, `KRUSKAL_MESSAGES`, …), English by default, so the logic stays pure and testable.
 - Use `**double asterisks**` for emphasis inside translated sentences.
 - To add a language: copy `en.ts`, translate it, and add it to `LANGUAGES` and `DICTIONARIES` in `src/i18n/index.tsx`.
 
@@ -149,7 +161,7 @@ The interface is available in **English** (default), **繁體中文**, **日本�
    (`{ ...state, note: 'What just happened, in plain words' }`).
 2. Add `logic.test.ts` next to it and run `npm test`.
 3. Build the visualizer with the shared pieces (`usePlayer`, `PlayerControls`, `Narration`, `Panel`, `GuideSteps`, …).
-4. Register it in `src/algorithms/index.tsx` with a `category` and a `preview`, and add its name, tagline and facts to `algorithms` in every dictionary under `src/i18n/`.
+4. Register it in `src/algorithms/index.tsx` with a `category` (a topic from `CATEGORIES`) and a `preview`, and add its name, tagline and facts to `algorithms` in every dictionary under `src/i18n/`.
 
 That's it — the landing page, Browse menu and routes update automatically.
 

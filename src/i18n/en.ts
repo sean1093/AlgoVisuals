@@ -2,6 +2,14 @@ import { SORT_MESSAGES } from '../algorithms/sorting/logic';
 import { SEARCH_MESSAGES } from '../algorithms/searching/logic';
 import { BST_MESSAGES } from '../algorithms/bst/logic';
 import { HEAP_MESSAGES } from '../algorithms/heap/logic';
+import { LIST_MESSAGES } from '../algorithms/linkedlist/logic';
+import { TRIE_MESSAGES } from '../algorithms/trie/logic';
+import { TOPO_MESSAGES } from '../algorithms/graphs/topo';
+import { KRUSKAL_MESSAGES } from '../algorithms/graphs/kruskal';
+import { UNION_MESSAGES } from '../algorithms/graphs/unionfind';
+import { FIB_MESSAGES } from '../algorithms/dp/fib';
+import { EDIT_MESSAGES } from '../algorithms/dp/editDistance';
+import { QUEENS_MESSAGES } from '../algorithms/dp/queens';
 
 /**
  * English UI text — the source of truth. Other languages must match this shape exactly
@@ -73,7 +81,7 @@ const en = {
     heroCaption: 'Sorting a fresh list, over and over',
     live: 'Live',
     topics: 'Topics',
-    topicNumber: (n: string) => `Topic ${n}`,
+    part: (n: number) => `Part ${n}`,
     openDemo: 'Open the demo',
     builtFor: 'Built for curious people, not just engineers.',
     steps: [
@@ -100,7 +108,30 @@ const en = {
     upNext: 'Up next',
   },
 
+  shelves: {
+    structures: {
+      name: 'Data structures',
+      blurb: 'Ways to arrange data so the questions you ask most are cheap to answer. Poke at them and watch them reshape.',
+    },
+    algorithms: {
+      name: 'Algorithms',
+      blurb: 'Step-by-step recipes for sorting, searching and solving problems — played back one move at a time.',
+    },
+  },
+
   categories: {
+    lists: {
+      name: 'Lists, stacks & queues',
+      blurb: 'The simplest ways to line things up — and why where you add or remove makes all the difference.',
+    },
+    trees: {
+      name: 'Trees & heaps',
+      blurb: 'Branching structures that keep data in order, so each step down rules out a whole branch.',
+    },
+    indexes: {
+      name: 'Hashing & spatial indexes',
+      blurb: 'Ways to jump straight to the right spot — by name, or by place on a map.',
+    },
     sorting: {
       name: 'Sorting',
       blurb: 'Different strategies for putting things in order — and why some are dramatically faster.',
@@ -109,17 +140,17 @@ const en = {
       name: 'Searching',
       blurb: 'Finding one thing among many, and how a little order makes it almost instant.',
     },
+    paths: {
+      name: 'Paths & mazes',
+      blurb: 'Exploring a grid of walls and mud to find the way from here to there.',
+    },
     graphs: {
-      name: 'Graphs & paths',
-      blurb: 'Exploring a maze of connections to find the way from here to there.',
+      name: 'Graph problems',
+      blurb: 'Classic puzzles on networks of dots and lines: ordering tasks, connecting cities cheaply, grouping friends.',
     },
-    structures: {
-      name: 'Data structures',
-      blurb: 'Clever ways to arrange data so the questions you ask most are cheap to answer.',
-    },
-    spatial: {
-      name: 'Spatial & maps',
-      blurb: 'Organising points on a plane or a planet so “what’s nearby?” is quick.',
+    dp: {
+      name: 'Recursion & dynamic programming',
+      blurb: 'Breaking a big problem into smaller copies of itself — and remembering answers so you never solve one twice.',
     },
   },
 
@@ -203,6 +234,36 @@ const en = {
       usedIn: ['Video games', 'Maps', 'Robotics'],
       facts: [['Shortest', 'Cheapest'], ['Explores', 'Fewer cells']],
     },
+    'linked-list': {
+      name: 'Linked List',
+      tagline: 'A chain of nodes, each pointing to the next. Cheap to change, slow to search.',
+      usedIn: ['Undo history', 'Music playlists', 'Inside hash tables'],
+      facts: [['Add at front', 'O(1)'], ['Find', 'O(n)']],
+    },
+    'stack-queue': {
+      name: 'Stack & Queue',
+      tagline: 'One hands back the newest item, the other the oldest. Watch them side by side.',
+      usedIn: ['Undo', 'Print queues', 'Function calls'],
+      facts: [['Add / take', 'O(1)']],
+    },
+    'topological-sort': {
+      name: 'Topological Sort',
+      tagline: 'Put tasks in an order that respects every “this before that”.',
+      usedIn: ['Build systems', 'Course planning', 'Spreadsheets'],
+      facts: [['Time', 'O(V + E)']],
+    },
+    'minimum-spanning-tree': {
+      name: 'Minimum Spanning Tree',
+      tagline: 'Connect every town for the lowest total cost: take the cheapest road that doesn’t close a loop.',
+      usedIn: ['Network design', 'Power grids', 'Clustering'],
+      facts: [['Algorithm', 'Kruskal'], ['Time', 'O(E log E)']],
+    },
+    'union-find': {
+      name: 'Union-Find',
+      tagline: 'Keep track of who’s in which group, and merge groups in a blink.',
+      usedIn: ['Kruskal', 'Image regions', 'Network connectivity'],
+      facts: [['Find / merge', '≈ O(1)']],
+    },
     'binary-search-tree': {
       name: 'Binary Search Tree',
       tagline: 'Smaller to the left, bigger to the right — so every step down halves the search.',
@@ -214,6 +275,30 @@ const en = {
       tagline: 'A tree that always keeps the smallest item on top — the perfect “what’s next?” list.',
       usedIn: ['Task schedulers', 'Dijkstra', 'Top-k lists'],
       facts: [['Peek', 'O(1)'], ['Push / pop', 'O(log n)']],
+    },
+    trie: {
+      name: 'Trie',
+      tagline: 'A tree of letters where words that start alike share a branch. The engine behind autocomplete.',
+      usedIn: ['Autocomplete', 'Spell checkers', 'Routing tables'],
+      facts: [['Look up', 'O(word length)']],
+    },
+    fibonacci: {
+      name: 'Fibonacci & Memoisation',
+      tagline: 'The same question asked again and again — until you write the answers down.',
+      usedIn: ['Dynamic programming', 'Caching', 'Interview classics'],
+      facts: [['Plain', 'O(1.6ⁿ)'], ['Memo', 'O(n)']],
+    },
+    'edit-distance': {
+      name: 'Edit Distance',
+      tagline: 'How many letter changes turn one word into another? A table that fills itself in.',
+      usedIn: ['Spell checkers', 'DNA comparison', 'Fuzzy search'],
+      facts: [['Time', 'O(m × n)']],
+    },
+    'n-queens': {
+      name: 'N-Queens',
+      tagline: 'Place queens that can’t attack each other: try, hit a dead end, back up, try again.',
+      usedIn: ['Backtracking', 'Sudoku solvers', 'Scheduling'],
+      facts: [['Approach', 'Backtracking']],
     },
     'hash-table': {
       name: 'Hash Table',
@@ -576,6 +661,282 @@ const en = {
       { label: 'Push', value: 'O(log n)' },
       { label: 'Take smallest', value: 'O(log n)' },
       { label: 'Memory', value: 'O(n)', hint: 'Just an array' },
+    ] as { label: string; value: string; hint?: string }[],
+  },
+
+  linkedList: {
+    notes: LIST_MESSAGES,
+    intro: 'Each node holds a value and an arrow to the next one. Add, find, remove — or reverse the whole chain.',
+    length: 'Nodes',
+    hops: 'Arrows followed',
+    value: 'Value',
+    placeholder: 'e.g. 7',
+    typeFirst: 'Type a value first',
+    addFront: 'Add to front',
+    addEnd: 'Add to end',
+    find: 'Find',
+    remove: 'Remove',
+    reverse: 'Reverse',
+    head: 'head',
+    emptyList: 'Empty list',
+    legend: { current: 'Where we are', found: 'Found', removing: 'Being removed' },
+    compareTitle: 'List vs. array',
+    compare:
+      'An array keeps items side by side, so it can jump straight to item 500. A linked list can’t — but adding or removing at the front never shifts anything.',
+    random6: 'Random 6',
+    steps: [
+      { title: 'Add to the front', detail: 'Type a number (or leave it blank for a random one) and press “Add to front”. One step, always.' },
+      { title: 'Add to the end', detail: 'Now “Add to end”. Watch it walk every arrow to find the last node.' },
+      { title: 'Reverse the list', detail: 'Press “Reverse” and follow prev, cur and next as each arrow flips.' },
+    ],
+    ideaTitle: 'A treasure hunt of arrows',
+    idea: [
+      'Each node only knows two things: its value, and where the next node is. To reach the fifth item you start at the **head** and follow four arrows.',
+      'That sounds slow, but it buys something: inserting or removing is just re-pointing an arrow or two. Nothing has to slide over to make room.',
+    ],
+    callout: '**Reversing** is a classic interview puzzle: keep three pointers, flip one arrow per step, and you’re done in one pass with no extra memory.',
+    facts: [
+      { label: 'Add / remove at front', value: 'O(1)' },
+      { label: 'Add at end', hint: 'Without a tail pointer', value: 'O(n)' },
+      { label: 'Find a value', value: 'O(n)' },
+      { label: 'Reverse', value: 'O(n)', hint: 'In place, O(1) memory' },
+    ] as { label: string; value: string; hint?: string }[],
+  },
+
+  stackQueue: {
+    intro: 'Both start with the same items. Add more, then take one out of each and compare.',
+    added: (label: string) => `${label} goes on top of the stack — and to the back of the queue.`,
+    took: (fromStack: string, fromQueue: string) =>
+      `The stack gave back ${fromStack}, the newest. The queue gave back ${fromQueue}, the one that waited longest.`,
+    same: (label: string) => `Only ${label} was left, so both gave it back.`,
+    items: 'Items in each',
+    add: (label: string) => `Add ${label}`,
+    take: 'Take one out',
+    stack: 'Stack',
+    queue: 'Queue',
+    stackRule: 'Last in, first out',
+    queueRule: 'First in, first out',
+    inOutTop: 'In and out at the top',
+    outFront: 'Out at the front',
+    inBack: 'In at the back',
+    cameOut: 'Came out in this order',
+    stackUses: 'Undo buttons, the browser’s back button, and how programs keep track of function calls.',
+    queueUses: 'Print jobs, messages waiting to be sent, and breadth-first search exploring a maze ring by ring.',
+    steps: [
+      { title: 'Add an item', detail: 'It lands on top of the stack and at the back of the queue.' },
+      { title: 'Take one out', detail: 'Same button, different answers: the stack hands back the newest, the queue the oldest.' },
+      { title: 'Empty them both', detail: 'Keep taking until both are empty, then compare the two “came out” lines — one is the reverse of the other.' },
+    ],
+    ideaTitle: 'Same items, opposite order',
+    idea: [
+      'A **stack** is a pile of plates: you only touch the top one. Whatever went in last comes out first.',
+      'A **queue** is a line at a shop: newcomers join the back, and the front is served first. Whoever waited longest goes next.',
+    ],
+    callout: 'Both are just lists with a rule about **where** you’re allowed to add and remove. That rule is what makes them useful.',
+    facts: [
+      { label: 'Add', value: 'O(1)' },
+      { label: 'Take out', value: 'O(1)' },
+      { label: 'Peek at next', value: 'O(1)' },
+      { label: 'Find something in the middle', value: 'O(n)', hint: 'Not what they’re for' },
+    ] as { label: string; value: string; hint?: string }[],
+  },
+
+  trie: {
+    notes: TRIE_MESSAGES,
+    intro: 'Words that start the same share the same path. Add a word, or type a prefix and press Find.',
+    emptyIntro: 'An empty trie — just the root. Add a word.',
+    words: 'Words',
+    nodes: 'Nodes',
+    lettersSaved: 'Letters shared',
+    word: 'Word',
+    placeholder: 'e.g. cart',
+    add: 'Add word',
+    find: 'Find prefix',
+    legend: { here: 'Where we are', created: 'New node', wordEnd: 'End of a word', match: 'Starts with prefix' },
+    allWords: 'Words in the trie',
+    suggestions: 'Autocomplete suggestions',
+    none: 'None',
+    sample: 'Sample words',
+    steps: [
+      { title: 'Add a word that shares a start', detail: 'Try “cart” or “doge”. Only the letters that are new grow new nodes.' },
+      { title: 'Find a prefix', detail: 'Type “ca” and press “Find prefix”. Everything below that node is a suggestion.' },
+      { title: 'Add a brand-new start', detail: 'Now add a word with a first letter nobody uses yet, like “bee”. A new branch sprouts from the root.' },
+    ],
+    ideaTitle: 'A tree spelled one letter at a time',
+    idea: [
+      'Each step down the tree adds one letter, so every node stands for a **prefix**. Words that start the same share the same path for as long as they agree.',
+      'To check a word or a prefix you just follow its letters — the time depends on how long the word is, not on how many words are stored.',
+    ],
+    callout: '**Autocomplete** is a trie in action: walk down to what you’ve typed so far, then list everything underneath.',
+    facts: [
+      { label: 'Add a word', value: 'O(k)', hint: 'k = letters in the word' },
+      { label: 'Look up a word', value: 'O(k)' },
+      { label: 'Find all with a prefix', value: 'O(k + matches)' },
+      { label: 'Memory', value: 'O(total letters)', hint: 'Less when words share starts' },
+    ] as { label: string; value: string; hint?: string }[],
+  },
+
+  topo: {
+    notes: TOPO_MESSAGES,
+    noLoop: 'Normal',
+    withLoop: 'With a loop',
+    newTasks: 'New tasks',
+    queue: 'Ready to start',
+    order: 'Order so far',
+    emptyQueue: '—',
+    legend: { waiting: 'Number = still waiting on', ready: 'Ready', placed: 'Placed', stuck: 'Stuck in a loop' },
+    readingTitle: 'How to read it',
+    reading: 'Each letter is a task. An arrow A → B means “A must be done before B” — like putting on socks before shoes, or taking a course before the one that builds on it.',
+    steps: [
+      { title: 'Play it to the end', detail: 'Press play. Tasks with a zero badge go first; crossing off arrows unlocks the rest.' },
+      { title: 'Try new tasks', detail: 'Press “New tasks” for a different set of arrows and run it again.' },
+      { title: 'Add a loop', detail: 'Switch to “With a loop” and play. Some tasks wait on each other forever — the algorithm notices.' },
+    ],
+    ideaTitle: 'Do whatever nothing is waiting on',
+    idea: [
+      'Count, for every task, how many others must come before it. Anything with a count of zero can start now, so it goes into a queue.',
+      'Take a task from the queue and cross off its arrows. Each crossed arrow lowers someone’s count; when a count reaches zero, that task is ready too. This is **Kahn’s algorithm**.',
+    ],
+    callout: 'If the queue runs dry while tasks are left, they’re waiting on each other in a **cycle** — so the same algorithm doubles as a loop detector.',
+    facts: [
+      { label: 'Time', value: 'O(V + E)', hint: 'V tasks, E arrows' },
+      { label: 'Memory', value: 'O(V)' },
+      { label: 'Works on', value: 'Directed, no loops' },
+      { label: 'Answers', value: 'Often several' },
+    ] as { label: string; value: string; hint?: string }[],
+  },
+
+  mst: {
+    notes: KRUSKAL_MESSAGES,
+    built: 'Roads built',
+    cost: 'Total cost',
+    allRoads: 'If you built every road',
+    newCosts: 'New costs',
+    cheapestFirst: 'Roads, cheapest first',
+    legend: { considering: 'Considering', built: 'Built', skipped: 'Skipped (would close a loop)' },
+    steps: [
+      { title: 'Watch it skip a road', detail: 'Press play. Sooner or later a cheap road gets skipped — both towns are already connected.' },
+      { title: 'Finish the network', detail: 'Let it run. It stops as soon as every town is linked: always one road fewer than towns.' },
+      { title: 'Change the costs', detail: 'Press “New costs” and compare the total to building every road.' },
+    ],
+    ideaTitle: 'Greedy, and still perfect',
+    idea: [
+      'You need to connect every town with roads, spending as little as possible. Loops are wasted money: if A, B and C are already linked, the road C–A adds nothing.',
+      '**Kruskal’s algorithm** simply takes the cheapest road that doesn’t close a loop, again and again. Taking the cheapest option each time usually isn’t optimal — here it provably is.',
+    ],
+    callout: 'How does it know two towns are already connected? It keeps a **union-find** of groups — see that page to watch it work.',
+    facts: [
+      { label: 'Time', value: 'O(E log E)', hint: 'Mostly sorting the roads' },
+      { label: 'Roads in the answer', value: 'V − 1' },
+      { label: 'Memory', value: 'O(V + E)' },
+    ] as { label: string; value: string; hint?: string }[],
+  },
+
+  unionFind: {
+    notes: UNION_MESSAGES,
+    intro: 'Eight people, each in a group of their own. Click two people to merge their groups.',
+    pickSecond: (who: string) => `Now click someone to join with ${who}.`,
+    groups: 'Groups',
+    largest: 'Largest group',
+    reset: 'Start over',
+    people: 'People',
+    forest: 'What’s stored: each points to a leader',
+    legend: { picked: 'Picked', climbing: 'Climbing up', leader: 'Leader' },
+    steps: [
+      { title: 'Join two people', detail: 'Click one person, then another. One becomes the other’s leader.' },
+      { title: 'Join two groups', detail: 'Make two pairs, then join someone from each. The smaller group hangs under the bigger one.' },
+      { title: 'Ask about a pair already together', detail: 'Click two people in the same group. Their leaders match, so nothing changes.' },
+    ],
+    ideaTitle: 'Every group has a leader',
+    idea: [
+      'Instead of storing lists of members, each person just points to someone else in their group. Follow the arrows up and you reach the group’s **leader**.',
+      'Two people are in the same group exactly when they have the same leader. To merge two groups, point one leader at the other.',
+    ],
+    callout: 'Two small tricks keep the trees flat: join the **smaller** group under the bigger, and after climbing, point everyone you passed **straight at the leader**. Together they make each step practically constant time.',
+    facts: [
+      { label: 'Find a leader', value: '≈ O(1)', hint: 'Amortised, with both tricks' },
+      { label: 'Merge two groups', value: '≈ O(1)' },
+      { label: 'Memory', value: 'O(n)', hint: 'One arrow per person' },
+    ] as { label: string; value: string; hint?: string }[],
+  },
+
+  fibonacci: {
+    notes: FIB_MESSAGES,
+    calls: 'Calls so far',
+    repeated: 'Repeated work',
+    reused: 'Answered from memo',
+    plain: 'Plain recursion',
+    withMemo: 'With a memo',
+    memoTable: 'The memo: answers saved so far',
+    which: 'Which number: fib(n)',
+    callsNote: 'Calls needed for bigger n. The memo grows by 2 per step; plain recursion grows by about 1.6× per step.',
+    legend: { current: 'Working on', repeat: 'Already worked out before', memo: 'Taken from the memo' },
+    steps: [
+      { title: 'Play the plain version', detail: 'Press play and watch the tree grow. Red-outlined calls repeat work done elsewhere.' },
+      { title: 'Switch on the memo', detail: 'Choose “With a memo” and play again. Each answer is saved the first time, then reused.' },
+      { title: 'Try a bigger number', detail: 'Move the slider to 6 or 7 and compare the two trees.' },
+    ],
+    ideaTitle: 'Remember answers, never repeat work',
+    idea: [
+      'Each Fibonacci number is the sum of the two before it: fib(n) = fib(n−1) + fib(n−2). Written as recursion it looks elegant — but fib(n−1) recomputes fib(n−2) all over again, and so on all the way down.',
+      'Add a **memo** — a little table of answers already found — and every value is computed exactly once. That idea, solving overlapping sub-problems once and reusing them, is called **dynamic programming**.',
+    ],
+    callout: 'Plain recursion for fib(40) makes over **300 million** calls. With a memo it takes 79.',
+    facts: [
+      { label: 'Plain recursion', value: 'O(1.6ⁿ)', hint: 'Exponential' },
+      { label: 'With a memo', value: 'O(n)' },
+      { label: 'Memory (memo)', value: 'O(n)' },
+    ] as { label: string; value: string; hint?: string }[],
+  },
+
+  editDistance: {
+    notes: EDIT_MESSAGES,
+    from: 'From',
+    to: 'To',
+    edits: 'Edits needed',
+    examples: 'Examples',
+    ops: { keep: 'keep', replace: 'replace', insert: 'insert', delete: 'delete' },
+    legend: { filling: 'Filling in', from: 'Built from', path: 'Cheapest path' },
+    steps: [
+      { title: 'Fill the table', detail: 'Press play. Each cell looks only at the three cells above and to its left.' },
+      { title: 'Watch the trace back', detail: 'After the last cell, the path walks back to the start and spells out the edits.' },
+      { title: 'Try your own words', detail: 'Type two words (up to 8 letters each) — say, your name and a friend’s.' },
+    ],
+    ideaTitle: 'Small answers build the big one',
+    idea: [
+      'How many single-letter edits — insert, delete or replace — turn one word into another? Trying every combination would take forever.',
+      'Instead, the cell in row i, column j answers a smaller question: how many edits turn the first i letters into the first j letters? Each cell needs only its three neighbours, so the table fills itself in, row by row.',
+    ],
+    callout: 'This is how **spell checkers** pick suggestions, and a close cousin of how biologists compare DNA and how diff tools compare files.',
+    facts: [
+      { label: 'Time', value: 'O(m × n)', hint: 'One step per cell' },
+      { label: 'Memory', value: 'O(m × n)', hint: 'Or O(n) keeping two rows' },
+    ] as { label: string; value: string; hint?: string }[],
+  },
+
+  queens: {
+    notes: QUEENS_MESSAGES,
+    queensPlaced: 'Queens placed',
+    tries: 'Placements tried',
+    backtracks: 'Backtracks',
+    boardSize: 'Board size',
+    boardHint: 'n queens on an n × n board',
+    legend: { row: 'Row we’re filling', safe: 'Safe square', attacked: 'Attacked' },
+    steps: [
+      { title: 'Watch it back up', detail: 'Press play on the 4 × 4 board. When a row has no safe square, the queen above moves on.' },
+      { title: 'Reach a solution', detail: 'Keep playing until every row has a queen.' },
+      { title: 'Solve the classic 8 × 8', detail: 'Slide the board to 8 and turn up the speed. It tries almost a thousand moves.' },
+    ],
+    ideaTitle: 'Try, and undo when stuck',
+    idea: [
+      'Queens attack along rows, columns and diagonals. Since each row can hold only one, place them row by row: put a queen on the first safe square, then move to the next row.',
+      'If a row has no safe square, an earlier choice was wrong. **Backtrack**: go back one row, move that queen to its next safe square and carry on. Dead ends are abandoned early instead of being explored to the end.',
+    ],
+    callout: 'Backtracking solves many puzzles the same way — **Sudoku**, crosswords, mazes: make a choice, go deeper, undo it when it leads nowhere.',
+    facts: [
+      { label: 'Worst case', value: 'O(n!)', hint: 'But pruning cuts most of it' },
+      { label: 'Memory', value: 'O(n)', hint: 'One column per row' },
+      { label: 'Solutions for 8 × 8', value: '92' },
     ] as { label: string; value: string; hint?: string }[],
   },
 

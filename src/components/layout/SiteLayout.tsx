@@ -2,7 +2,7 @@ import { ReactNode, useCallback, useEffect, useRef, useState } from 'react';
 import { Link, NavLink, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Check, ChevronDown, Globe, LucideIcon, Monitor, Moon, Sun } from 'lucide-react';
-import { CATEGORIES, getAlgorithmsByCategory } from '../../registry';
+import { SHELVES, getAlgorithmsByCategory, getCategoriesByShelf } from '../../registry';
 import { LANGUAGES, useI18n } from '../../i18n';
 import { ThemePreference, useTheme } from '../../theme';
 
@@ -212,37 +212,44 @@ function BrowseMenu() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -6 }}
             transition={{ duration: 0.15 }}
-            className="absolute inset-x-0 top-full border-b border-line bg-paper/95 shadow-lift backdrop-blur-md"
+            className="absolute inset-x-0 top-full border-b border-line bg-paper shadow-lift"
           >
-            <div className="mx-auto grid max-h-[75vh] max-w-6xl gap-x-8 gap-y-6 overflow-y-auto px-5 py-7 sm:grid-cols-2 md:px-8 lg:grid-cols-5">
-              {CATEGORIES.map((category) => {
-                const items = getAlgorithmsByCategory(category.id);
-                if (!items.length) return null;
-                return (
-                  <div key={category.id}>
-                    <p className="mb-3 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-ink-mute">
-                      <span className="h-2 w-2 rounded-full" style={{ backgroundColor: category.theme.accent }} />
-                      {t.categories[category.id].name}
-                    </p>
-                    <ul className="space-y-0.5">
-                      {items.map((algo) => (
-                        <li key={algo.id}>
-                          <NavLink
-                            to={`/demo/${algo.id}`}
-                            className={({ isActive }) =>
-                              `block rounded-lg px-2.5 py-1.5 text-sm transition-colors ${
-                                isActive ? 'bg-card font-medium text-ink shadow-card' : 'text-ink-soft hover:bg-paper-deep hover:text-ink'
-                              }`
-                            }
-                          >
-                            {t.algorithms[algo.id].name}
-                          </NavLink>
-                        </li>
-                      ))}
-                    </ul>
+            <div className="mx-auto grid max-h-[75vh] max-w-6xl gap-x-12 gap-y-8 overflow-y-auto px-5 py-7 md:px-8 lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
+              {SHELVES.map((shelf) => (
+                <div key={shelf}>
+                  <p className="mb-4 border-b border-line pb-2 font-display text-lg text-ink">{t.shelves[shelf].name}</p>
+                  <div className={`grid gap-x-6 gap-y-5 sm:grid-cols-2 ${shelf === 'algorithms' ? 'lg:grid-cols-3' : ''}`}>
+                    {getCategoriesByShelf(shelf).map((category) => {
+                      const items = getAlgorithmsByCategory(category.id);
+                      if (!items.length) return null;
+                      return (
+                        <div key={category.id}>
+                          <p className="mb-2 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-ink-mute">
+                            <span className="h-2 w-2 flex-shrink-0 rounded-full" style={{ backgroundColor: category.theme.accent }} />
+                            {t.categories[category.id].name}
+                          </p>
+                          <ul className="space-y-0.5">
+                            {items.map((algo) => (
+                              <li key={algo.id}>
+                                <NavLink
+                                  to={`/demo/${algo.id}`}
+                                  className={({ isActive }) =>
+                                    `block rounded-lg px-2.5 py-1.5 text-sm transition-colors ${
+                                      isActive ? 'bg-card font-medium text-ink shadow-card' : 'text-ink-soft hover:bg-paper-deep hover:text-ink'
+                                    }`
+                                  }
+                                >
+                                  {t.algorithms[algo.id].name}
+                                </NavLink>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      );
+                    })}
                   </div>
-                );
-              })}
+                </div>
+              ))}
             </div>
           </motion.div>
         )}
