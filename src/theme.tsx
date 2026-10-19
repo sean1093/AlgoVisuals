@@ -8,12 +8,12 @@ export type ThemePreference = Theme | 'system';
 const STORAGE_KEY = 'algovisuals.theme';
 const META_COLORS: Record<Theme, string> = { light: '#f6f3ec', dark: '#161513' };
 
-function readSaved(): Theme | null {
+function readPreference(): ThemePreference {
   try {
     const saved = localStorage.getItem(STORAGE_KEY);
-    return saved === 'light' || saved === 'dark' ? saved : null;
+    return saved === 'light' || saved === 'dark' ? saved : 'system';
   } catch {
-    return null;
+    return 'system';
   }
 }
 
@@ -35,9 +35,9 @@ const ThemeContext = createContext<ThemeValue>({ theme: 'light', preference: 'sy
  * inline script in index.html can apply the right theme before first paint.
  */
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [saved, setSaved] = useState<Theme | null>(readSaved);
+  const [preference, setPreferenceState] = useState<ThemePreference>(readPreference);
   const [system, setSystem] = useState<Theme>(systemTheme);
-  const theme = saved ?? system;
+  const theme = preference === 'system' ? system : preference;
 
   // Keep following the system while there is no explicit choice
   useEffect(() => {
@@ -56,7 +56,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   // Pick up a choice made in another tab
   useEffect(() => {
     const onStorage = (e: StorageEvent) => {
-      if (e.key === STORAGE_KEY) setSaved(readSaved());
+      if (e.key === STORAGE_KEY) setPreferenceState(readPreference());
     };
     window.addEventListener('storage', onStorage);
     return () => window.removeEventListener('storage', onStorage);
@@ -68,7 +68,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   }, [theme]);
 
   const setPreference = useCallback((preference: ThemePreference) => {
-    setSaved(preference === 'system' ? null : preference);
+    setPreferenceState(preference);
     try {
       if (preference === 'system') localStorage.removeItem(STORAGE_KEY);
       else localStorage.setItem(STORAGE_KEY, preference);
@@ -77,10 +77,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  const value = useMemo(
-    () => ({ theme, preference: saved ?? ('system' as const), setPreference }),
-    [theme, saved, setPreference]
-  );
+  const value = useMemo(() => ({ theme, preference, setPreference }), [theme, preference, setPreference]);
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
 }
 
