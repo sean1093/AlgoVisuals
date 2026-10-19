@@ -12,7 +12,7 @@ import { getCategory } from '../../registry';
 import { Messages, useI18n } from '../../i18n';
 import Rich from '../../components/shared/Rich';
 
-const { accent: ACCENT, soft: SOFT } = getCategory('structures').theme;
+const { accent: ACCENT, soft: SOFT } = getCategory('indexes').theme;
 const FOUND = 'var(--color-sage)';
 const CLASH = 'var(--color-clay)';
 

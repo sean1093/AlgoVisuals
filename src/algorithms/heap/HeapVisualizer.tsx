@@ -16,7 +16,7 @@ import { getCategory } from '../../registry';
 import { useI18n } from '../../i18n';
 import Rich from '../../components/shared/Rich';
 
-const { accent: ACCENT, soft: SOFT } = getCategory('structures').theme;
+const { accent: ACCENT, soft: SOFT } = getCategory('trees').theme;
 const SWAP = 'var(--color-clay)';
 const SETTLED = 'var(--color-sage)';
 const START = [12, 30, 18, 45, 37, 25, 60];

@@ -1,5 +1,14 @@
 import {
   ArrowDownUp,
+  ArrowRightLeft,
+  Calculator,
+  Crown,
+  Link2,
+  ListTree,
+  Merge,
+  PencilLine,
+  Workflow,
+  Cable,
   BarChart3,
   Binary,
   Flag,
@@ -29,10 +38,28 @@ import PathfindingVisualizer from './pathfinding/PathfindingVisualizer';
 import BSTVisualizer from './bst/BSTVisualizer';
 import HeapVisualizer from './heap/HeapVisualizer';
 import HashTableVisualizer from './hashtable/HashTableVisualizer';
+import LinkedListVisualizer from './linkedlist/LinkedListVisualizer';
+import StackQueueVisualizer from './stackqueue/StackQueueVisualizer';
+import TrieVisualizer from './trie/TrieVisualizer';
+import TopoSortVisualizer from './graphs/TopoSortVisualizer';
+import MSTVisualizer from './graphs/MSTVisualizer';
+import UnionFindVisualizer from './graphs/UnionFindVisualizer';
+import FibonacciVisualizer from './dp/FibonacciVisualizer';
+import EditDistanceVisualizer from './dp/EditDistanceVisualizer';
+import QueensVisualizer from './dp/QueensVisualizer';
 import {
   BSTPreview,
+  EditDistancePreview,
+  FibPreview,
   HashPreview,
   HeapPreview,
+  LinkedListPreview,
+  MSTPreview,
+  QueensPreview,
+  StackQueuePreview,
+  TopoPreview,
+  TriePreview,
+  UnionFindPreview,
   SortRacePreview,
   barsPreview,
   boxesPreview,
@@ -49,6 +76,22 @@ const MOVE = 'var(--color-clay)';
  * Simply add registration here, and Landing Page and routes will auto-update
  */
 export function registerAllAlgorithms() {
+  // Lists, stacks & queues
+  registerAlgorithm({
+    id: 'linked-list',
+    category: 'lists',
+    icon: Link2,
+    component: LinkedListVisualizer,
+    preview: LinkedListPreview,
+  });
+  registerAlgorithm({
+    id: 'stack-queue',
+    category: 'lists',
+    icon: ArrowRightLeft,
+    component: StackQueueVisualizer,
+    preview: StackQueuePreview,
+  });
+
   // Sorting
   registerAlgorithm({
     id: 'bubble-sort',
@@ -116,63 +159,70 @@ export function registerAllAlgorithms() {
     preview: boxesPreview('binary'),
   });
 
-  // Graphs & paths
+  // Paths & mazes
   registerAlgorithm({
     id: 'bfs',
-    category: 'graphs',
+    category: 'paths',
     icon: Network,
     component: () => <PathfindingVisualizer algorithm="bfs" />,
     preview: gridPreview('bfs'),
   });
   registerAlgorithm({
     id: 'dfs',
-    category: 'graphs',
+    category: 'paths',
     icon: Spline,
     component: () => <PathfindingVisualizer algorithm="dfs" />,
     preview: gridPreview('dfs'),
   });
   registerAlgorithm({
     id: 'dijkstra',
-    category: 'graphs',
+    category: 'paths',
     icon: Route,
     component: () => <PathfindingVisualizer algorithm="dijkstra" />,
     preview: gridPreview('dijkstra'),
   });
   registerAlgorithm({
     id: 'astar',
-    category: 'graphs',
+    category: 'paths',
     icon: Flag,
     component: () => <PathfindingVisualizer algorithm="astar" />,
     preview: gridPreview('astar'),
   });
 
-  // Data structures
+  // Trees & heaps
   registerAlgorithm({
     id: 'binary-search-tree',
-    category: 'structures',
+    category: 'trees',
     icon: Binary,
     component: BSTVisualizer,
     preview: BSTPreview,
   });
   registerAlgorithm({
     id: 'binary-heap',
-    category: 'structures',
+    category: 'trees',
     icon: Layers,
     component: HeapVisualizer,
     preview: HeapPreview,
   });
   registerAlgorithm({
+    id: 'trie',
+    category: 'trees',
+    icon: ListTree,
+    component: TrieVisualizer,
+    preview: TriePreview,
+  });
+  registerAlgorithm({
     id: 'hash-table',
-    category: 'structures',
+    category: 'indexes',
     icon: Hash,
     component: HashTableVisualizer,
     preview: HashPreview,
   });
 
-  // Spatial & maps
+  // Hashing & spatial indexes
   registerAlgorithm({
     id: 'quadtree',
-    category: 'spatial',
+    category: 'indexes',
     icon: Grid2x2,
     theme: { accent: 'var(--color-sage)', soft: 'var(--color-sage-soft)' },
     component: QuadTreeVisualizer,
@@ -181,10 +231,56 @@ export function registerAllAlgorithms() {
 
   registerAlgorithm({
     id: 'geohash',
-    category: 'spatial',
+    category: 'indexes',
     icon: MapPin,
     theme: { accent: 'var(--color-clay)', soft: 'var(--color-clay-soft)' },
     component: GeoHashVisualizer,
     preview: GeoHashPreview,
+  });
+
+  // Graph problems
+  registerAlgorithm({
+    id: 'topological-sort',
+    category: 'graphs',
+    icon: Workflow,
+    component: TopoSortVisualizer,
+    preview: TopoPreview,
+  });
+  registerAlgorithm({
+    id: 'minimum-spanning-tree',
+    category: 'graphs',
+    icon: Cable,
+    component: MSTVisualizer,
+    preview: MSTPreview,
+  });
+  registerAlgorithm({
+    id: 'union-find',
+    category: 'graphs',
+    icon: Merge,
+    component: UnionFindVisualizer,
+    preview: UnionFindPreview,
+  });
+
+  // Recursion & dynamic programming
+  registerAlgorithm({
+    id: 'fibonacci',
+    category: 'dp',
+    icon: Calculator,
+    component: FibonacciVisualizer,
+    preview: FibPreview,
+  });
+  registerAlgorithm({
+    id: 'edit-distance',
+    category: 'dp',
+    icon: PencilLine,
+    component: EditDistanceVisualizer,
+    preview: EditDistancePreview,
+  });
+  registerAlgorithm({
+    id: 'n-queens',
+    category: 'dp',
+    icon: Crown,
+    component: QueensVisualizer,
+    preview: QueensPreview,
   });
 }

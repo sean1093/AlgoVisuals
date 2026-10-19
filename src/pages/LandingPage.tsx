@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowRight, MousePointerClick, Sparkles, Lightbulb } from 'lucide-react';
-import { CATEGORIES, getAlgorithmsByCategory, getAllAlgorithms, getCategory } from '../registry';
+import { CATEGORIES, SHELVES, getAlgorithmsByCategory, getAllAlgorithms, getCategory } from '../registry';
 import HeroSortLoop from '../components/shared/HeroSortLoop';
 import { useI18n } from '../i18n';
 
@@ -21,7 +21,8 @@ function LandingPage() {
     document.title = t.meta.title;
   }, [t]);
   const algorithms = getAllAlgorithms();
-  const first = algorithms[0];
+  // The hero shows sorting, so start there
+  const first = algorithms.find((a) => a.id === 'bubble-sort') ?? algorithms[0];
   const categories = CATEGORIES.filter((c) => getAlgorithmsByCategory(c.id).length);
   const sortTheme = getCategory('sorting').theme;
 
@@ -87,38 +88,55 @@ function LandingPage() {
         </motion.div>
       </section>
 
-      {/* Topic jump links */}
-      <nav aria-label={tl.topics} className="mx-auto max-w-6xl px-5 pb-14 md:px-8">
-        <div className="flex flex-wrap gap-2">
-          {categories.map((c) => (
+      {/* Topic jump links, grouped by part */}
+      <nav aria-label={tl.topics} className="mx-auto max-w-6xl space-y-4 px-5 pb-14 md:px-8">
+        {SHELVES.map((shelf) => (
+          <div key={shelf} className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
             <a
-              key={c.id}
-              href={`#${c.id}`}
-              className="inline-flex items-center gap-2 rounded-full border border-line bg-card/70 px-4 py-2 text-sm text-ink-soft transition-colors hover:border-line-strong hover:text-ink"
+              href={`#${shelf}`}
+              className="w-40 flex-shrink-0 text-[11px] font-semibold uppercase tracking-[0.14em] text-ink-mute transition-colors hover:text-ink"
             >
-              <span className="h-2 w-2 rounded-full" style={{ backgroundColor: c.theme.accent }} />
-              {t.categories[c.id].name}
-              <span className="text-xs text-ink-mute">{getAlgorithmsByCategory(c.id).length}</span>
+              {t.shelves[shelf].name}
             </a>
-          ))}
-        </div>
+            <div className="flex flex-wrap gap-2">
+              {categories
+                .filter((c) => c.shelf === shelf)
+                .map((c) => (
+                  <a
+                    key={c.id}
+                    href={`#${c.id}`}
+                    className="inline-flex items-center gap-2 rounded-full border border-line bg-card/70 px-4 py-2 text-sm text-ink-soft transition-colors hover:border-line-strong hover:text-ink"
+                  >
+                    <span className="h-2 w-2 rounded-full" style={{ backgroundColor: c.theme.accent }} />
+                    {t.categories[c.id].name}
+                    <span className="text-xs text-ink-mute">{getAlgorithmsByCategory(c.id).length}</span>
+                  </a>
+                ))}
+            </div>
+          </div>
+        ))}
       </nav>
 
-      {/* Collection, by topic */}
+      {/* Collection: two parts, each with its topics */}
       <section id="collection" className="scroll-mt-20 border-t border-line/70 bg-card/40">
-        <div className="mx-auto max-w-6xl space-y-20 px-5 py-20 md:px-8 md:py-24">
-          {categories.map((category, ci) => {
+        <div className="mx-auto max-w-6xl px-5 py-20 md:px-8 md:py-24">
+          {SHELVES.map((shelf, si) => (
+          <div key={shelf} id={shelf} className={`scroll-mt-24 ${si > 0 ? 'mt-28 border-t border-line/70 pt-20' : ''}`}>
+            <div className="mb-14 max-w-2xl">
+              <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.14em] text-ink-mute">{tl.part(si + 1)}</p>
+              <h2 className="font-display text-5xl tracking-tight text-ink md:text-6xl">{t.shelves[shelf].name}</h2>
+              <p className="mt-4 text-lg leading-relaxed text-ink-soft">{t.shelves[shelf].blurb}</p>
+            </div>
+            <div className="space-y-16">
+          {categories.filter((c) => c.shelf === shelf).map((category) => {
             const items = getAlgorithmsByCategory(category.id);
             return (
               <div key={category.id} id={category.id} className="scroll-mt-24">
-                <div className="mb-8 flex flex-col justify-between gap-3 md:flex-row md:items-end">
-                  <div>
-                    <p className="mb-2 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-ink-mute">
-                      <span className="h-2 w-2 rounded-full" style={{ backgroundColor: category.theme.accent }} />
-                      {tl.topicNumber(String(ci + 1).padStart(2, '0'))}
-                    </p>
-                    <h2 className="font-display text-4xl tracking-tight text-ink">{t.categories[category.id].name}</h2>
-                  </div>
+                <div className="mb-6 flex flex-col justify-between gap-2 md:flex-row md:items-end">
+                  <h3 className="flex items-center gap-3 font-display text-3xl tracking-tight text-ink">
+                    <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: category.theme.accent }} />
+                    {t.categories[category.id].name}
+                  </h3>
                   <p className="max-w-md text-ink-soft">{t.categories[category.id].blurb}</p>
                 </div>
 
@@ -141,7 +159,7 @@ function LandingPage() {
                             <Preview className="h-28 w-28 text-ink transition-transform duration-500 group-hover:scale-105" />
                           </div>
                           <div className="flex flex-1 flex-col p-6">
-                            <h3 className="font-display text-2xl text-ink">{text.name}</h3>
+                            <h4 className="font-display text-2xl text-ink">{text.name}</h4>
                             <p className="mt-2 text-[15px] leading-relaxed text-ink-soft">{text.tagline}</p>
                             {text.facts.length > 0 && (
                               <div className="mt-4 flex flex-wrap gap-1.5">
@@ -168,6 +186,9 @@ function LandingPage() {
               </div>
             );
           })}
+            </div>
+          </div>
+          ))}
         </div>
       </section>
 

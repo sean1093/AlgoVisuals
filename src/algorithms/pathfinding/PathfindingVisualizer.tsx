@@ -15,7 +15,7 @@ import { getCategory } from '../../registry';
 import { useI18n } from '../../i18n';
 import Rich from '../../components/shared/Rich';
 
-const { accent: ACCENT, soft: SOFT } = getCategory('graphs').theme;
+const { accent: ACCENT, soft: SOFT } = getCategory('paths').theme;
 const ROWS = 17;
 const COLS = 31;
 const CELL = 20;
