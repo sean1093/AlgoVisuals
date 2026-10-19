@@ -2,6 +2,7 @@ import { ReactNode, createContext, useCallback, useContext, useEffect, useMemo, 
 
 export type Theme = 'light' | 'dark';
 
+// The inline script in index.html repeats this key and these colours to theme the page before React loads
 const STORAGE_KEY = 'algovisuals.theme';
 const META_COLORS: Record<Theme, string> = { light: '#f6f3ec', dark: '#161513' };
 
@@ -39,8 +40,22 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     const media = window.matchMedia?.('(prefers-color-scheme: dark)');
     if (!media) return;
     const onChange = () => setSystem(media.matches ? 'dark' : 'light');
-    media.addEventListener('change', onChange);
-    return () => media.removeEventListener('change', onChange);
+    // Safari < 14 only has the older addListener API
+    if (media.addEventListener) media.addEventListener('change', onChange);
+    else media.addListener(onChange);
+    return () => {
+      if (media.removeEventListener) media.removeEventListener('change', onChange);
+      else media.removeListener(onChange);
+    };
+  }, []);
+
+  // Pick up a choice made in another tab
+  useEffect(() => {
+    const onStorage = (e: StorageEvent) => {
+      if (e.key === STORAGE_KEY) setSaved(readSaved());
+    };
+    window.addEventListener('storage', onStorage);
+    return () => window.removeEventListener('storage', onStorage);
   }, []);
 
   useEffect(() => {

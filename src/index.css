@@ -24,9 +24,12 @@
   --color-clay-soft: #f5e1d8;
   /* Text drawn on top of an accent colour */
   --color-on-accent: #ffffff;
+  /* Slightly brighter card, for hover */
+  --color-card-hover: #ffffff;
 
-  --shadow-card: 0 1px 2px rgb(31 29 26 / 0.04), 0 8px 24px -12px rgb(31 29 26 / 0.12);
-  --shadow-lift: 0 2px 4px rgb(31 29 26 / 0.05), 0 20px 40px -16px rgb(31 29 26 / 0.2);
+  /* Tailwind inlines theme values, so point at variables that switch with the theme */
+  --shadow-card: var(--elevation-card);
+  --shadow-lift: var(--elevation-lift);
 }
 
 /*
@@ -35,6 +38,9 @@
  */
 :root {
   color-scheme: light;
+  --elevation-card: 0 1px 2px rgb(31 29 26 / 0.04), 0 8px 24px -12px rgb(31 29 26 / 0.12);
+  --elevation-lift: 0 2px 4px rgb(31 29 26 / 0.05), 0 20px 40px -16px rgb(31 29 26 / 0.2);
+  --shadow-thumb: 0 2px 6px rgb(31 29 26 / 0.15);
   --grain-glow: rgb(255 255 255 / 0.7);
   --grain-dot: rgb(31 29 26 / 0.035);
 
@@ -57,6 +63,7 @@
 }
 
 :root[data-theme="dark"] {
+  /* Keep --color-paper in sync with META_COLORS in src/theme.tsx and the script in index.html */
   color-scheme: dark;
   --color-paper: #161513;
   --color-paper-deep: #211f1c;
@@ -72,10 +79,12 @@
   --color-clay: #e58468;
   --color-clay-soft: #3a2620;
 
-  --shadow-card: 0 1px 2px rgb(0 0 0 / 0.3), 0 8px 24px -12px rgb(0 0 0 / 0.55);
-  --shadow-lift: 0 2px 4px rgb(0 0 0 / 0.35), 0 20px 40px -16px rgb(0 0 0 / 0.7);
+  --elevation-card: 0 1px 2px rgb(0 0 0 / 0.3), 0 8px 24px -12px rgb(0 0 0 / 0.55);
+  --elevation-lift: 0 2px 4px rgb(0 0 0 / 0.35), 0 20px 40px -16px rgb(0 0 0 / 0.7);
 
   --color-on-accent: #15130f;
+  --color-card-hover: #25221e;
+  --shadow-thumb: 0 2px 6px rgb(0 0 0 / 0.5);
   --grain-glow: rgb(255 255 255 / 0.025);
   --grain-dot: rgb(255 255 255 / 0.03);
 
@@ -178,7 +187,7 @@ body {
   border-radius: 999px;
   background: var(--color-card);
   border: 2px solid var(--accent);
-  box-shadow: 0 2px 6px rgb(31 29 26 / 0.15);
+  box-shadow: var(--shadow-thumb);
   transition: transform 0.15s ease;
 }
 .range::-moz-range-thumb {
@@ -187,7 +196,7 @@ body {
   border-radius: 999px;
   background: var(--color-card);
   border: 2px solid var(--accent);
-  box-shadow: 0 2px 6px rgb(31 29 26 / 0.15);
+  box-shadow: var(--shadow-thumb);
 }
 .range:active::-webkit-slider-thumb {
   transform: scale(1.15);
