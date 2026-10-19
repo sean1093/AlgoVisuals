@@ -1,17 +1,19 @@
 import { ReactNode, createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
 export type Theme = 'light' | 'dark';
+/** What the visitor picked; 'system' follows the OS setting */
+export type ThemePreference = Theme | 'system';
 
 // The inline script in index.html repeats this key and these colours to theme the page before React loads
 const STORAGE_KEY = 'algovisuals.theme';
 const META_COLORS: Record<Theme, string> = { light: '#f6f3ec', dark: '#161513' };
 
-function readSaved(): Theme | null {
+function readPreference(): ThemePreference {
   try {
     const saved = localStorage.getItem(STORAGE_KEY);
-    return saved === 'light' || saved === 'dark' ? saved : null;
+    return saved === 'light' || saved === 'dark' ? saved : 'system';
   } catch {
-    return null;
+    return 'system';
   }
 }
 
@@ -20,20 +22,22 @@ function systemTheme(): Theme {
 }
 
 interface ThemeValue {
+  /** The theme actually shown */
   theme: Theme;
-  toggle: () => void;
+  preference: ThemePreference;
+  setPreference: (preference: ThemePreference) => void;
 }
 
-const ThemeContext = createContext<ThemeValue>({ theme: 'light', toggle: () => {} });
+const ThemeContext = createContext<ThemeValue>({ theme: 'light', preference: 'system', setPreference: () => {} });
 
 /**
- * Light / dark theme. Follows the system setting until the visitor picks one,
- * then remembers the choice. index.html applies it before first paint.
+ * Light / dark / follow-system theme. 'system' is stored as no saved value, so the
+ * inline script in index.html can apply the right theme before first paint.
  */
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [saved, setSaved] = useState<Theme | null>(readSaved);
+  const [preference, setPreferenceState] = useState<ThemePreference>(readPreference);
   const [system, setSystem] = useState<Theme>(systemTheme);
-  const theme = saved ?? system;
+  const theme = preference === 'system' ? system : preference;
 
   // Keep following the system while there is no explicit choice
   useEffect(() => {
@@ -52,7 +56,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   // Pick up a choice made in another tab
   useEffect(() => {
     const onStorage = (e: StorageEvent) => {
-      if (e.key === STORAGE_KEY) setSaved(readSaved());
+      if (e.key === STORAGE_KEY) setPreferenceState(readPreference());
     };
     window.addEventListener('storage', onStorage);
     return () => window.removeEventListener('storage', onStorage);
@@ -63,17 +67,17 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     document.querySelector('meta[name="theme-color"]')?.setAttribute('content', META_COLORS[theme]);
   }, [theme]);
 
-  const toggle = useCallback(() => {
-    const next: Theme = theme === 'dark' ? 'light' : 'dark';
-    setSaved(next);
+  const setPreference = useCallback((preference: ThemePreference) => {
+    setPreferenceState(preference);
     try {
-      localStorage.setItem(STORAGE_KEY, next);
+      if (preference === 'system') localStorage.removeItem(STORAGE_KEY);
+      else localStorage.setItem(STORAGE_KEY, preference);
     } catch {
       // Not persisted; the choice still applies for this visit
     }
-  }, [theme]);
+  }, []);
 
-  const value = useMemo(() => ({ theme, toggle }), [theme, toggle]);
+  const value = useMemo(() => ({ theme, preference, setPreference }), [theme, preference, setPreference]);
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
 }
 

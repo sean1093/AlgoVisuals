@@ -1,10 +1,10 @@
 import { ReactNode, useCallback, useEffect, useRef, useState } from 'react';
 import { Link, NavLink, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Check, ChevronDown, Globe, Moon, Sun } from 'lucide-react';
+import { Check, ChevronDown, Globe, LucideIcon, Monitor, Moon, Sun } from 'lucide-react';
 import { CATEGORIES, getAlgorithmsByCategory } from '../../registry';
 import { LANGUAGES, useI18n } from '../../i18n';
-import { useTheme } from '../../theme';
+import { ThemePreference, useTheme } from '../../theme';
 
 function GithubMark() {
   return (
@@ -49,29 +49,36 @@ function useDismiss(open: boolean, close: () => void) {
   return ref;
 }
 
-function ThemeToggle() {
-  const { theme, toggle } = useTheme();
-  const { t } = useI18n();
-  const label = theme === 'dark' ? t.common.lightMode : t.common.darkMode;
-  return (
-    <button
-      type="button"
-      onClick={toggle}
-      aria-label={label}
-      title={label}
-      className="flex h-9 w-9 items-center justify-center rounded-full text-ink-soft transition-colors hover:bg-paper-deep hover:text-ink"
-    >
-      {theme === 'dark' ? <Sun size={17} /> : <Moon size={17} />}
-    </button>
-  );
+interface HeaderMenuItem<T extends string> {
+  id: T;
+  label: string;
+  icon?: LucideIcon;
+  /** Language of the label, for screen readers */
+  lang?: string;
 }
 
-function LanguageMenu() {
-  const { lang, setLang, t } = useI18n();
+/**
+ * Small header dropdown with one selected option (used for language and theme)
+ */
+function HeaderMenu<T extends string>({
+  label,
+  trigger,
+  items,
+  value,
+  onSelect,
+  triggerClassName,
+}: {
+  /** Accessible name, e.g. "Theme: System" */
+  label: string;
+  trigger: ReactNode;
+  items: HeaderMenuItem<T>[];
+  value: T;
+  onSelect: (id: T) => void;
+  triggerClassName: string;
+}) {
   const [open, setOpen] = useState(false);
   const close = useCallback(() => setOpen(false), []);
   const ref = useDismiss(open, close);
-  const current = LANGUAGES.find((l) => l.id === lang)!;
 
   return (
     <div ref={ref} className="relative">
@@ -79,48 +86,98 @@ function LanguageMenu() {
         type="button"
         onClick={() => setOpen((o) => !o)}
         aria-expanded={open}
-        aria-label={t.common.language}
-        title={t.common.language}
-        className={`flex items-center gap-1.5 rounded-full px-3 py-2 text-sm transition-colors ${
-          open ? 'bg-card text-ink shadow-card' : 'text-ink-soft hover:text-ink'
+        aria-haspopup="true"
+        aria-label={label}
+        title={label}
+        className={`flex items-center rounded-full transition-colors ${triggerClassName} ${
+          open ? 'bg-card text-ink shadow-card' : 'text-ink-soft hover:bg-paper-deep hover:text-ink'
         }`}
       >
-        <Globe size={16} />
-        <span className="hidden sm:inline">{current.short}</span>
+        {trigger}
       </button>
       <AnimatePresence>
         {open && (
           <motion.ul
-            aria-label={t.common.language}
+            aria-label={label}
             initial={{ opacity: 0, y: -6 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -6 }}
             transition={{ duration: 0.15 }}
-            className="absolute right-0 top-full mt-2 w-44 overflow-hidden rounded-2xl border border-line bg-card p-1.5 shadow-lift"
+            className="absolute right-0 top-full mt-2 w-48 overflow-hidden rounded-2xl border border-line bg-card p-1.5 shadow-lift"
           >
-            {LANGUAGES.map((l) => (
-              <li key={l.id}>
-                <button
-                  type="button"
-                  aria-pressed={l.id === lang}
-                  lang={l.id}
-                  onClick={() => {
-                    setLang(l.id);
-                    close();
-                  }}
-                  className={`flex w-full items-center justify-between rounded-xl px-3 py-2 text-left text-sm transition-colors ${
-                    l.id === lang ? 'bg-paper-deep/70 font-medium text-ink' : 'text-ink-soft hover:bg-paper-deep/60 hover:text-ink'
-                  }`}
-                >
-                  {l.label}
-                  {l.id === lang && <Check size={15} />}
-                </button>
-              </li>
-            ))}
+            {items.map(({ id, label: itemLabel, icon: Icon, lang }) => {
+              const active = id === value;
+              return (
+                <li key={id}>
+                  <button
+                    type="button"
+                    aria-pressed={active}
+                    lang={lang}
+                    onClick={() => {
+                      onSelect(id);
+                      close();
+                    }}
+                    className={`flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-left text-sm transition-colors ${
+                      active ? 'bg-paper-deep/70 font-medium text-ink' : 'text-ink-soft hover:bg-paper-deep/60 hover:text-ink'
+                    }`}
+                  >
+                    {Icon && <Icon size={15} />}
+                    <span className="flex-1">{itemLabel}</span>
+                    {active && <Check size={15} />}
+                  </button>
+                </li>
+              );
+            })}
           </motion.ul>
         )}
       </AnimatePresence>
     </div>
+  );
+}
+
+const THEME_OPTIONS: { id: ThemePreference; icon: LucideIcon; key: 'themeLight' | 'themeDark' | 'themeSystem' }[] = [
+  { id: 'light', icon: Sun, key: 'themeLight' },
+  { id: 'dark', icon: Moon, key: 'themeDark' },
+  { id: 'system', icon: Monitor, key: 'themeSystem' },
+];
+
+function ThemeMenu() {
+  const { preference, setPreference } = useTheme();
+  const { t } = useI18n();
+  const items = THEME_OPTIONS.map(({ id, icon, key }) => ({ id, icon, label: t.common[key] }));
+  const current = items.find((i) => i.id === preference)!;
+  const Icon = current.icon;
+
+  return (
+    <HeaderMenu
+      label={`${t.common.theme}: ${current.label}`}
+      trigger={<Icon size={17} />}
+      triggerClassName="h-9 w-9 justify-center"
+      items={items}
+      value={preference}
+      onSelect={setPreference}
+    />
+  );
+}
+
+function LanguageMenu() {
+  const { lang, setLang, t } = useI18n();
+  const current = LANGUAGES.find((l) => l.id === lang)!;
+
+  return (
+    <HeaderMenu
+      label={`${t.common.language}: ${current.label}`}
+      trigger={
+        <>
+          <Globe size={16} />
+          <span className="hidden sm:inline">{current.short}</span>
+        </>
+      }
+      triggerClassName="gap-1.5 px-3 py-2 text-sm"
+      items={LANGUAGES.map((l) => ({ id: l.id, label: l.label, lang: l.id }))}
+      value={lang}
+      onSelect={setLang}
+    />
   );
 }
 
@@ -209,7 +266,7 @@ function SiteHeader() {
           </Link>
           <BrowseMenu />
           <LanguageMenu />
-          <ThemeToggle />
+          <ThemeMenu />
           <a
             href="https://github.com/sean1093/AlgoVisuals"
             target="_blank"
