@@ -21,7 +21,8 @@ function LandingPage() {
     document.title = t.meta.title;
   }, [t]);
   const algorithms = getAllAlgorithms();
-  const first = algorithms[0];
+  // The hero shows sorting, so start there
+  const first = algorithms.find((a) => a.id === 'bubble-sort') ?? algorithms[0];
   const categories = CATEGORIES.filter((c) => getAlgorithmsByCategory(c.id).length);
   const sortTheme = getCategory('sorting').theme;
 

@@ -85,7 +85,7 @@ function StackQueueVisualizer() {
     setStackOut([...stackOut, out.fromStack!]);
     setQueueOut([...queueOut, out.fromQueue!]);
     setNote(out.fromStack!.id === out.fromQueue!.id ? ts.same(out.fromStack!.label) : ts.took(out.fromStack!.label, out.fromQueue!.label));
-    setProgress((p) => ({ ...p, take: true, drain: p.drain || (p.take && out.pair.stack.length === 0) }));
+    setProgress((p) => ({ ...p, take: true, drain: p.drain || out.pair.stack.length === 0 }));
   };
   const reset = () => {
     setPair(startPair());
