@@ -41,8 +41,8 @@ import {
 
 const SORT_ACCENT = getCategory('sorting').theme.accent;
 const PIVOT = getCategory('searching').theme.accent;
-const DONE = '#3f6b5c';
-const MOVE = '#c0553a';
+const DONE = 'var(--color-sage)';
+const MOVE = 'var(--color-clay)';
 
 /**
  * Register all algorithms
@@ -174,7 +174,7 @@ export function registerAllAlgorithms() {
     id: 'quadtree',
     category: 'spatial',
     icon: Grid2x2,
-    theme: { accent: '#3f6b5c', soft: '#e2ebe4' },
+    theme: { accent: 'var(--color-sage)', soft: 'var(--color-sage-soft)' },
     component: QuadTreeVisualizer,
     preview: QuadTreePreview,
   });
@@ -183,7 +183,7 @@ export function registerAllAlgorithms() {
     id: 'geohash',
     category: 'spatial',
     icon: MapPin,
-    theme: { accent: '#c0553a', soft: '#f5e1d8' },
+    theme: { accent: 'var(--color-clay)', soft: 'var(--color-clay-soft)' },
     component: GeoHashVisualizer,
     preview: GeoHashPreview,
   });

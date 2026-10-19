@@ -63,7 +63,7 @@ function TreeDiagram({ nodes, edges, accent, minDepth = 3, emptyText = '', label
             initial={false}
             animate={{ x1: a.x, y1: a.y, x2: b.x, y2: b.y }}
             transition={{ type: 'spring', stiffness: 260, damping: 30 }}
-            stroke={highlight ? accent : '#cfc7b6'}
+            stroke={highlight ? accent : 'var(--color-line-strong)'}
             strokeWidth={highlight ? 2.5 : 1.5}
           />
         );
@@ -79,12 +79,12 @@ function TreeDiagram({ nodes, edges, accent, minDepth = 3, emptyText = '', label
             onClick={onNodeClick ? () => onNodeClick(n) : undefined}
             style={onNodeClick ? { cursor: 'pointer' } : undefined}
           >
-            <circle r={r} fill={n.fill ?? '#fffdf8'} stroke={n.stroke ?? '#cfc7b6'} strokeWidth={n.stroke ? 2.5 : 1.5} />
-            <text textAnchor="middle" dy="0.35em" fontSize={r > 16 ? 14 : 12} fontWeight={600} fill={n.text ?? '#1f1d1a'} className="tabular-nums">
+            <circle r={r} fill={n.fill ?? 'var(--color-card)'} stroke={n.stroke ?? 'var(--color-line-strong)'} strokeWidth={n.stroke ? 2.5 : 1.5} />
+            <text textAnchor="middle" dy="0.35em" fontSize={r > 16 ? 14 : 12} fontWeight={600} fill={n.text ?? 'var(--color-ink)'} className="tabular-nums">
               {n.label}
             </text>
             {n.caption && (
-              <text textAnchor="middle" y={r + 13} fontSize={10} fill="#8d867b" fontFamily="JetBrains Mono, monospace">
+              <text textAnchor="middle" y={r + 13} fontSize={10} fill="var(--color-ink-mute)" fontFamily="JetBrains Mono, monospace">
                 {n.caption}
               </text>
             )}

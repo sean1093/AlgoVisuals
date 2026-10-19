@@ -26,7 +26,7 @@ function Slider({
   onChange,
   minLabel,
   maxLabel,
-  accent = '#1f1d1a',
+  accent = 'var(--color-ink)',
   className = ''
 }: SliderProps) {
   const id = useId();

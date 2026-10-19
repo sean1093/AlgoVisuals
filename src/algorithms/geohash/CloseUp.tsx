@@ -3,7 +3,7 @@ import { BASE32, decode, encode } from './logic';
 import { clampLat, sharedPrefix, wrapLng } from './format';
 import { useI18n } from '../../i18n';
 
-const ACCENT = '#c0553a';
+const ACCENT = 'var(--color-clay)';
 const VIEW_W = 600;
 const VIEW_H = 400;
 
@@ -103,9 +103,9 @@ function CloseUp({ geohash, lat, lng, showNeighbors, onPick }: CloseUpProps) {
               y={y}
               width={cellW}
               height={cellH}
-              fill={centre ? ACCENT : '#1f1d1a'}
+              fill={centre ? ACCENT : 'var(--color-ink)'}
               fillOpacity={centre ? 0.07 : 0.025}
-              stroke={centre ? ACCENT : '#1f1d1a'}
+              stroke={centre ? ACCENT : 'var(--color-ink)'}
               strokeOpacity={centre ? 1 : 0.18}
               strokeWidth={centre ? 2 : 1}
               className={centre ? '' : 'transition-all hover:[fill-opacity:0.08]'}
@@ -120,7 +120,7 @@ function CloseUp({ geohash, lat, lng, showNeighbors, onPick }: CloseUpProps) {
                 letterSpacing={1}
                 pointerEvents="none"
               >
-                <tspan fill="#1f1d1a" fillOpacity={0.35}>{code.slice(0, shared)}</tspan>
+                <tspan fill="var(--color-ink)" fillOpacity={0.35}>{code.slice(0, shared)}</tspan>
                 <tspan fill={ACCENT} fontWeight={600}>{code.slice(shared)}</tspan>
               </text>
             )}
@@ -151,7 +151,7 @@ function CloseUp({ geohash, lat, lng, showNeighbors, onPick }: CloseUpProps) {
                 textAnchor="middle"
                 fontFamily="JetBrains Mono, monospace"
                 fontSize={Math.min(11, w / 2.2)}
-                fill={active ? ACCENT : '#1f1d1a'}
+                fill={active ? ACCENT : 'var(--color-ink)'}
                 fillOpacity={active ? 1 : 0.3}
                 fontWeight={active ? 700 : 500}
               >
@@ -178,14 +178,14 @@ function CloseUp({ geohash, lat, lng, showNeighbors, onPick }: CloseUpProps) {
           fontFamily="JetBrains Mono, monospace"
           fontSize={13}
           fontWeight={600}
-          fill="#fffdf8"
+          fill="var(--color-card)"
         >
           {geohash}
         </text>
       </g>
 
       {/* Pin */}
-      <circle cx={pin.x} cy={pin.y} r={7} fill={ACCENT} stroke="#fffdf8" strokeWidth={2.5} pointerEvents="none" />
+      <circle cx={pin.x} cy={pin.y} r={7} fill={ACCENT} stroke="var(--color-card)" strokeWidth={2.5} pointerEvents="none" />
     </svg>
   );
 }

@@ -22,9 +22,88 @@
   --color-sage-soft: #e2ebe4;
   --color-clay: #c0553a;
   --color-clay-soft: #f5e1d8;
+  /* Text drawn on top of an accent colour */
+  --color-on-accent: #ffffff;
+  /* Slightly brighter card, for hover */
+  --color-card-hover: #ffffff;
 
-  --shadow-card: 0 1px 2px rgb(31 29 26 / 0.04), 0 8px 24px -12px rgb(31 29 26 / 0.12);
-  --shadow-lift: 0 2px 4px rgb(31 29 26 / 0.05), 0 20px 40px -16px rgb(31 29 26 / 0.2);
+  /* Tailwind inlines theme values, so point at variables that switch with the theme */
+  --shadow-card: var(--elevation-card);
+  --shadow-lift: var(--elevation-lift);
+}
+
+/*
+ * Colours that components reference directly (SVG fills, topic accents…).
+ * Each has a light value here and a dark value below.
+ */
+:root {
+  color-scheme: light;
+  --elevation-card: 0 1px 2px rgb(31 29 26 / 0.04), 0 8px 24px -12px rgb(31 29 26 / 0.12);
+  --elevation-lift: 0 2px 4px rgb(31 29 26 / 0.05), 0 20px 40px -16px rgb(31 29 26 / 0.2);
+  --shadow-thumb: 0 2px 6px rgb(31 29 26 / 0.15);
+  --grain-glow: rgb(255 255 255 / 0.7);
+  --grain-dot: rgb(31 29 26 / 0.035);
+
+  --accent-sorting: #4a5a9c;
+  --soft-sorting: #e3e6f3;
+  --accent-searching: #a8741a;
+  --soft-searching: #f5ead2;
+  --accent-graphs: #7a4f86;
+  --soft-graphs: #ece1ee;
+  --accent-structures: #2f6f86;
+  --soft-structures: #dceaef;
+
+  --bar-idle: #d9d3c5;
+  --bar-range: #b9bfdc;
+  --path-wall: #2f2b27;
+  --path-mud: #d9c7a1;
+  --path-explored: #dcc8e1;
+  --path-frontier: #f1e7f3;
+  --path-route: #e8b04b;
+}
+
+:root[data-theme="dark"] {
+  /* Keep --color-paper in sync with META_COLORS in src/theme.tsx and the script in index.html */
+  color-scheme: dark;
+  --color-paper: #161513;
+  --color-paper-deep: #211f1c;
+  --color-card: #1d1b18;
+  --color-ink: #ede7dc;
+  --color-ink-soft: #b8b0a3;
+  --color-ink-mute: #8a8276;
+  --color-line: #322e29;
+  --color-line-strong: #4a443c;
+
+  --color-sage: #74b39b;
+  --color-sage-soft: #1f2e28;
+  --color-clay: #e58468;
+  --color-clay-soft: #3a2620;
+
+  --elevation-card: 0 1px 2px rgb(0 0 0 / 0.3), 0 8px 24px -12px rgb(0 0 0 / 0.55);
+  --elevation-lift: 0 2px 4px rgb(0 0 0 / 0.35), 0 20px 40px -16px rgb(0 0 0 / 0.7);
+
+  --color-on-accent: #15130f;
+  --color-card-hover: #25221e;
+  --shadow-thumb: 0 2px 6px rgb(0 0 0 / 0.5);
+  --grain-glow: rgb(255 255 255 / 0.025);
+  --grain-dot: rgb(255 255 255 / 0.03);
+
+  --accent-sorting: #96a4e6;
+  --soft-sorting: #23263a;
+  --accent-searching: #deac4f;
+  --soft-searching: #322819;
+  --accent-graphs: #c196cd;
+  --soft-graphs: #2e2433;
+  --accent-structures: #6bb8d2;
+  --soft-structures: #1b2b32;
+
+  --bar-idle: #3b3731;
+  --bar-range: #3d4468;
+  --path-wall: #6a6359;
+  --path-mud: #5b4c30;
+  --path-explored: #4a3653;
+  --path-frontier: #2f2535;
+  --path-route: #e8b04b;
 }
 
 html {
@@ -76,8 +155,8 @@ body {
 /* Soft paper grain for the page background */
 .paper-grain {
   background-image:
-    radial-gradient(circle at 20% 0%, rgb(255 255 255 / 0.7), transparent 45%),
-    radial-gradient(rgb(31 29 26 / 0.035) 1px, transparent 1px);
+    radial-gradient(circle at 20% 0%, var(--grain-glow), transparent 45%),
+    radial-gradient(var(--grain-dot) 1px, transparent 1px);
   background-size: auto, 22px 22px;
 }
 
@@ -108,7 +187,7 @@ body {
   border-radius: 999px;
   background: var(--color-card);
   border: 2px solid var(--accent);
-  box-shadow: 0 2px 6px rgb(31 29 26 / 0.15);
+  box-shadow: var(--shadow-thumb);
   transition: transform 0.15s ease;
 }
 .range::-moz-range-thumb {
@@ -117,7 +196,7 @@ body {
   border-radius: 999px;
   background: var(--color-card);
   border: 2px solid var(--accent);
-  box-shadow: 0 2px 6px rgb(31 29 26 / 0.15);
+  box-shadow: var(--shadow-thumb);
 }
 .range:active::-webkit-slider-thumb {
   transform: scale(1.15);

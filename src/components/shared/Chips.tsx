@@ -25,7 +25,7 @@ function Chips<T extends string>({ options, value, onChange, accent, label, clas
               aria-checked={active}
               onClick={() => onChange(option.id)}
               className={`rounded-full border px-3 py-1.5 text-[13px] transition-colors ${
-                active ? 'border-transparent text-white' : 'border-line text-ink-soft hover:border-line-strong hover:text-ink'
+                active ? 'border-transparent text-on-accent' : 'border-line text-ink-soft hover:border-line-strong hover:text-ink'
               }`}
               style={active ? { backgroundColor: accent } : undefined}
             >

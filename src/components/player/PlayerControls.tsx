@@ -60,7 +60,7 @@ function PlayerControls({ player, accent, keyboard = true, className = '' }: Pla
         <button
           type="button"
           onClick={player.toggle}
-          className="flex h-12 w-12 items-center justify-center rounded-full text-white shadow-card transition-transform active:scale-95"
+          className="flex h-12 w-12 items-center justify-center rounded-full text-on-accent shadow-card transition-transform active:scale-95"
           style={{ backgroundColor: accent }}
           aria-label={playing ? tc.pause : atEnd ? tc.replay : tc.play}
           title={`${playing ? tc.pause : tc.play} (${tc.spaceKey})`}

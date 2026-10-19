@@ -128,6 +128,12 @@ Each topic has one accent colour (defined in `CATEGORIES` in `src/registry.ts`);
 | **Framer Motion** | Animation library |
 | **Lucide React** | Icon library |
 
+## 🌙 Dark mode
+
+A sun/moon button in the header switches between light and dark. It follows the system setting until the visitor picks one, then remembers the choice; a tiny script in `index.html` applies it before first paint so there's no flash.
+
+All colours are CSS variables (`src/index.css`): the Tailwind tokens (`--color-paper`, `--color-ink`, …) plus topic accents (`--accent-sorting`, `--soft-sorting`, …) and visualisation colours (`--bar-idle`, `--path-wall`, …). Each has a light value and a dark value under `:root[data-theme="dark"]`. Components — including SVG fills — use `var(--…)` instead of hex values, and text on an accent colour uses `--color-on-accent`.
+
 ## 🌐 Languages
 
 The interface is available in **English** (default), **繁體中文**, **日本語** and **한국어** — switch with the globe button in the header (the choice is remembered).

@@ -6,7 +6,7 @@ import { useI18n } from '../../i18n';
 
 export const MAP_WIDTH = 720;
 export const MAP_HEIGHT = 360;
-const ACCENT = '#c0553a';
+const ACCENT = 'var(--color-clay)';
 
 export function latLngToXY(lat: number, lng: number) {
   return {
@@ -40,7 +40,7 @@ const LandDots = memo(function LandDots() {
       }
     }
   });
-  return <path d={d} fill="#1f1d1a" fillOpacity={0.2} />;
+  return <path d={d} fill="var(--color-ink)" fillOpacity={0.2} />;
 });
 
 /**
@@ -106,7 +106,7 @@ function WorldMap({ lat, lng, bounds, firstChar, onPick }: WorldMapProps) {
               height={cellH}
               fill={active ? ACCENT : 'transparent'}
               fillOpacity={active ? 0.08 : 0}
-              stroke="#1f1d1a"
+              stroke="var(--color-ink)"
               strokeOpacity={0.08}
             />
             <text
@@ -114,7 +114,7 @@ function WorldMap({ lat, lng, bounds, firstChar, onPick }: WorldMapProps) {
               y={row * cellH + 18}
               fontFamily="JetBrains Mono, monospace"
               fontSize={12}
-              fill={active ? ACCENT : '#1f1d1a'}
+              fill={active ? ACCENT : 'var(--color-ink)'}
               fillOpacity={active ? 1 : 0.28}
               fontWeight={active ? 600 : 500}
             >
@@ -144,7 +144,7 @@ function WorldMap({ lat, lng, bounds, firstChar, onPick }: WorldMapProps) {
         animate={{ r: 18, opacity: 0 }}
         transition={{ duration: 1.2, ease: 'easeOut' }}
       />
-      <circle cx={pos.x} cy={pos.y} r={6} fill={ACCENT} stroke="#fffdf8" strokeWidth={2.5} />
+      <circle cx={pos.x} cy={pos.y} r={6} fill={ACCENT} stroke="var(--color-card)" strokeWidth={2.5} />
     </svg>
   );
 }

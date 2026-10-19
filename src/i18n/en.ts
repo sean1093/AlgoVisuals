@@ -44,6 +44,8 @@ const en = {
     copy: 'Copy',
     whereUsed: 'Where it’s used',
     language: 'Language',
+    darkMode: 'Switch to dark mode',
+    lightMode: 'Switch to light mode',
     /** Joins short lists inside sentences */
     listSeparator: ', ',
     quote: (s: string) => `“${s}”`,

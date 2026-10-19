@@ -40,6 +40,8 @@ const ko: Messages = {
     copy: '복사',
     whereUsed: '어디에 쓰일까',
     language: '언어',
+    darkMode: '다크 모드로 전환',
+    lightMode: '라이트 모드로 전환',
     listSeparator: ', ',
     quote: (s: string) => `“${s}”`,
   },

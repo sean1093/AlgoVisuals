@@ -9,8 +9,8 @@ const SORT = getCategory('sorting').theme.accent;
 const SEARCH = getCategory('searching').theme.accent;
 const GRAPH = getCategory('graphs').theme.accent;
 const STRUCT = getCategory('structures').theme.accent;
-const DONE = '#3f6b5c';
-const ACTION = '#c0553a';
+const DONE = 'var(--color-sage)';
+const ACTION = 'var(--color-clay)';
 
 /**
  * Bar chart preview; `marks` maps bar index → colour
@@ -55,8 +55,8 @@ export function boxesPreview(kind: 'linear' | 'binary') {
           const current = kind === 'binary' ? i === 6 : i === 5;
           return (
             <g key={v} transform={`translate(${col * 34 + 2} ${row * 34 + 2})`}>
-              <rect width="28" height="28" rx="6" fill={current ? SEARCH : '#fffdf8'} fillOpacity={current ? 1 : out ? 0.4 : 1} stroke={current ? SEARCH : 'currentColor'} strokeOpacity={current ? 1 : 0.25} />
-              <text x="14" y="18.5" textAnchor="middle" fontSize="11" fontWeight="600" fill={current ? '#fff' : 'currentColor'} fillOpacity={out ? 0.3 : 0.8}>
+              <rect width="28" height="28" rx="6" fill={current ? SEARCH : 'var(--color-card)'} fillOpacity={current ? 1 : out ? 0.4 : 1} stroke={current ? SEARCH : 'currentColor'} strokeOpacity={current ? 1 : 0.25} />
+              <text x="14" y="18.5" textAnchor="middle" fontSize="11" fontWeight="600" fill={current ? 'var(--color-on-accent)' : 'currentColor'} fillOpacity={out ? 0.3 : 0.8}>
                 {v}
               </text>
             </g>
@@ -88,7 +88,7 @@ export function gridPreview(kind: 'bfs' | 'dfs' | 'dijkstra' | 'astar') {
           const c = i % n;
           const r = Math.floor(i / n);
           const key = `${r},${c}`;
-          const fill = walls.has(key) ? '#2f2b27' : path.has(key) ? '#e8b04b' : visited(r, c) ? GRAPH : '#fffdf8';
+          const fill = walls.has(key) ? 'var(--path-wall)' : path.has(key) ? 'var(--path-route)' : visited(r, c) ? GRAPH : 'var(--color-card)';
           const opacity = walls.has(key) || path.has(key) ? 1 : visited(r, c) ? 0.25 : 1;
           return <rect key={i} x={c * s} y={r * s} width={s} height={s} fill={fill} fillOpacity={opacity} stroke="currentColor" strokeOpacity="0.12" strokeWidth="0.6" />;
         })}
@@ -120,8 +120,8 @@ function treePreview(labels: (number | null)[], marks: Record<number, string>) {
           const mark = marks[i];
           return (
             <g key={i}>
-              <circle cx={x} cy={y} r="8.5" fill={mark ?? '#fffdf8'} stroke={mark ?? 'currentColor'} strokeOpacity={mark ? 1 : 0.35} />
-              <text x={x} y={y + 3.5} textAnchor="middle" fontSize="9" fontWeight="600" fill={mark ? '#fff' : 'currentColor'}>
+              <circle cx={x} cy={y} r="8.5" fill={mark ?? 'var(--color-card)'} stroke={mark ?? 'currentColor'} strokeOpacity={mark ? 1 : 0.35} />
+              <text x={x} y={y + 3.5} textAnchor="middle" fontSize="9" fontWeight="600" fill={mark ? 'var(--color-on-accent)' : 'currentColor'}>
                 {l}
               </text>
             </g>
@@ -145,8 +145,8 @@ export const HashPreview = ({ className = '' }: PreviewProps) => (
         <line x1="13" y1="0" x2="13" y2="15" stroke="currentColor" strokeOpacity="0.2" />
         {chain.map((w, i) => (
           <g key={w} transform={`translate(${17 + i * 28} 1.5)`}>
-            <rect width="24" height="12" rx="3" fill={row === 2 && i === 1 ? ACTION : row === 5 ? STRUCT : '#fffdf8'} fillOpacity={row === 5 ? 0.85 : 1} stroke="currentColor" strokeOpacity={row === 2 && i === 1 ? 0 : 0.25} />
-            <text x="12" y="9" textAnchor="middle" fontSize="7.5" fill={row === 5 || (row === 2 && i === 1) ? '#fff' : 'currentColor'}>
+            <rect width="24" height="12" rx="3" fill={row === 2 && i === 1 ? ACTION : row === 5 ? STRUCT : 'var(--color-card)'} fillOpacity={row === 5 ? 0.85 : 1} stroke="currentColor" strokeOpacity={row === 2 && i === 1 ? 0 : 0.25} />
+            <text x="12" y="9" textAnchor="middle" fontSize="7.5" fill={row === 5 || (row === 2 && i === 1) ? 'var(--color-on-accent)' : 'currentColor'}>
               {w}
             </text>
           </g>

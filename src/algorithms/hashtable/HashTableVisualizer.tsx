@@ -13,8 +13,8 @@ import { Messages, useI18n } from '../../i18n';
 import Rich from '../../components/shared/Rich';
 
 const { accent: ACCENT, soft: SOFT } = getCategory('structures').theme;
-const FOUND = '#3f6b5c';
-const CLASH = '#c0553a';
+const FOUND = 'var(--color-sage)';
+const CLASH = 'var(--color-clay)';
 
 const STARTER = ['cat', 'dog', 'owl', 'fox', 'bee'];
 const MORE = ['yak', 'emu', 'ant', 'eel', 'koi', 'cow', 'pig', 'hen', 'ram', 'elk', 'bat', 'ape', 'gnu', 'cod', 'jay'];
@@ -172,11 +172,11 @@ function HashTableVisualizer() {
                   <div
                     key={bucket}
                     className="flex min-h-12 items-center gap-3 px-3 py-1.5 transition-colors"
-                    style={active ? { backgroundColor: highlight?.kind === 'clash' ? '#f5e1d8' : SOFT } : undefined}
+                    style={active ? { backgroundColor: highlight?.kind === 'clash' ? 'var(--color-clay-soft)' : SOFT } : undefined}
                   >
                     <span
                       className="w-8 flex-shrink-0 text-right font-mono text-xs"
-                      style={{ color: active ? ACCENT : '#8d867b', fontWeight: active ? 700 : 500 }}
+                      style={{ color: active ? ACCENT : 'var(--color-ink-mute)', fontWeight: active ? 700 : 500 }}
                     >
                       {bucket}
                     </span>
@@ -191,7 +191,7 @@ function HashTableVisualizer() {
                               type="button"
                               onClick={() => setInput(word)}
                               className="rounded-lg border px-2.5 py-1 text-sm transition-colors"
-                              style={colour ? { backgroundColor: colour, borderColor: colour, color: '#fff' } : { backgroundColor: '#fffdf8', borderColor: '#e3ddd0', color: '#1f1d1a' }}
+                              style={colour ? { backgroundColor: colour, borderColor: colour, color: 'var(--color-on-accent)' } : { backgroundColor: 'var(--color-card)', borderColor: 'var(--color-line)', color: 'var(--color-ink)' }}
                             >
                               {word}
                             </button>

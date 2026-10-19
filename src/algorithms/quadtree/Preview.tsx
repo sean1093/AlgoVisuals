@@ -18,12 +18,12 @@ function QuadTreePreview({ className = '' }: { className?: string }) {
   return (
     <svg viewBox="-2 -2 104 104" className={className} aria-hidden="true">
       <rect x="0" y="0" width="100" height="100" rx="3" fill="none" stroke="currentColor" strokeOpacity="0.35" />
-      <rect x="75" y="0" width="25" height="25" fill="#3f6b5c" fillOpacity="0.12" />
+      <rect x="75" y="0" width="25" height="25" fill="var(--color-sage)" fillOpacity="0.12" />
       {LINES.map((d) => (
         <path key={d} d={d} stroke="currentColor" strokeOpacity="0.35" strokeWidth="0.8" />
       ))}
       {POINTS.map(([x, y]) => (
-        <circle key={`${x}-${y}`} cx={x} cy={y} r="2.2" fill="#3f6b5c" />
+        <circle key={`${x}-${y}`} cx={x} cy={y} r="2.2" fill="var(--color-sage)" />
       ))}
     </svg>
   );

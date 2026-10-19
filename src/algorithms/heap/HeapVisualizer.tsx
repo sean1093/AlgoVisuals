@@ -17,8 +17,8 @@ import { useI18n } from '../../i18n';
 import Rich from '../../components/shared/Rich';
 
 const { accent: ACCENT, soft: SOFT } = getCategory('structures').theme;
-const SWAP = '#c0553a';
-const SETTLED = '#3f6b5c';
+const SWAP = 'var(--color-clay)';
+const SETTLED = 'var(--color-sage)';
 const START = [12, 30, 18, 45, 37, 25, 60];
 const SPEEDS = [1400, 800, 380, 120];
 
@@ -41,7 +41,7 @@ function heapToDiagram(frame: HeapFrame) {
       depth: level,
       fill: colour,
       stroke: colour,
-      text: colour ? '#fff' : undefined,
+      text: colour ? 'var(--color-on-accent)' : undefined,
       caption: `[${i}]`,
     };
   });
@@ -170,7 +170,7 @@ function HeapVisualizer() {
                   >
                     <span
                       className="flex h-10 w-10 items-center justify-center rounded-lg border text-sm font-medium tabular-nums"
-                      style={colour ? { backgroundColor: colour, borderColor: colour, color: '#fff' } : { borderColor: '#e3ddd0', backgroundColor: '#fffdf8' }}
+                      style={colour ? { backgroundColor: colour, borderColor: colour, color: 'var(--color-on-accent)' } : { borderColor: 'var(--color-line)', backgroundColor: 'var(--color-card)' }}
                     >
                       {item.value}
                     </span>
